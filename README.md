@@ -9,7 +9,13 @@
 # 1、应用场景
 
 ## 简介
-> 啥，听说你用了springboot，但是开发的接口还在裸奔？快来试试这个easy-spring-boot-api吧，它也许是你想要找的神器！
+> 啥，听说你用了springboot，但是开发的接口还在裸奔？快来试试这个easy-spring-boot-api吧，服务器API开发神器，加签、验签、加解密、缓存、分布式锁、错误码管理、国际化、会话管理、接口文档等等功能一应俱全，且支持灵活自定义实现！
+>
+> 此项目已提供了java和TS版本客户端，让前后端开发人员真正聚焦业务功能，接口安全和接口规范交给EasyApi吧！
+>
+> java版本客户端就在此项目下：easy-spring-boot-api-client
+>
+> TS版本客户端地址：[https://github.com/pddon/easy-api-client](https://github.com/pddon/easy-api-client)
 
 * 神器亮相
 
