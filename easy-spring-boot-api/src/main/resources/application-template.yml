@@ -1,0 +1,58 @@
+spring.messages: 
+  basename: messages
+  useCodeAsDefaultMessage: false
+  fallbackToSystemLocale: false
+easyapi:
+  #全局默认配置
+  enable: true
+  enableSwagger: true
+  locale: "zh_CN"
+  alwaysUserDefaultLocale: true
+  basePackage: "com.pddon.framework.easyapi"
+  error: #错误码相关配置
+    #自定义系统错误码值,格式【枚举名 ：数值】
+    systemErrorCodes: 
+      #INVALID_METHOD: 404
+    #业务异常定义，格式【错误码多语言字典值 ：错误码指代的默认中文翻译描述信息】
+    businessCodeStart: 200001
+    businessCodeEnd: 999999
+    businessErrorCodes: 
+      #USER_ACCOUNT_NOT_FOUND.desc: "用户账号[{0}]未找到!"
+      #ACCOUNT_NOT_FOUND:
+      #  code: 200006
+      #  desc: "账户[{0}]未找到！"
+  api:
+    #业务接口api包名
+    swagger: 
+      #basePackage: "com.pddon.framework.easyapi.controller"
+      title: "业务API"
+      description: "所有业务接口列表"
+      termsOfServiceUrl: "www.pddon.cn"
+      contact: "service@pddon.com"
+      version: "v1.0.0"
+    #api请求系统参数配置
+    request: 
+      parameter: 
+        rename: 
+          #channelId: "buId"
+    #api响应系统参数配置
+    response:
+      field: 
+        rename: 
+          #code: "status"
+    #渠道、应用信息配置
+    channels:
+      android:
+        default:
+          enable: true
+          secret: "123456"
+          keyPair: 
+            privateSecret: ""
+            publicSecret: ""
+      ios: 
+        default: 
+          enable: true
+          secret: "12345678"  
+          keyPair:
+            privateSecret: ""
+            publicSecret: ""  
