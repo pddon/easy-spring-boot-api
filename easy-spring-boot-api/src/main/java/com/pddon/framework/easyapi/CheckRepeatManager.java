@@ -15,7 +15,6 @@ public interface CheckRepeatManager {
 	/**
 	 * 校验防重复提交码是否正确
 	 * @param key 防重码键值, 用户ID+时间戳 或者 sign值
-	 * @throws BusinessException
 	 */
 	void check(String key);
 	/**

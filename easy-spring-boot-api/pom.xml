@@ -3,10 +3,6 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-
-	<groupId>com.pddon.framework</groupId>
-	<artifactId>easy-spring-boot-api</artifactId>
-	<version>1.0.0.SNAPSHOT</version>
 	<parent>
 		<groupId>org.springframework.boot</groupId>
 		<artifactId>spring-boot-starter-parent</artifactId>
@@ -14,41 +10,61 @@
 		<relativePath /> <!-- lookup parent from repository -->
 	</parent>
 
+	<groupId>com.pddon.framework</groupId>
+	<artifactId>easy-spring-boot-api</artifactId>
+	<version>1.0.0</version>
 	<name>easy-spring-boot-api</name>
+	<description>easy-spring-boot-api是一款服务器API开发神器，基于springboot，可以做到零配置零代码即可集成所有api开发需要基础能力。，集成该项目后，不用自己再去处理api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、分布式锁、应用、渠道管理等等功能。 还提供了java和typescript版本的项目，极大简化了web或者其他客户端应用接入api服务的流程。</description>
 	<url>https://pddon.cn</url>
+
+	<developers>
+		<developer>
+			<name>Allen</name>
+			<email>Allen@pddon.com</email>
+			<organization>pddon</organization>
+			<organizationUrl>https://www.pddon.cn</organizationUrl>
+		</developer>
+	</developers>
+	<scm>
+		<connection>scm:git:git://github.com/pddon/easy-spring-boot-api.git</connection>
+		<developerConnection>scm:git:ssh://github.com:pddon/easy-spring-boot-api.git</developerConnection>
+		<url>https://github.com/pddon/easy-spring-boot-api/tree/master</url>
+	</scm>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
 
 	<!-- 定义公共变量 -->
 	<properties>
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 		<project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+		<maven.compiler.source>8</maven.compiler.source>
+		<maven.compiler.target>8</maven.compiler.target>
+		<skipTests>true</skipTests>
 		<gpg.executable>C:\Program Files (x86)\GnuPG\bin\gpg.exe</gpg.executable>
 		<java.version>1.8</java.version>
-		<aspectj.version>1.8.9</aspectj.version>
+		<aspectj.version>1.9.6</aspectj.version>
 		<cglib.version>3.1</cglib.version>
 		<swagger.version>2.9.2</swagger.version>
+		<knif4j.version>2.0.5</knif4j.version>
 		<logstash.version>5.0</logstash.version>
+		<commons-codec.version>1.14</commons-codec.version>
+		<springboot.version>2.3.12.RELEASE</springboot.version>
 	</properties>
-
-	<dependencyManagement>
-		<dependencies>
-			<dependency>
-				<groupId>com.github.xiaoymin</groupId>
-				<artifactId>knife4j-dependencies</artifactId>
-				<version>2.0.5</version>
-				<type>pom</type>
-				<scope>import</scope>
-			</dependency>
-		</dependencies>
-	</dependencyManagement>
 
 	<dependencies>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
+			<version>${springboot.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-web</artifactId>
+			<version>${springboot.version}</version>
 			<exclusions>
 				<exclusion>
 					<groupId>org.springframework.boot</groupId>
@@ -59,6 +75,7 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-undertow</artifactId>
+			<version>${springboot.version}</version>
 		</dependency>
 		<!-- 接口自动文档化依赖 -->
 		<!-- <dependency> <groupId>io.springfox</groupId> <artifactId>springfox-swagger2</artifactId> 
@@ -69,11 +86,13 @@
 		<dependency>
 			<groupId>com.github.xiaoymin</groupId>
 			<artifactId>knife4j-spring-boot-starter</artifactId>
+			<version>${knif4j.version}</version>
 		</dependency>
 		<!-- aspectJ -->
 		<dependency>
 			<groupId>org.aspectj</groupId>
 			<artifactId>aspectjweaver</artifactId>
+			<version>${aspectj.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>cglib</groupId>
@@ -83,16 +102,19 @@
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter</artifactId>
+			<version>${springboot.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-configuration-processor</artifactId>
+			<version>${springboot.version}</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>commons-codec</groupId>
 			<artifactId>commons-codec</artifactId>
+			<version>${commons-codec.version}</version>
 		</dependency>
 		<!-- logstash日志收集配置 -->
 		<dependency>
@@ -104,11 +126,13 @@
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
 			<optional>true</optional>
 		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
+			<version>${springboot.version}</version>
 			<scope>test</scope>
 		</dependency>
 	</dependencies>
@@ -127,6 +151,11 @@
 
 	<!-- 配置拉取远程项目发布包仓库地址信息 -->
 	<repositories>
+		<repository>
+			<id>central</id>
+			<name>central</name>
+			<url>https://central.sonatype.com/nexus/content/groups/public/</url>
+		</repository>
 		<repository>
 			<id>spring-milestones</id>
 			<name>Spring Milestones</name>
@@ -187,9 +216,9 @@
 			<url>http://oss.sonatype.org/content/groups/public</url>
 		</pluginRepository>
 	</pluginRepositories>
-
 	<build>
 		<plugins>
+			<!--
 			<plugin>
 				<groupId>org.sonatype.plugins</groupId>
 				<artifactId>nexus-staging-maven-plugin</artifactId>
@@ -204,6 +233,19 @@
 					<serverId>ossrh</serverId>
 					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
 					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			-->
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.4.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<tokenAuth>true</tokenAuth>
+					<checksums>required</checksums>
+					<autoPublish>true</autoPublish>
 				</configuration>
 			</plugin>
 			<!-- Source -->
@@ -243,7 +285,21 @@
 				</executions>
 			</plugin>
 			<!-- GPG -->
-			<!-- 
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-gpg-plugin</artifactId>

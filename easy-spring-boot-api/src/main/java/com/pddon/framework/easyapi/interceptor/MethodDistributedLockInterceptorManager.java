@@ -13,7 +13,6 @@ import com.pddon.framework.easyapi.LockDistributedManager;
 import com.pddon.framework.easyapi.annotation.LockDistributed;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.exception.BusinessException;
-import com.pddon.framework.easyapi.utils.*;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import com.pddon.framework.easyapi.utils.DistributedLockDaemonThreadUtil;
 import com.pddon.framework.easyapi.utils.MethdInvokeUtil;
@@ -91,10 +90,10 @@ public class MethodDistributedLockInterceptorManager implements MethodIntercepto
 				if(log.isTraceEnabled()){
 					log.trace("执行锁内业务成功[{}]-[{}]，执行解锁流程!", lockName, lockId);
 				}
-				this.lockDistributedManager.unlock(lockName, lockId);
 				if(thread != null){
 					thread.terminate();
 				}
+				this.lockDistributedManager.unlock(lockName, lockId);
 			}
 		}else{
 			log.warn("未找到分布式锁注解，请检查配置！");
@@ -135,7 +134,7 @@ public class MethodDistributedLockInterceptorManager implements MethodIntercepto
 		}
 		String id = nameValueMap.get(lockDistributed.id());
 		if(StringUtils.isBlank(id)){
-			log.warn("缓存参数配置错误，未找到参数信息:[{}]", lockDistributed.id());
+			log.warn("分布式锁注解上id参数设置错误，未找到参数信息:[{}]", lockDistributed.id());
 			throw new BusinessException(ErrorCodes.NOT_FOUND_CONFIG).setParam("分布式锁ID配置错误:"+lockDistributed.id());
 		}
 		StringBuffer key = new StringBuffer(prefix).append(":").append(id);

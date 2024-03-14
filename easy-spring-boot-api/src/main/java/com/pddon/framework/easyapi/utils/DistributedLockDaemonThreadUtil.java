@@ -1,10 +1,12 @@
 package com.pddon.framework.easyapi.utils;
 
 import com.pddon.framework.easyapi.LockDistributedManager;
+import lombok.extern.slf4j.Slf4j;
 
+@Slf4j
 public class DistributedLockDaemonThreadUtil {
     public static class DaemonRefreshThread extends Thread{
-        private final long startTimeSeconds;
+        private long startTimeSeconds;
         private LockDistributedManager lockDistributedManager;
         private String lockName;
         private String identifier;
@@ -30,15 +32,23 @@ public class DistributedLockDaemonThreadUtil {
                 try {
                     Thread.sleep(200);
                 } catch (InterruptedException e) {
-                    //
+                    Thread.interrupted();
                 }
                 long currentTimeSeconds = System.currentTimeMillis() / 1000;
                 long spendTimeSeconds = currentTimeSeconds - startTimeSeconds;
                 long maxLastTime = timeoutSeconds / 3;
                 if(timeoutSeconds - spendTimeSeconds < maxLastTime){
                     //刷新锁超时时间
-                    lockDistributedManager.refreshLock(lockName, identifier, timeoutSeconds);
+                    if(lockDistributedManager.refreshLock(lockName, identifier, timeoutSeconds)){
+                        //更新锁开始时间
+                        startTimeSeconds = System.currentTimeMillis() / 1000;
+                    }else{
+                        alive = false;
+                    }
                 }
+            }
+            if(log.isInfoEnabled()){
+                log.info("分布式锁[{}]守护线程结束!", lockName);
             }
         }
     }
