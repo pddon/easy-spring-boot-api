@@ -18,12 +18,6 @@
 >
 > TS版本客户端地址：[https://github.com/pddon/easy-api-client](https://github.com/pddon/easy-api-client)
 
-* 神器亮相
-
-    > springboot叫一键启动，easy-spring-boot-api为你的springboot项目插上翅膀，力求一键起飞！
-
-    ![easy-spring-boot-api logo](doc/imgs/logo.jpg)
-
 ## 1.1 项目架构说明
 ### 1.1.1 easy-spring-boot-api跟Springboot的关系
 
@@ -156,7 +150,7 @@
 
 * easy-spring-boot-api提供的业务功能有哪些呢？
 
-    > 那么请听我慢慢道来，其提供了如下业务功能：
+    > 其提供了如下业务功能：
     >
     > 1. 规范API请求参数，支持系统参数名自定义和系统参数的拓展，系统参数的校验等等
     > 2. 规范API响应参数，支持系统参数名自定义和添加额外的系统参数
@@ -181,11 +175,11 @@
 
 ## 2.1 项目模块介绍
 
-| 模块                         | 说明                                                         | 地址                                                         |
-| ---------------------------- | ------------------------------------------------------------ | ------------------------------------------------------------ |
-| easy-spring-boot-api              | 为springboot应用提供API业务增强解决方案                      | https://mvnrepository.com/artifact/com.pddon.framework/easy-spring-boot-api |
-| easy-spring-boot-api-demo         | EasyApi框架使用完整示例demo                               | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-demo |
-| easy-spring-boot-api-simple-demos | EasyApi框架简易demo集合，后续的使用示例尽量从单个项目包含单个特性去逐个演示 | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-simple-demos |
+| 模块                          | 说明                         | 地址                                                                                   |
+|-----------------------------|----------------------------|--------------------------------------------------------------------------------------|
+| easy-spring-boot-api        | 为springboot应用提供API业务增强解决方案 | https://mvnrepository.com/artifact/com.pddon.framework/easy-spring-boot-api          |
+| easy-spring-boot-api-demo   | EasyApi框架使用完整示例demo        | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-demo   |
+| easy-spring-boot-api-client | EasyApi框架java版客户端工具包       | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-client |
 
 ## 2.2 项目版本依赖
 
@@ -219,7 +213,7 @@
     │     │      └─pddon
     │     │          └─framework
     │     │              └─demo
-    │     │                  └─easy-spring-boot-api
+    │     │                  └─easyapi
     │     │                      ├─controller
     │     │                      │  │      
     │     │                      │  └─ TestController.java
@@ -507,12 +501,11 @@ public class StartDemoApplication {
 >
 > ​      如果在使用此框架的过程中有任何疑问或者好的建议可以通过以下联系方式找到大部队，大家一起交流一起进步！
 
-| 渠道        | 联系地址                                            | 说明                                              |
-| ----------- | --------------------------------------------------- | ------------------------------------------------- |
-| QQ群        | 757901536                                           | 可加QQ群，进行技术交流                            |
-| 邮箱号      | allen@pddon.com                                     | 有问题也可以发邮件留言                            |
-| 留言板      | http://www.pddon.com/blog/app/words/msgBoard.html   | 通过留言板留言                                    |
-| gitee Issue | https://gitee.com/pddon/easy-spring-boot-api/issues | 在使用过程中如果遇到问题，可以提Issue，不定时回复 |
-| 微信公众号  | ![淡远文摘](doc/imgs/wechatBlog.png)                | 关注公众号不迷路，不定期更新技术文章              |
+| 渠道        | 联系地址                                                 | 说明                          |
+| ----------- |------------------------------------------------------|-----------------------------|
+| QQ群        | 757901536                                            | 可加QQ群，进行技术交流                |
+| 邮箱号      | allen@pddon.com                                      | 有问题也可以发邮件留言                 |
+| gitee Issue | https://github.com/pddon/easy-spring-boot-api/issues | 在使用过程中如果遇到问题，可以提Issue，不定时回复 |
+| 微信公众号  | ![胖弟弟科技](doc/imgs/wechatBlog.png)                    | 关注公众号不迷路，不定期分享技术文章          |
 
 
