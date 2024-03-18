@@ -78,7 +78,8 @@ public class ApiResponseAspector implements ResponseBodyAdvice {
 	public boolean supports(MethodParameter returnType, Class converterType) {
 		// 只需要拦截我们配置的包名下的接口即可
 		Class<?> targetClass = RequestContext.getContext().getTargetClass();
-		
+
+
 		return ClassOriginCheckUtil.isBasePackagesChild(targetClass, config.getAllBasePackages());
 	}
 

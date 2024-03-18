@@ -36,14 +36,17 @@ import org.springframework.web.bind.annotation.RestController;
 import com.pddon.framework.easyapi.LanguageTranslateManager;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.context.RequestContext;
+import springfox.documentation.annotations.ApiIgnore;
 
 @Api(tags = "测试")
+@ApiIgnore
 @RestController
 public class CustomErrorController implements ErrorController{
 	@Autowired
 	private LanguageTranslateManager languageTranslateManager;
 	
 	@ApiOperation(value = "默认错误处理接口")
+	@ApiIgnore
     @RequestMapping("/error")
     public DefaultResponseWrapper<ErrorResponse> error(HttpServletRequest request, HttpServletResponse response){
 		
