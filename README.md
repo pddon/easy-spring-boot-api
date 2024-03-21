@@ -4,19 +4,28 @@
 
 **[Gitee源码地址：https://gitee.com/pddon/easy-spring-boot-api](https://gitee.com/pddon/easy-spring-boot-api)**
 
-**[演示地址：https://demo.pddon.cn/doc.html](http://www.pddon.com:8181/doc.html)**
+**[演示地址：https://demo.pddon.cn/doc.html(暂未部署)](http://www.pddon.com:8181/doc.html)**
 
 # 1、应用场景
 
 ## 简介
-> 啥，听说你用了springboot，但是开发的接口还在裸奔？快来试试这个easy-spring-boot-api吧，它是一款服务器API开发神器，基于springboot，可以做到零配置零代码即可集成所有api开发需要的常用基础能力。
-> 集成该项目后，不用自己再去处理api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、分布式锁、应用、渠道管理等等功能一应俱全，且支持灵活自定义实现！
+> 本项目是基于springboot的api接口开发框架，可用于构建OpenAPI、业务系统的接口服务器等等。其特点如下：
 >
-> 而且此项目已提供了java和TS版本客户端用于api使用者快速接入，让前后端开发人员真正聚焦业务功能，接口安全和接口规范交给EasyApi吧！
+> * 简化接口开发、接口对接工作
+> * 增强接口易用性、安全性
+> * 标准化接口请求/响应参数、格式、错误码、异常处理、国际化翻译、接口日志、接口调用频次控制
+> * 增加了一些通用功能支持（如：缓存、锁、防重提交、接口覆盖、会话控制等等）。
+> * 通过其提供的注解功能即可启用，可以做到零配置零代码即可集成常用api开发需要的所有基础能力。
+> * 支持常用api的灵活自定义实现，包括且不限于加签验签、加解密算法等等功能！
+> * 支持yaml配置启停各种预置功能
+> * 提供多种客户端包接入，现已提供java版本和Typescript版本客户端包
 >
-> java版本客户端就在此项目下：easy-spring-boot-api-client
+> 集成该项目后，不用再从零实现api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、会话、接口替换、分布式锁、应用、渠道管理等等功能。
 >
-> TS版本客户端地址：[https://github.com/pddon/easy-api-client](https://github.com/pddon/easy-api-client)
+> * java版本客户端就在此项目下：easy-spring-boot-api-client
+> * TS版本客户端地址：[https://github.com/pddon/easy-api-client](https://github.com/pddon/easy-api-client)
+>
+> 快速入门教程： https://github.com/pddon/easy-spring-boot-api/blob/main/doc/quickStart.md
 
 ## 1.1 项目架构说明
 ### 1.1.1 easy-spring-boot-api跟Springboot的关系
@@ -29,12 +38,12 @@
 
     * easy-spring-boot-api使用了springboot带来的所有便利，其在springmvc的基础上提供了额外的功能增强，如下图所示
 
-        ![easy-spring-boot-api业务流程图](doc/imgs/easy-spring-boot-api业务流程图.jpg)
+        ![easy-spring-boot-api业务流程图](doc/imgs/业务流程图.jpg)
 
 ### 1.1.2 easy-spring-boot-api项目组件架构解析
 * 架构图
 
-    ![easy-spring-boot-api内部组件架构图](doc/imgs/easy-spring-boot-api内部组件架构图.jpg)
+    ![easy-spring-boot-api内部组件架构图](doc/imgs/内部组件架构图.jpg)
 
 * 组件介绍
 
@@ -109,11 +118,15 @@
 
         > 提供注解标注方法是否需要启用分布式锁，解决接口并发问题
 
-     9. 自动接口文档生成器
+     9. 接口替换功能
 
-        > 已内置swagger+knif4j，只需指定API包路径即可实现接口文档的自动生成。
+        > 通过注解配置实现替换系统已有接口，拓展其功能，可用于一些基于标准项目的客开项目定制化开发
 
-     10. 其他更多功能就不一一赘述，等你来发现哦。。。。。。
+     10. 自动接口文档生成器
+
+         > 已内置swagger+knif4j，只需指定API包路径即可实现接口文档的自动生成。
+
+     11. 其他更多功能就不一一赘述，等你来发现哦。。。。。。
 
 ## 1.2 其他说明
 * 如果你有遇到如下困扰时，你也许可以尝试使用easy-spring-boot-api框架 
@@ -134,7 +147,7 @@
   >
   >8. 时常为了写接口文档而占用太多coding time，而且接口文档还无法实时与接口变更保持同步
 
-  > 现在你有福了，你只需要引入easy-spring-boot-api框架，并为你的SpringBoot应用添加`@Enableeasy-spring-boot-api`注解，即可解决上述所有的困扰！
+  > 现在你有福了，你只需要引入easy-spring-boot-api框架，并为你的SpringBoot应用添加`@EnableEasyApi`注解，即可解决上述所有的困扰！
 
 * easy-spring-boot-api为你默默做了哪些工作呢？
 
@@ -146,7 +159,7 @@
     > 一个字，那就是"爽"，让开发者爽，让接口使用者爽！
 
     * 规范web应用的API输入输出
-    * 简化开发人员的工作，节省研发成本，给开发者无微不至的关爱！
+    * 简化开发人员的工作，节省研发成本！
 
 * easy-spring-boot-api提供的业务功能有哪些呢？
 
@@ -163,23 +176,24 @@
     > 9. 简单方便的缓存管理器，使用Guava cache作为默认的本地缓存管理器，支持缓存管理器的灵活拓展，提供`@CacheMethodResult`和`@CacheMethodResultEvict`注解实现方法接口结果的缓存和失效
     > 10. 接口安全相关组件，验签、加解密、防重复提交等等，使用时只需要为你的API添加一个注解即可搞定
     > 11. 接口会话管理机制，提供Guava cache实现的默认本地会话管理器，支持业务灵活定制以支持分布式会话管理
-    > 12. 接口文档化支持，提供了swagger接口文档自动生成，并整合了knife4j提供简单易用的实时api文档
+    > 12. 接口文档化支持，提供了swagger接口文档自动生成，并整合了knife4j提供简单易用的实时api文档，支持在线调试和多种格式的离线导出
     > 13. 接口调用日志打印，提供对接口请求参数信息、接口响应信息的简要打印，预留了接口调用日志持久化机制，用于业务方定制流量监控相关功能
-    > 14. web容器性能参数优化（迭代加）
-    > 15. 接口实时流量监控和管理（迭代加）
-    > 16. 更细粒度的接口访问权限控制（迭代加），主要为应用提供简洁易用的内置权限管理组件
-    > 17. 日志采集功能的集成支持（迭代加）
-    > 18. devops的支持（迭代加）
+    > 14. 更多分布式缓存、数据存储相关功能(迭代加)
+    > 15. web容器性能参数优化（迭代加）
+    > 16. 接口实时流量监控和管理（迭代加）
+    > 17. 更细粒度的接口访问权限控制（迭代加），主要为应用提供简洁易用的内置权限管理组件
+    > 18. 日志采集功能的集成支持（迭代加）
+    > 19. devops的支持（迭代加）
 
 # 2、项目模块
 
 ## 2.1 项目模块介绍
 
-| 模块                          | 说明                         | 地址                                                                                   |
-|-----------------------------|----------------------------|--------------------------------------------------------------------------------------|
-| easy-spring-boot-api        | 为springboot应用提供API业务增强解决方案 | https://mvnrepository.com/artifact/com.pddon.framework/easy-spring-boot-api          |
-| easy-spring-boot-api-demo   | EasyApi框架使用完整示例demo        | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-demo   |
-| easy-spring-boot-api-client | EasyApi框架java版客户端工具包       | https://gitee.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-client |
+| 模块                        | 说明                                    | 地址                                                         |
+| --------------------------- | --------------------------------------- | ------------------------------------------------------------ |
+| easy-spring-boot-api        | 为springboot应用提供API业务增强解决方案 | https://mvnrepository.com/artifact/com.pddon.framework/easy-spring-boot-api |
+| easy-spring-boot-api-demo   | EasyApi框架使用完整示例demo             | https://github.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-demo |
+| easy-spring-boot-api-client | EasyApi框架java版客户端工具包           | https://github.com/pddon/easy-spring-boot-api/tree/master/easy-spring-boot-api-client |
 
 ## 2.2 项目版本依赖
 
