@@ -14,6 +14,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.properties.EasyApiConfig;
 import com.pddon.framework.easyapi.properties.ResponseSystemFieldRenameProperties;
@@ -114,7 +115,8 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 	 * @throws JsonProcessingException 
 	 */
 	private Map<String, Object> baseResponseWrapper(Object resp) throws JsonProcessingException, IOException {
-		ObjectMapper mapper = new ObjectMapper(); 
+		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		JsonNode json = mapper.readTree(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp));
 		Map<String, Object> map = new HashMap<>();
 		if(RequestContext.getContext().getResponseWrapper() != null){//系统签名为

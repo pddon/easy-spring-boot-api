@@ -42,7 +42,11 @@ public class DefaultSignManagerImpl implements SignManager{
 				if(value.getClass().isEnum()){
 					value = ((Enum)value).name();
 				}
-				nameValueMap.putAll(BeanPropertyUtil.objToStringMap(value, null, IgnoreSign.class));
+				String key = null;
+				if(BeanPropertyUtil.isBaseType(value)){
+					key = param.getParamName();
+				}
+				nameValueMap.putAll(BeanPropertyUtil.objToStringMap(value, key, IgnoreSign.class));
 			}
 		}
 		//按key进行字符串自然序排序后，进行拼接

@@ -14,6 +14,7 @@ import java.io.IOException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pddon.framework.easyapi.properties.EasyApiConfig;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import lombok.extern.slf4j.Slf4j;
@@ -106,7 +107,8 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
                         }
                     	try{
                         	// 解析json                
-                        	ObjectMapper mapper = new ObjectMapper(); 
+                        	ObjectMapper mapper = new ObjectMapper();
+							mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
                         	JsonNode json = mapper.readTree(body);
                         	SystemParameterRenameProperties.DEFAULT_PARAM_MAP.keySet().stream().forEach(key -> {
                             	String paramName = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(key);

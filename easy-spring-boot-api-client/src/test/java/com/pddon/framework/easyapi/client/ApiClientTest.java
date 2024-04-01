@@ -34,7 +34,7 @@ public class ApiClientTest {
     private static ApiClient client;
     @BeforeClass
     public static void init(){
-        client = ApiClient.newInstance(ApplicationConfig.builder()
+        /*client = ApiClient.newInstance(ApplicationConfig.builder()
                         .appId("webApp")
                         .baseUrl("http://localhost:8282/test/")
                         .channelId("default")
@@ -42,7 +42,16 @@ public class ApiClientTest {
                         .secret("NKVNcuwwEF76622A")
                         .privateSecret("")
                         .publicSecret("")
-                        .build());
+                        .build());*/
+        client = ApiClient.newInstance(ApplicationConfig.builder()
+                .appId("pddon-payment-demo")
+                .baseUrl("http://localhost:8989/payment/")
+                .channelId("local_test")
+                .locale("zh_CN")
+                .secret("NKVNcuwwEF3sc22A")
+                .privateSecret("")
+                .publicSecret("")
+                .build());
     }
 
     @Test

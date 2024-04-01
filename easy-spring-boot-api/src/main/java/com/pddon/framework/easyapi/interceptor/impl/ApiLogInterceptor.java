@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.List;
 import java.util.Map;
 
+import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.BeanUtils;
@@ -56,6 +57,7 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 		}
 		
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		Map<String, Object> systemParams = RequestContext.getContext().getAttachments();
 		String paramValues = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(systemParams);		
 		ApiInvokeLog apiLog = mapper.readValue(paramValues, ApiInvokeLog.class);
@@ -86,6 +88,7 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 		}
 		ApiInfo info = RequestContext.getContext().getApiInfo();
 		ObjectMapper mapper = new ObjectMapper();
+		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		// 序列化 
 	    String respStr = null;
 	    if(resp != null){	    	
@@ -104,6 +107,7 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 	public static String objectArrToJSONString(List<ApiRequestParameter> arr){
 		if(arr != null && arr.size() > 0){
 			ObjectMapper mapper = new ObjectMapper();
+			mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 			StringBuffer buffer = new StringBuffer();
 			for(ApiRequestParameter param : arr){
 				try {
