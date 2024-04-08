@@ -13,14 +13,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.exception.handler.CommonExceptionHandler;
 import org.springframework.stereotype.Service;
 import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 
 import com.pddon.framework.easyapi.consts.ErrorCodes;
-import com.pddon.framework.easyapi.exception.handler.AbstractCommonExceptionHandler;
 
 @Service
-public class ParamFormatExceptionHandler extends AbstractCommonExceptionHandler {
+public class ParamFormatExceptionHandler implements CommonExceptionHandler {
 	
 	/**
 	 * @author danyuan

@@ -16,10 +16,8 @@ import java.util.stream.Collectors;
 import com.pddon.framework.easyapi.consts.CacheKeyMode;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
-import com.pddon.framework.easyapi.consts.ErrorCodes;
-import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
-import com.pddon.framework.easyapi.utils.MethdInvokeUtil;
+import com.pddon.framework.easyapi.utils.MethodInvokeUtil;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
@@ -53,7 +51,7 @@ public class MethodCacheManager {
 		int i = 0;
 		String paramName = "";
 		for(Object param : args){
-			paramName = MethdInvokeUtil.getBaseTypeParamName(method.getParameterAnnotations()[i]);
+			paramName = MethodInvokeUtil.getBaseTypeParamName(method.getParameterAnnotations()[i]);
 			if(StringUtils.isBlank(paramName)){
 				if(parameters != null){
 					paramName = parameters[i];

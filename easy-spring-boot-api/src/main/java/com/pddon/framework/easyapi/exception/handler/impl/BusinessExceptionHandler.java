@@ -12,6 +12,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.exception.handler.CommonExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,11 +23,10 @@ import com.pddon.framework.easyapi.LanguageTranslateManager;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.exception.BusinessException;
-import com.pddon.framework.easyapi.exception.handler.AbstractCommonExceptionHandler;
 
 @Service
 @Slf4j
-public class BusinessExceptionHandler extends AbstractCommonExceptionHandler {
+public class BusinessExceptionHandler implements CommonExceptionHandler {
 
 	@Autowired
 	private LanguageTranslateManager languageTranslateManager;

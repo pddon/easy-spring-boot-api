@@ -20,6 +20,7 @@ import javax.validation.ConstraintViolationException;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.controller.response.ErrorInfo;
 import com.pddon.framework.easyapi.controller.response.ErrorResponse;
+import com.pddon.framework.easyapi.exception.handler.CommonExceptionHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.BindException;
@@ -30,10 +31,9 @@ import org.springframework.web.bind.MissingServletRequestParameterException;
 import com.pddon.framework.easyapi.LanguageTranslateManager;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.context.RequestContext;
-import com.pddon.framework.easyapi.exception.handler.AbstractCommonExceptionHandler;
 
 @Service
-public class InvalidationExceptionHandler extends AbstractCommonExceptionHandler {
+public class InvalidationExceptionHandler implements CommonExceptionHandler {
 
 	@Autowired
 	private LanguageTranslateManager languageTranslateManager;

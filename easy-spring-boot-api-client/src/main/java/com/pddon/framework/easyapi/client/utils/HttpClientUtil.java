@@ -2,7 +2,8 @@ package com.pddon.framework.easyapi.client.utils;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
-import com.pddon.framework.easyapi.client.exception.BusinessException;
+import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;

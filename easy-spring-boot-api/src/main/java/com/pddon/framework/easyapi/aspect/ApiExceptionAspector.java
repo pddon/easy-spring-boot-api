@@ -9,8 +9,7 @@
 package com.pddon.framework.easyapi.aspect;
 
 import java.lang.reflect.UndeclaredThrowableException;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -41,17 +40,11 @@ import com.pddon.framework.easyapi.utils.IOUtils;
 @Slf4j
 public class ApiExceptionAspector implements HandlerExceptionResolver{
 
-	private static Set<CommonExceptionHandler> handlers = new HashSet<>();
+	@Autowired
+	private List<CommonExceptionHandler> handlers;
 	
 	@Autowired
 	private DefaultExceptionHandler defaultExceptionHandler;
-
-	/**
-	 * @author danyuan
-	 */
-	public static void addHandler(CommonExceptionHandler handler) {
-		handlers.add(handler);
-	}
 
 	@ExceptionHandler
 	public DefaultResponseWrapper<?> resolveRestControllerException(HttpServletRequest request,

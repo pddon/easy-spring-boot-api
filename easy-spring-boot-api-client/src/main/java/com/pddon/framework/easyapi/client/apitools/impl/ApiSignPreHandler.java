@@ -3,10 +3,10 @@ package com.pddon.framework.easyapi.client.apitools.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
-import com.pddon.framework.easyapi.client.config.SystemParameterRenameManager;
+import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.client.utils.BeanPropertyUtil;
-import com.pddon.framework.easyapi.client.utils.EncryptUtils;
+import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -49,8 +49,8 @@ public class ApiSignPreHandler implements ApiPreHandler {
         String timestamp = String.valueOf(System.currentTimeMillis());
         String data = timestamp + content + timestamp;
         String sign = EncryptUtils.encryptSHA1Hex(config.getSecret(), data);
-        paramMap.put(SystemParameterRenameManager.getSysParamName(SystemParameterRenameManager.SIGN), sign);
-        paramMap.put(SystemParameterRenameManager.getSysParamName(SystemParameterRenameManager.TIMESTAMP), timestamp);
+        paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.SIGN), sign);
+        paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.TIMESTAMP), timestamp);
         return paramMap;
     }
 }

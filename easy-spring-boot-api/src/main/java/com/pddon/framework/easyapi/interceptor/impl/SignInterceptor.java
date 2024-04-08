@@ -12,6 +12,7 @@ import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.List;
 
+import com.pddon.framework.easyapi.dto.SecretInfo;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -23,7 +24,6 @@ import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.dto.ApiRequestParameter;
-import com.pddon.framework.easyapi.dto.SecretInfo;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.interceptor.AbstractApiMethodInterceptor;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
@@ -49,7 +49,7 @@ public class SignInterceptor extends AbstractApiMethodInterceptor {
 		if(log.isTraceEnabled()){
 			log.trace("开始校验接口数字签名信息！");
 		}
-		SecretInfo secret = secretManager.load(RequestContext.getContext().getChannelId(), 				
+		SecretInfo secret = secretManager.load(RequestContext.getContext().getChannelId(),
 				RequestContext.getContext().getAppId(), 
 				RequestContext.getContext().getSecretId(), 
 				RequestContext.getContext().getUserId(), 

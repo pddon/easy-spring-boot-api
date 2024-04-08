@@ -3,11 +3,11 @@ package com.pddon.framework.easyapi.client.apitools.impl;
 import com.pddon.framework.easyapi.client.apitools.ApiAfterHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.client.consts.ErrorCodes;
-import com.pddon.framework.easyapi.client.exception.BusinessException;
-import com.pddon.framework.easyapi.client.response.DefaultResponseWrapper;
-import com.pddon.framework.easyapi.client.utils.BeanPropertyUtil;
-import com.pddon.framework.easyapi.client.utils.EncryptUtils;
+import com.pddon.framework.easyapi.consts.ErrorCodes;
+import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -46,6 +46,7 @@ public class ApiCheckSignAfterHandler implements ApiAfterHandler {
         content = timestamp + content + timestamp;
         String sign = EncryptUtils.encryptSHA1Hex(config.getSecret(), content);
         if(!sign.equalsIgnoreCase(response.getSign())){
+            log.warn("content: {}", content);
             throw new BusinessException(ErrorCodes.ERROR_SIGN.getCode(), ErrorCodes.ERROR_SIGN.getMsgCode());
         }
         return response;

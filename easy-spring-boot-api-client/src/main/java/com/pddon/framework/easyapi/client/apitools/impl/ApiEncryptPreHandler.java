@@ -3,7 +3,7 @@ package com.pddon.framework.easyapi.client.apitools.impl;
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.client.utils.EncryptUtils;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

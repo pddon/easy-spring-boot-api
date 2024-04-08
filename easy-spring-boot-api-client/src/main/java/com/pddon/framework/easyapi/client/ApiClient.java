@@ -5,7 +5,7 @@ import com.pddon.framework.easyapi.client.apitools.*;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.client.consts.HttpMethod;
-import com.pddon.framework.easyapi.client.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.client.methods.CloseableHttpResponse;

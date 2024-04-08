@@ -4,38 +4,15 @@
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
 	<parent>
-		<groupId>org.springframework.boot</groupId>
-		<artifactId>spring-boot-starter-parent</artifactId>
-		<version>2.3.12.RELEASE</version>
-		<relativePath /> <!-- lookup parent from repository -->
+		<groupId>com.pddon.framework</groupId>
+		<artifactId>easy-spring-boot-api-parent</artifactId>
+		<version>1.0.2</version>
 	</parent>
 
-	<groupId>com.pddon.framework</groupId>
 	<artifactId>easy-spring-boot-api</artifactId>
-	<version>1.0.2</version>
 	<name>easy-spring-boot-api</name>
 	<description>easy-spring-boot-api是一款服务器API开发神器，基于springboot，可以做到零配置零代码即可集成所有api开发需要基础能力。，集成该项目后，不用自己再去处理api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、分布式锁、应用、渠道管理等等功能。 还提供了java和typescript版本的项目，极大简化了web或者其他客户端应用接入api服务的流程。</description>
 	<url>https://pddon.cn</url>
-
-	<developers>
-		<developer>
-			<name>Allen</name>
-			<email>Allen@pddon.com</email>
-			<organization>pddon</organization>
-			<organizationUrl>https://www.pddon.cn</organizationUrl>
-		</developer>
-	</developers>
-	<scm>
-		<connection>scm:git:git://github.com/pddon/easy-spring-boot-api.git</connection>
-		<developerConnection>scm:git:ssh://github.com:pddon/easy-spring-boot-api.git</developerConnection>
-		<url>https://github.com/pddon/easy-spring-boot-api/tree/master</url>
-	</scm>
-	<licenses>
-		<license>
-			<name>MIT License</name>
-			<url>http://www.opensource.org/licenses/mit-license.php</url>
-		</license>
-	</licenses>
 
 	<!-- 定义公共变量 -->
 	<properties>
@@ -44,18 +21,14 @@
 		<maven.compiler.source>8</maven.compiler.source>
 		<maven.compiler.target>8</maven.compiler.target>
 		<skipTests>true</skipTests>
-		<gpg.executable>C:\Program Files (x86)\GnuPG\bin\gpg.exe</gpg.executable>
-		<java.version>1.8</java.version>
-		<aspectj.version>1.9.6</aspectj.version>
-		<cglib.version>3.1</cglib.version>
-		<swagger.version>1.5.22</swagger.version>
-		<knif4j.version>3.0.3</knif4j.version>
-		<logstash.version>5.0</logstash.version>
-		<commons-codec.version>1.14</commons-codec.version>
-		<springboot.version>2.3.12.RELEASE</springboot.version>
 	</properties>
 
 	<dependencies>
+		<dependency>
+			<groupId>com.pddon.framework</groupId>
+			<artifactId>easy-spring-boot-api-base</artifactId>
+			<version>${project.version}</version>
+		</dependency>
 		<dependency>
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-validation</artifactId>
@@ -160,85 +133,6 @@
 		</dependency>
 	</dependencies>
 
-	<!-- 配置部署本项目发布包的远程仓库 -->
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-
-	<!-- 配置拉取远程项目发布包仓库地址信息 -->
-	<repositories>
-		<repository>
-			<id>central</id>
-			<name>central</name>
-			<url>https://central.sonatype.com/nexus/content/groups/public/</url>
-		</repository>
-		<repository>
-			<id>spring-milestones</id>
-			<name>Spring Milestones</name>
-			<url>https://repo.spring.io/milestone</url>
-		</repository>
-		<repository>
-			<id>Sonatype</id>
-			<name>Sonatype Repository</name>
-			<url>http://repository.sonatype.org/content/groups/public</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>Central</id>
-			<name>Central Repository</name>
-			<url>http://repo1.maven.org/maven2</url>
-			<layout>default</layout>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>false</enabled>
-			</snapshots>
-		</repository>
-		<repository>
-			<id>public</id>
-			<name>Public Repositories</name>
-			<url>http://www.danyuanblog.com:8082/nexus/content/groups/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</repository>
-	</repositories>
-
-	<pluginRepositories>
-		<pluginRepository>
-			<id>public</id>
-			<name>Public Repositories</name>
-			<url>http://www.danyuanblog.com:8082/nexus/content/groups/public</url>
-			<releases>
-				<enabled>true</enabled>
-			</releases>
-			<snapshots>
-				<enabled>true</enabled>
-			</snapshots>
-		</pluginRepository>
-		<pluginRepository>
-			<name>oss.sonatype.org</name>
-			<id>oss.sonatype.org</id>
-			<url>http://oss.sonatype.org/content/groups/public</url>
-		</pluginRepository>
-	</pluginRepositories>
 	<build>
 		<plugins>
 			<!--

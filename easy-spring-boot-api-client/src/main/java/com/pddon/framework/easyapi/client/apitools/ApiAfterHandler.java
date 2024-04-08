@@ -2,7 +2,7 @@ package com.pddon.framework.easyapi.client.apitools;
 
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.client.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 
 /**
  * @ClassName: ApiAfterHandler

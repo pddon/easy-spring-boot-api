@@ -38,7 +38,7 @@ import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dto.ApiInfo;
 import com.pddon.framework.easyapi.dto.ApiRequestParameter;
 import com.pddon.framework.easyapi.utils.ClassOriginCheckUtil;
-import com.pddon.framework.easyapi.utils.MethdInvokeUtil;
+import com.pddon.framework.easyapi.utils.MethodInvokeUtil;
 
 @Component
 @Slf4j
@@ -117,10 +117,10 @@ public class ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 	    //参数注解，1维是参数，2维是注解
         Annotation[][] annotations = method.getParameterAnnotations();
         //获取参数
-		List<ApiRequestParameter> params = MethdInvokeUtil.parseParameters(paramNames, args, annotations, methodAnnos);
+		List<ApiRequestParameter> params = MethodInvokeUtil.parseParameters(paramNames, args, annotations, methodAnnos);
 	    
 	    //获取接口信息
-	    HttpServletRequest request = RequestContext.getContext().getRequest();
+	    HttpServletRequest request = (HttpServletRequest)RequestContext.getContext().getRequest();
 	    HandlerMethod handler = RequestContext.getContext().getHandler();
 	    String controllerName = handler.getBeanType().getName();
 	    controllerName = controllerName.substring(controllerName.lastIndexOf(".") + 1);

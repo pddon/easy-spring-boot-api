@@ -2,9 +2,9 @@ package com.pddon.framework.easyapi.client.apitools;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
-import com.pddon.framework.easyapi.client.exception.BusinessException;
-import com.pddon.framework.easyapi.client.response.DefaultResponseWrapper;
-import com.pddon.framework.easyapi.client.utils.IOUtils;
+import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;

@@ -133,7 +133,7 @@ public class ApiInvokeAspector {
 			List<ApiRequestParameter> params = parseParameters(parameterNames, args, annotations, methodAnnos);
 		    
 		    //获取接口信息
-		    HttpServletRequest request = RequestContext.getContext().getRequest();
+		    HttpServletRequest request = (HttpServletRequest)RequestContext.getContext().getRequest();
 		    HandlerMethod handler = RequestContext.getContext().getHandler();
 		    String controllerName = handler.getBeanType().getName();
 		    controllerName = controllerName.substring(controllerName.lastIndexOf(".") + 1);

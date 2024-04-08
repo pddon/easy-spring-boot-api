@@ -2,7 +2,7 @@ package com.pddon.framework.easyapi.client.apitools;
 
 import cn.hutool.core.bean.BeanUtil;
 import cn.hutool.json.JSONUtil;
-import com.pddon.framework.easyapi.client.utils.IOUtils;
+import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.http.HttpEntity;
 import org.apache.http.NameValuePair;

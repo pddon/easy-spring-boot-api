@@ -4,10 +4,10 @@ import cn.hutool.core.collection.CollectionUtil;
 import com.pddon.framework.easyapi.client.apitools.ApiAfterHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.client.response.DefaultResponseWrapper;
-import com.pddon.framework.easyapi.client.utils.BeanPropertyUtil;
-import com.pddon.framework.easyapi.client.utils.EncryptUtils;
-import com.pddon.framework.easyapi.client.utils.IOUtils;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
+import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 

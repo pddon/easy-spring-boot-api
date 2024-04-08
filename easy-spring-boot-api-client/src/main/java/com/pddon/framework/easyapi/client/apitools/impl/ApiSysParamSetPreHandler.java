@@ -2,8 +2,8 @@ package com.pddon.framework.easyapi.client.apitools.impl;
 
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
-import com.pddon.framework.easyapi.client.config.SystemParameterRenameManager;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
+import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Component;
 
@@ -27,9 +27,9 @@ public class ApiSysParamSetPreHandler implements ApiPreHandler {
 
     @Override
     public Map<String, Object> handle(ApiInfo apiInfo, Map<String, Object> paramMap, ApplicationConfig config, Map<String, Object> headers) {
-        paramMap.put(SystemParameterRenameManager.getSysParamName(SystemParameterRenameManager.APP_ID), config.getAppId());
-        paramMap.put(SystemParameterRenameManager.getSysParamName(SystemParameterRenameManager.CHANNEL_ID), config.getChannelId());
-        paramMap.put(SystemParameterRenameManager.getSysParamName(SystemParameterRenameManager.LOCALE), config.getLocale());
+        paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.APP_ID), config.getAppId());
+        paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.CHANNEL_ID), config.getChannelId());
+        paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.LOCALE), config.getLocale());
         headers.put("Accept", "application/json");
         return paramMap;
     }
