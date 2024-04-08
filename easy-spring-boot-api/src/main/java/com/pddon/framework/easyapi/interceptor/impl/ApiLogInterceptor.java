@@ -46,6 +46,8 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 	private static String INVOKE_RESPONSE_LOG = "接口响应：{}({}【{}】),版本号:{},请求参数：[{}],响应参数：{}";
 	@Autowired
 	private InvokeApiLogManager invokeApiLogManager;
+	@Autowired
+	private ObjectMapper objectMapper;
 	/**
 	 * @author danyuan
 	 */
@@ -56,11 +58,11 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 			log.trace("开始打印调用接口入参！");
 		}
 		
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		//ObjectMapper mapper = new ObjectMapper();
+		//objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		Map<String, Object> systemParams = RequestContext.getContext().getAttachments();
-		String paramValues = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(systemParams);		
-		ApiInvokeLog apiLog = mapper.readValue(paramValues, ApiInvokeLog.class);
+		String paramValues = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(systemParams);
+		ApiInvokeLog apiLog = objectMapper.readValue(paramValues, ApiInvokeLog.class);
 		BeanUtils.copyProperties(RequestContext.getContext().getApiInfo(), apiLog);	
 		invokeApiLogManager.save(apiLog);
 		ApiInfo info = RequestContext.getContext().getApiInfo();
@@ -87,12 +89,12 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 			log.trace("开始打印调用接口返回信息！");
 		}
 		ApiInfo info = RequestContext.getContext().getApiInfo();
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		//ObjectMapper mapper = new ObjectMapper();
+		//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 		// 序列化 
 	    String respStr = null;
 	    if(resp != null){	    	
-	    	respStr = mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp);
+	    	respStr = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp);
 	    	if(respStr.length() > MAX_RESP_LOG_SIZE){
 	    		respStr = respStr.substring(0, MAX_RESP_LOG_SIZE) + RESPONSE_TAIL;
 	    	}
@@ -104,14 +106,14 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 		log.info(INVOKE_RESPONSE_LOG, info.getApiName(), info.getApiUri(), info.getApiMethod(), info.getApiVersion(), reqStr, respStr);
 	}
 
-	public static String objectArrToJSONString(List<ApiRequestParameter> arr){
+	public String objectArrToJSONString(List<ApiRequestParameter> arr){
 		if(arr != null && arr.size() > 0){
-			ObjectMapper mapper = new ObjectMapper();
-			mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+			//ObjectMapper mapper = new ObjectMapper();
+			//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 			StringBuffer buffer = new StringBuffer();
 			for(ApiRequestParameter param : arr){
 				try {
-					buffer.append(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(param.getParam())).append(",");
+					buffer.append(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(param.getParam())).append(",");
 				} catch (JsonProcessingException e) {
 					if(log.isTraceEnabled()){
 						log.trace(IOUtils.getThrowableInfo(e));

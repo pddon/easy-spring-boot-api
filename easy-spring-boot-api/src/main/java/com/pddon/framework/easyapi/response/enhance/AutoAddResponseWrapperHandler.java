@@ -39,6 +39,9 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 	
 	@Autowired
 	private EasyApiConfig easyApiConfig;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	/**
 	 * @author danyuan
@@ -115,9 +118,9 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 	 * @throws JsonProcessingException 
 	 */
 	private Map<String, Object> baseResponseWrapper(Object resp) throws JsonProcessingException, IOException {
-		ObjectMapper mapper = new ObjectMapper();
-		mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		JsonNode json = mapper.readTree(mapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp));
+		//ObjectMapper mapper = new ObjectMapper();
+		//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+		JsonNode json = objectMapper.readTree(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp));
 		Map<String, Object> map = new HashMap<>();
 		if(RequestContext.getContext().getResponseWrapper() != null){//系统签名为
 			map.put(responseWrapperProperties.getSign(), RequestContext.getContext().getResponseWrapper().getSign());

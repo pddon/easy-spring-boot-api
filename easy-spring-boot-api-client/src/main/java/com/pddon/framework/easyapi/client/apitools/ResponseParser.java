@@ -2,6 +2,10 @@ package com.pddon.framework.easyapi.client.apitools;
 
 import cn.hutool.json.JSONObject;
 import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.IOUtils;
@@ -10,8 +14,12 @@ import org.apache.http.HttpEntity;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
+import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.IOException;
+import java.lang.reflect.Type;
 
 /**
  * @ClassName: ResponseParser
@@ -21,16 +29,43 @@ import java.io.IOException;
  * @Addr: https://pddon.cn
  */
 @Slf4j
+@Component
 public class ResponseParser {
 
-    public static <T> DefaultResponseWrapper<T> parseResponse(String data, Class<T> tClass){
-        JSONObject json = JSONUtil.parseObj(data);
 
+    private static ObjectMapper mapper;
+
+    @Autowired
+    public ResponseParser(ObjectMapper objectMapper){
+        mapper = objectMapper;
+    }
+
+    public static <T> DefaultResponseWrapper<T> parseResponse(String data, Class<T> tClass){
+        //ObjectMapper mapper = new ObjectMapper().findAndRegisterModules();;
+        //mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+        DefaultResponseWrapper<T> wrapper = null;
+        try {
+            Type[] types = new Type[1];
+            types[0] = tClass;
+            final ParameterizedTypeImpl type = ParameterizedTypeImpl.make(DefaultResponseWrapper.class, types,
+                    DefaultResponseWrapper.class.getDeclaringClass());
+            TypeReference<DefaultResponseWrapper> typeReference = new TypeReference<DefaultResponseWrapper>() {
+                @Override
+                public Type getType() {
+                    return type;
+                }
+            };
+            wrapper = mapper.readValue(data, typeReference);
+        } catch (JsonProcessingException e) {
+            log.warn(IOUtils.getThrowableInfo(e));
+            throw new BusinessException("反序列化响应数据失败!");
+        }
+        /*JSONObject json = JSONUtil.parseObj(data);
         DefaultResponseWrapper<T> wrapper = json.toBean(DefaultResponseWrapper.class);
         if(json.containsKey("data")){
             T response = JSONUtil.parseObj(json.get("data")).toBean(tClass);
             wrapper.setData(response);
-        }
+        }*/
         return wrapper;
     }
 

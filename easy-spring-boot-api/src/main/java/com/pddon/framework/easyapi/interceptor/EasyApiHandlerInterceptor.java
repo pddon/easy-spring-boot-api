@@ -43,6 +43,9 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 	
 	@Autowired
 	private EasyApiConfig easyApiConfig;
+
+	@Autowired
+	private ObjectMapper objectMapper;
 	
 	@Override
 	public boolean preHandle(HttpServletRequest request,
@@ -107,9 +110,9 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
                         }
                     	try{
                         	// 解析json                
-                        	ObjectMapper mapper = new ObjectMapper();
-							mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-                        	JsonNode json = mapper.readTree(body);
+                        	//ObjectMapper mapper = new ObjectMapper();
+							//objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
+                        	JsonNode json = objectMapper.readTree(body);
                         	SystemParameterRenameProperties.DEFAULT_PARAM_MAP.keySet().stream().forEach(key -> {
                             	String paramName = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(key);
                             	if(json.has(paramName)){

@@ -93,11 +93,13 @@ public class BeanPropertyUtil {
                         if(!StringUtils.isEmpty(parentKey)){
                     		currentKey = parentKey + "." + key;
                     	}
-                        if(isBaseType(val)){
-                        	resultMap.put(currentKey, val.toString());
-                        }else if(val instanceof Serializable){
-                        	resultMap.putAll(objToStringMap(val, currentKey, hashCodeSet, ignoreAnno));
-                        }
+						if(val != null){
+							if(isBaseType(val)){
+								resultMap.put(currentKey, val.toString());
+							}else if(val instanceof Serializable){
+								resultMap.putAll(objToStringMap(val, currentKey, hashCodeSet, ignoreAnno));
+							}
+						}
                     }
                 }
             }else if(object.getClass().isArray() && !isIgnoreType(object.getClass().getComponentType())){//数组
@@ -108,7 +110,9 @@ public class BeanPropertyUtil {
                 	if(!StringUtils.isEmpty(parentKey)){
                 		currentKey = parentKey+"["+String.valueOf(i)+"]";
                 	}
-                	resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					if(subObj != null){
+						resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					}
             	}
             }else if(object instanceof List<?>){//List集合
             	List<Object> list = (List<Object>)object;
@@ -118,7 +122,9 @@ public class BeanPropertyUtil {
                 	if(!StringUtils.isEmpty(parentKey)){
                 		currentKey = parentKey+"["+String.valueOf(i)+"]";
                 	}
-                	resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					if(subObj != null){
+						resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					}
             	}            	      	
             }else if(object instanceof Set<?>){//Set集合
             	Set<Object> set = (Set<Object>)object;
@@ -129,7 +135,9 @@ public class BeanPropertyUtil {
                 	if(!StringUtils.isEmpty(parentKey)){
                 		currentKey = parentKey+"["+String.valueOf(i++)+"]";
                 	}
-                	resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));           		
+					if(subObj != null){
+						resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					}
             	} 
             	set.removeAll(set);
             	set.addAll(newSet);
@@ -158,7 +166,9 @@ public class BeanPropertyUtil {
                     	if(!StringUtils.isEmpty(parentKey)){
                     		currentKey = parentKey+"."+currentKey;
                     	}
-                    	resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+						if(subObj != null){
+							resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+						}
                 	}                	
                 }
             } 
@@ -225,32 +235,38 @@ public class BeanPropertyUtil {
             	Object[] arr = (Object[]) object;            	
             	for(int i=0; i<arr.length; i++){
             		Object subObj = arr[i];
-            		try{
-                		arr[i]=decorateObj(fieldName + i, subObj, allAnnos, fun, hashCodeSet);
-                	}catch(Exception e){
-                		log.warn(e.getMessage());
-                	}             		
+					if(subObj != null){
+						try{
+							arr[i]=decorateObj(fieldName + i, subObj, allAnnos, fun, hashCodeSet);
+						}catch(Exception e){
+							log.warn(e.getMessage());
+						}
+					}
             	}
             }else if(object instanceof List<?>){//List集合
             	List<Object> list = (List<Object>)object;
             	for(int i=0; i < list.size(); i++){
             		Object subObj = list.get(i);
-            		try{
-                		list.set(i, decorateObj(fieldName + i, subObj, allAnnos, fun, hashCodeSet));
-                	}catch(Exception e){
-                		log.warn(e.getMessage());
-                	}             		
+					if(subObj != null){
+						try{
+							list.set(i, decorateObj(fieldName + i, subObj, allAnnos, fun, hashCodeSet));
+						}catch(Exception e){
+							log.warn(e.getMessage());
+						}
+					}
             	}            	      	
             }else if(object instanceof Set<?>){//Set集合
             	Set<Object> set = (Set<Object>)object;
             	Set<Object> newSet = new HashSet<Object>();
             	int i = 0;
             	for(Object subObj : set){
-            		try{
-            			newSet.add(decorateObj(fieldName + i++, subObj, allAnnos, fun, hashCodeSet));
-                	}catch(Exception e){
-                		log.warn(e.getMessage());
-                	}             		
+					if(subObj != null){
+						try{
+							newSet.add(decorateObj(fieldName + i++, subObj, allAnnos, fun, hashCodeSet));
+						}catch(Exception e){
+							log.warn(e.getMessage());
+						}
+					}
             	} 
             	set.removeAll(set);
             	set.addAll(newSet);
@@ -266,12 +282,14 @@ public class BeanPropertyUtil {
                 			for(Annotation anno : fieldAnnos){
 								allFieldAnnos.put(anno.annotationType(), anno);
                 			}
-                		}   
-                    	try{
-                    		field.set(object, decorateObj(field.getName(), subObj, allFieldAnnos, fun, hashCodeSet));
-                    	}catch(Exception e){
-                    		log.warn(e.getMessage());
-                    	}
+                		}
+						if(subObj != null){
+							try{
+								field.set(object, decorateObj(field.getName(), subObj, allFieldAnnos, fun, hashCodeSet));
+							}catch(Exception e){
+								log.warn(e.getMessage());
+							}
+						}
                 	}                	
                 }
             } 
