@@ -1,7 +1,5 @@
 package com.pddon.framework.easyapi.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -16,13 +14,6 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 public class BaseApplicationConfig extends BaseEntity {
-
-    /**
-     * 记录ID
-     * @author pddon.com
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
 
     /**
      * 应用所属渠道ID
