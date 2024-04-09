@@ -24,7 +24,8 @@
         <module>easy-spring-boot-api-client</module>
 		<module>easy-spring-boot-api-demo</module>
 		<module>easy-spring-boot-api-dao</module>
-	</modules>
+        <module>easy-spring-boot-api-service</module>
+    </modules>
 
 	<!-- 定义公共变量 -->
 	<properties>
@@ -46,6 +47,9 @@
 		<mybatis.plus.version>3.1.0</mybatis.plus.version>
 		<mysql.connector.version>5.1.41</mysql.connector.version>
 		<jedis.version>2.8.0</jedis.version>
+		<hutool.version>5.8.11</hutool.version>
+		<commons-io.version>2.11.0</commons-io.version>
+		<guava.version>27.0.1-android</guava.version>
 	</properties>
 
 	<dependencies>

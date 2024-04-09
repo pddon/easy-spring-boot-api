@@ -9,23 +9,24 @@
         <version>1.0.2</version>
     </parent>
 
-    <artifactId>easy-spring-boot-api-client</artifactId>
-    <name>easy-spring-boot-api-client</name>
-    <description>easy-spring-boot-api-client是easy-spring-boot-api开源api框架的java客户端，可以极大简化您的客户端API调用流程。</description>
+    <artifactId>easy-spring-boot-api-service</artifactId>
+    <name>easy-spring-boot-api-service</name>
+    <description>easy-spring-boot-api是一款服务器API开发神器，基于springboot，可以做到零配置零代码即可集成所有api开发需要基础能力。，集成该项目后，不用自己再去处理api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、分布式锁、应用、渠道管理等等功能。 还提供了java和typescript版本的项目，极大简化了web或者其他客户端应用接入api服务的流程。</description>
     <url>https://pddon.cn</url>
 
+    <!-- 定义公共变量 -->
     <properties>
-        <maven.compiler.source>8</maven.compiler.source>
-        <maven.compiler.target>8</maven.compiler.target>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+        <maven.compiler.source>8</maven.compiler.source>
+        <maven.compiler.target>8</maven.compiler.target>
         <skipTests>true</skipTests>
-        <java.version>1.8</java.version>
     </properties>
+
     <dependencies>
         <dependency>
             <groupId>com.pddon.framework</groupId>
-            <artifactId>easy-spring-boot-api-base</artifactId>
+            <artifactId>easy-spring-boot-api-dao</artifactId>
             <version>${project.version}</version>
         </dependency>
         <dependency>
@@ -39,18 +40,12 @@
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-json</artifactId>
-            <scope>compile</scope>
+            <artifactId>spring-boot-starter-mail</artifactId>
         </dependency>
         <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-autoconfigure</artifactId>
-            <scope>compile</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-logging</artifactId>
-            <scope>compile</scope>
+            <groupId>commons-io</groupId>
+            <artifactId>commons-io</artifactId>
+            <version>${commons-io.version}</version>
         </dependency>
     </dependencies>
 
