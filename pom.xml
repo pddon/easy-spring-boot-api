@@ -23,7 +23,8 @@
 		<module>easy-spring-boot-api</module>
         <module>easy-spring-boot-api-client</module>
 		<module>easy-spring-boot-api-demo</module>
-    </modules>
+		<module>easy-spring-boot-api-dao</module>
+	</modules>
 
 	<!-- 定义公共变量 -->
 	<properties>
@@ -41,7 +42,27 @@
 		<logstash.version>5.0</logstash.version>
 		<commons-codec.version>1.14</commons-codec.version>
 		<springboot.version>2.3.12.RELEASE</springboot.version>
+		<druid.version>1.1.12</druid.version>
+		<mybatis.plus.version>3.1.0</mybatis.plus.version>
+		<mysql.connector.version>5.1.41</mysql.connector.version>
+		<jedis.version>2.8.0</jedis.version>
 	</properties>
+
+	<dependencies>
+		<!-- Log libs end -->
+		<dependency>
+			<groupId>org.projectlombok</groupId>
+			<artifactId>lombok</artifactId>
+			<version>1.18.20</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-test</artifactId>
+			<version>${springboot.version}</version>
+			<scope>test</scope>
+		</dependency>
+	</dependencies>
 
 	<developers>
 		<developer>
@@ -142,4 +163,105 @@
 			<url>http://oss.sonatype.org/content/groups/public</url>
 		</pluginRepository>
 	</pluginRepositories>
+
+	<build>
+		<plugins>
+			<!--
+			<plugin>
+				<groupId>org.sonatype.plugins</groupId>
+				<artifactId>nexus-staging-maven-plugin</artifactId>
+				<version>1.6.7</version>
+				<extensions>true</extensions>
+				<executions>
+					<execution>
+						<phase>deploy</phase>
+					</execution>
+				</executions>
+				<configuration>
+					<serverId>ossrh</serverId>
+					<nexusUrl>https://oss.sonatype.org/</nexusUrl>
+					<autoReleaseAfterClose>true</autoReleaseAfterClose>
+				</configuration>
+			</plugin>
+			-->
+			<plugin>
+				<groupId>org.sonatype.central</groupId>
+				<artifactId>central-publishing-maven-plugin</artifactId>
+				<version>0.4.0</version>
+				<extensions>true</extensions>
+				<configuration>
+					<publishingServerId>central</publishingServerId>
+					<tokenAuth>true</tokenAuth>
+					<checksums>required</checksums>
+					<autoPublish>true</autoPublish>
+				</configuration>
+			</plugin>
+			<!-- Source -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-source-plugin</artifactId>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar-no-fork</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- Javadoc -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-javadoc-plugin</artifactId>
+				<version>2.10.4</version>
+				<configuration>
+					<show>private</show>
+					<nohelp>true</nohelp>
+					<charset>UTF-8</charset>
+					<encoding>UTF-8</encoding>
+					<docencoding>UTF-8</docencoding>
+					<!-- 防止文档不规范报错 -->
+					<additionalparam>-Xdoclint:none</additionalparam>
+				</configuration>
+				<executions>
+					<execution>
+						<phase>package</phase>
+						<goals>
+							<goal>jar</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!-- GPG -->
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>3.0.1</version>
+				<executions>
+					<execution>
+						<id>sign-artifacts</id>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			<!--
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-gpg-plugin</artifactId>
+				<version>1.6</version>
+				<executions>
+					<execution>
+						<phase>verify</phase>
+						<goals>
+							<goal>sign</goal>
+						</goals>
+					</execution>
+				</executions>
+			</plugin>
+			 -->
+		</plugins>
+	</build>
 </project>

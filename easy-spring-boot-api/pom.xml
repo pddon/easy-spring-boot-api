@@ -118,19 +118,6 @@
 			<artifactId>logstash-logback-encoder</artifactId>
 			<version>${logstash.version}</version>
 		</dependency>
-		<!-- Log libs end -->
-		<dependency>
-			<groupId>org.projectlombok</groupId>
-			<artifactId>lombok</artifactId>
-			<version>1.18.20</version>
-			<optional>true</optional>
-		</dependency>
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<version>${springboot.version}</version>
-			<scope>test</scope>
-		</dependency>
 	</dependencies>
 
 	<build>
