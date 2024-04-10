@@ -6,6 +6,7 @@ easyapi:
   #全局默认配置
   enable: true
   enableSwagger: true
+  enablePersistSession: false
   locale: "zh_CN"
   alwaysUserDefaultLocale: true
   basePackage: "com.pddon.framework.easyapi"

@@ -24,6 +24,7 @@ public enum DefaultConfigPropertiesValue {
 	,EASYAPI_DEFAULT_LOG_LEVEL("logging.level.com.pddon.framework.easyapi","INFO", DefaultConfigValueMode.OPTION)
 	,EASYAPI_ENABLE("easyapi.enable",true, DefaultConfigValueMode.OPTION)
 	,EASYAPI_ENABLE_SWAGGER("easyapi.enableSwagger",true, DefaultConfigValueMode.OPTION)
+	,EASYAPI_ENABLE_PERSIST_SESSION("easyapi.enablePersistSession",false, DefaultConfigValueMode.OPTION)
 	,SRPRING_MSG_USE_CODE_AS_DEFAULT_MESSAGE("spring.messages.useCodeAsDefaultMessage",false, DefaultConfigValueMode.FORCE_DEFAULT)
 	,SRPRING_MSG_FALLBACK_TO_SYSTEM_LOCALE("spring.messages.fallbackToSystemLocale",false, DefaultConfigValueMode.FORCE_DEFAULT)
 	,KNIFE4J_BASIC_ENABLE("knife4j.basic.enable",true, DefaultConfigValueMode.OPTION)
