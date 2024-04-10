@@ -25,7 +25,7 @@ easyapi:
   #根包名集合,以逗号分隔
   basePackages: "com.pddon.framework.demo.easyapi"
   #是否在控制台打印所有配置信息
-  #printAllProperties: true
+  printAllProperties: true
   error: #错误码相关配置
     #自定义系统错误码值,格式【枚举名 ：数值】
     systemErrorCodes:

@@ -26,6 +26,13 @@ public enum DefaultConfigPropertiesValue {
 	,EASYAPI_ENABLE_SWAGGER("easyapi.enableSwagger",true, DefaultConfigValueMode.OPTION)
 	,SRPRING_MSG_USE_CODE_AS_DEFAULT_MESSAGE("spring.messages.useCodeAsDefaultMessage",false, DefaultConfigValueMode.FORCE_DEFAULT)
 	,SRPRING_MSG_FALLBACK_TO_SYSTEM_LOCALE("spring.messages.fallbackToSystemLocale",false, DefaultConfigValueMode.FORCE_DEFAULT)
+	,KNIFE4J_BASIC_ENABLE("knife4j.basic.enable",true, DefaultConfigValueMode.OPTION)
+	,KNIFE4J_ENABLE("knife4j.enable",true, DefaultConfigValueMode.OPTION)
+	,KNIFE4J_BASIC_USERNAME("knife4j.basic.username","develop", DefaultConfigValueMode.OPTION)
+	,KNIFE4J_BASIC_PASSWORD("knife4j.basic.password","pddon", DefaultConfigValueMode.OPTION)
+	,KNIFE4J_DOCUMENTS_0_GROUP("knife4j.documents[0].group","使用说明文档", DefaultConfigValueMode.OPTION)
+	,KNIFE4J_DOCUMENTS_0_NAME("knife4j.documents[0].name","全局通用接口调用说明", DefaultConfigValueMode.OPTION)
+	,KNIFE4J_DOCUMENTS_0_LOCATIONS("knife4j.documents[0].locations","classpath*:markdown/*", DefaultConfigValueMode.OPTION)
 	;
 	private String key;
 	

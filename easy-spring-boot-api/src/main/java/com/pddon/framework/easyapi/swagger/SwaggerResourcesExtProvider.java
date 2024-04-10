@@ -22,16 +22,16 @@ import java.util.*;
 @Component
 @Qualifier("swaggerResourcesExtProvider")
 public class SwaggerResourcesExtProvider  {
-    private final String swagger2Url;
+    private final String swagger3Url;
 
-    boolean swagger2Available;
+    boolean swagger3Available;
 
     private final DocumentationCache documentationCache;
 
     @Autowired
     public SwaggerResourcesExtProvider(Environment environment, DocumentationCache documentationCache) {
-        swagger2Url = environment.getProperty("springfox.documentation.swagger.v2.path", "/v2/api-docs");
-        swagger2Available = true;
+        swagger3Url = environment.getProperty("springfox.documentation.swagger.v3.path", "/v3/api-docs");
+        swagger3Available = true;
         this.documentationCache = documentationCache;
     }
 
@@ -43,9 +43,9 @@ public class SwaggerResourcesExtProvider  {
             Documentation documentation=entry.getValue();
             List<VendorExtension> vendorExtensions=documentation.getVendorExtensions();
 
-            if (swagger2Available) {
-                OrderedSwaggerResource swaggerResource = resource(swaggerGroup, swagger2Url,vendorExtensions);
-                swaggerResource.setSwaggerVersion("2.0");
+            if (swagger3Available) {
+                OrderedSwaggerResource swaggerResource = resource(swaggerGroup, swagger3Url, vendorExtensions);
+                swaggerResource.setSwaggerVersion("3.0");
                 resources.add(swaggerResource);
             }
         }
