@@ -3,10 +3,12 @@ package com.pddon.framework.easyapi.client.apitools.impl;
 import cn.hutool.core.collection.CollectionUtil;
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
+import com.pddon.framework.easyapi.encrypt.SignEncryptHandler;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import com.pddon.framework.easyapi.utils.EncryptUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -22,6 +24,9 @@ import java.util.stream.Collectors;
  */
 @Component
 public class ApiSignPreHandler implements ApiPreHandler {
+
+    @Autowired
+    private SignEncryptHandler signEncryptHandler;
 
     @Override
     public int order() {
@@ -44,11 +49,16 @@ public class ApiSignPreHandler implements ApiPreHandler {
                     .filter(key -> !apiInfo.getIgnoreSignParams().contains(key))
                     .collect(Collectors.toMap(key -> key, key -> map.get(key)));
         }
+        //剔除系统参数
+        final Map<String, String> map = nameValueMap;
+        nameValueMap = nameValueMap.keySet().stream()
+                .filter(key -> !SystemParameterRenameProperties.DEFAULT_PARAM_MAP.containsKey(key))
+                .collect(Collectors.toMap(key->key, key -> map.get(key)));
         //按key进行字符串自然序排序后，进行拼接
         String content = EncryptUtils.sortAndMontage(nameValueMap);
         String timestamp = String.valueOf(System.currentTimeMillis());
         String data = timestamp + content + timestamp;
-        String sign = EncryptUtils.encryptSHA1Hex(config.getSecret(), data);
+        String sign = signEncryptHandler.sign(config.getSecret(), data);
         paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.SIGN), sign);
         paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.TIMESTAMP), timestamp);
         return paramMap;

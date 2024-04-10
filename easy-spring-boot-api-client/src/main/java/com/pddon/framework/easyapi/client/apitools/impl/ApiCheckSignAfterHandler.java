@@ -4,11 +4,13 @@ import com.pddon.framework.easyapi.client.apitools.ApiAfterHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
+import com.pddon.framework.easyapi.encrypt.SignEncryptHandler;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import com.pddon.framework.easyapi.utils.EncryptUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
@@ -24,6 +26,10 @@ import java.util.Map;
 @Component
 @Slf4j
 public class ApiCheckSignAfterHandler implements ApiAfterHandler {
+
+    @Autowired
+    private SignEncryptHandler signEncryptHandler;
+
     @Override
     public int order() {
         return -2;//验签处理器最先执行
@@ -44,7 +50,7 @@ public class ApiCheckSignAfterHandler implements ApiAfterHandler {
         String content = EncryptUtils.sortAndMontage(nameValueMap);
         String timestamp = response.getTimestamp() != null ? response.getTimestamp().toString() : "";
         content = timestamp + content + timestamp;
-        String sign = EncryptUtils.encryptSHA1Hex(config.getSecret(), content);
+        String sign = signEncryptHandler.sign(config.getSecret(), content);
         if(!sign.equalsIgnoreCase(response.getSign())){
             log.warn("content: {}", content);
             throw new BusinessException(ErrorCodes.ERROR_SIGN.getCode(), ErrorCodes.ERROR_SIGN.getMsgCode());
