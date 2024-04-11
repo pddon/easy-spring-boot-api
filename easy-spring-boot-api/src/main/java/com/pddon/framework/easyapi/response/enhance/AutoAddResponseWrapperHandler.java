@@ -101,7 +101,7 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 		//去除空字段
 		if(map != null){
 			//添加其他系统响应参数
-			map.putAll(RequestContext.getContext().getResonseSystemParams());
+			map.putAll(RequestContext.getContext().getResponseSystemParams());
 			for(Iterator<Map.Entry<String, Object>> it = map.entrySet().iterator(); it.hasNext();){
 				if(it.next().getValue() == null){
 					it.remove();

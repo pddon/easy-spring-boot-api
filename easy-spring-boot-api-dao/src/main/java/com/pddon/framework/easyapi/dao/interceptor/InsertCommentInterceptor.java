@@ -3,11 +3,12 @@ package com.pddon.framework.easyapi.dao.interceptor;
 import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.entity.BaseEntity;
+import com.pddon.framework.easyapi.dao.entity.BaseTenantEntity;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
 import org.apache.ibatis.plugin.*;
-import org.springframework.util.StringUtils;
 
 import java.util.Date;
 import java.util.Map;
@@ -38,6 +39,13 @@ public class InsertCommentInterceptor extends SqlExplainInterceptor implements I
             if(!StringUtils.isEmpty(userId)){
                 entity.setCrtUserId(userId);
             }
+            /*if(param instanceof BaseTenantEntity){
+                BaseTenantEntity tenantEntity = (BaseTenantEntity) param;
+                String tenantId = RequestContext.getContext().getChannelId();
+                if(StringUtils.isEmpty(tenantEntity.getTenantId()) && StringUtils.isNotEmpty(tenantId)){
+                    tenantEntity.setTenantId(tenantId);
+                }
+            }*/
         }else if(param instanceof Map) {
             Map map = (Map) param;
             map.put("crtTime", new Date());

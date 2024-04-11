@@ -8,21 +8,34 @@
  */
 package com.pddon.framework.easyapi.dao.config;
 
+import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
+import com.baomidou.mybatisplus.core.parser.ISqlParser;
 import com.baomidou.mybatisplus.extension.injector.LogicSqlInjector;
 import com.baomidou.mybatisplus.extension.plugins.IllegalSQLInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
+import com.baomidou.mybatisplus.extension.plugins.tenant.TenantHandler;
+import com.baomidou.mybatisplus.extension.plugins.tenant.TenantSqlParser;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.interceptor.InsertCommentInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.RenameCacheKeyInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.UpdateCommentInterceptor;
+import com.pddon.framework.easyapi.dao.tenant.EasyApiTenantHandler;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.StringValue;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Configuration
 @Slf4j
 public class MybatisPlusConfig {
+
 	/**
 	 * 逻辑删除插件
 	 * @return
@@ -34,14 +47,25 @@ public class MybatisPlusConfig {
 		return new LogicSqlInjector();
 	}
 	/**
-     * 分页插件
+     * 分页和多租户插件
      * @return
 	 * @author allen
      */
     @Bean
     public PaginationInterceptor paginationInterceptor() {
     	log.info("Init Pagination Plugin ...");
-        return new PaginationInterceptor().setDialectType("mysql");
+		PaginationInterceptor paginationInterceptor = new PaginationInterceptor().setDialectType("mysql");
+		// 创建SQL解析器，会对sql进行拦截处理。
+		TenantSqlParser tenantSqlParser = new TenantSqlParser();
+		tenantSqlParser.setTenantHandler(new EasyApiTenantHandler());
+
+		// 创建SQL解析器集合
+		List<ISqlParser> sqlParserList = new ArrayList<>();
+		sqlParserList.add(tenantSqlParser);
+
+		// 设置SQL解析器集合
+		paginationInterceptor.setSqlParserList(sqlParserList);
+        return paginationInterceptor;
     }
     /**
      * 乐观锁插件

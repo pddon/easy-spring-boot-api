@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.controller.utils;
 
 import com.pddon.framework.easyapi.annotation.ReplaceRoute;
+import com.pddon.framework.easyapi.utils.AnnotationClassUtils;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -24,33 +25,10 @@ import java.util.*;
 public class ReplaceRouteUtil {
     private static Map<String, String> routerMap = new HashMap<>();
 
-    static List<Class<?>> getAllClassByAnnotation(String packageName, Class<? extends Annotation> tClass){
-        // 创建扫描器
-        ClassPathScanningCandidateComponentProvider provider =
-                new ClassPathScanningCandidateComponentProvider(false);
-        // 添加注解过滤器，这里以@Service为例
-        provider.addIncludeFilter(new AnnotationTypeFilter(tClass));
-        // 设置扫描的基础包，这里以com.example为例
-        provider.setResourceLoader(null);
-
-        List<Class<?>> scanClassList = new ArrayList<>();
-        // 获取扫描到的类名
-        Set<BeanDefinition> candidateComponents = provider.findCandidateComponents(packageName);
-        for (BeanDefinition beanDef : candidateComponents) {
-            Class<?> cls = null;
-            try {
-                cls = Class.forName(beanDef.getBeanClassName());
-            } catch (ClassNotFoundException e) {
-                log.warn(IOUtils.getThrowableInfo(e));
-            }
-            scanClassList.add(cls);
-        }
-        return scanClassList;
-    }
     public static void initRoute(List<String> packageList) {
         List<Class<?>> scanClassList = new ArrayList<>();
         for (String packageName : packageList) {
-            scanClassList.addAll(getAllClassByAnnotation(packageName, ReplaceRoute.class));
+            scanClassList.addAll(AnnotationClassUtils.getAllClassByAnnotation(packageName, ReplaceRoute.class));
         }
         
         for (Class clazz : scanClassList) {

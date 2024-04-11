@@ -13,13 +13,7 @@ import lombok.experimental.Accessors;
 @Setter
 @ToString
 @Accessors(chain=true)
-public class BaseApplicationConfig extends BaseEntity {
-
-    /**
-     * 应用所属渠道ID
-     * @author pddon.com
-     */
-    private String channelId;
+public class BaseApplicationConfig extends BaseTenantEntity {
 
     /**
      * 应用ID

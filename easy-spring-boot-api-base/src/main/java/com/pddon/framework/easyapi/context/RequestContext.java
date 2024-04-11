@@ -63,6 +63,10 @@ public class RequestContext {
      */
     private Session session;
     /**
+     * 是否忽略多租户条件
+     */
+    private boolean ignoreTenant = false;
+    /**
 	 * 对响应信息进行数字签名的结果
 	 */
 	private DefaultResponseWrapper<?> responseWrapper;
@@ -70,7 +74,7 @@ public class RequestContext {
 	/**
 	 * 额外的系统响应参数
 	 */
-	private Map<String, Object> resonseSystemParams = new HashMap<>();
+	private Map<String, Object> responseSystemParams = new HashMap<>();
 	
     /**
      * 附带属性
@@ -99,7 +103,7 @@ public class RequestContext {
     
     public void clear() {
         this.attachments.clear(); 
-        this.resonseSystemParams.clear();
+        this.responseSystemParams.clear();
         this.targetClass = null;
         this.apiRestrictions = null;
         this.apiInfo = null;
@@ -176,7 +180,7 @@ public class RequestContext {
      * @author danyuan
      */
     public void setResonseSystemParamValue(String key, Object value){
-    	resonseSystemParams.put(key, value);
+    	responseSystemParams.put(key, value);
     }
     
     /**
@@ -184,7 +188,7 @@ public class RequestContext {
      * @author danyuan
      */
     public Object getResonseSystemParamValue(String key){
-    	return resonseSystemParams.get(key);
+    	return responseSystemParams.get(key);
     }
 
 	

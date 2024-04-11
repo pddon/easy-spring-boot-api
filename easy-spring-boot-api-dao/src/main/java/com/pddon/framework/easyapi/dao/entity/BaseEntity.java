@@ -11,7 +11,6 @@ import java.util.Date;
 @Data
 @Accessors(chain=true)
 public class BaseEntity implements Serializable {
-
     /**
      * 版本号，用于乐观锁控制
      * @author pddon.com
