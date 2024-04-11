@@ -20,7 +20,8 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 //添加mybatis插件支持，包含乐观锁、逻辑删除、分页等插件，引入redis配置、druid连接池配置
-@Import({MybatisPlusConfig.class, RedisConfig.class, DruidConfig.class})
+//@Import({MybatisPlusConfig.class, RedisConfig.class, DruidConfig.class})
+@Import({MybatisPlusConfig.class, RedisConfig.class}) //支持多数据源后移除单druid数据源配置
 public @interface EnableEasyApiDao {
     
 }

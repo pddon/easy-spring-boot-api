@@ -21,6 +21,10 @@
         <maven.compiler.source>8</maven.compiler.source>
         <maven.compiler.target>8</maven.compiler.target>
         <skipTests>true</skipTests>
+        <mybatis.plus.version>3.1.0</mybatis.plus.version>
+        <mysql.connector.version>8.0.17</mysql.connector.version>
+        <dynamic-datasource.version>2.5.4</dynamic-datasource.version>
+        <druid.starter.version>1.2.3</druid.starter.version>
     </properties>
 
     <dependencies>
@@ -37,8 +41,13 @@
         <!-- relation db begin -->
         <dependency>
             <groupId>com.alibaba</groupId>
-            <artifactId>druid</artifactId>
-            <version>${druid.version}</version>
+            <artifactId>druid-spring-boot-starter</artifactId>
+            <version>${druid.starter.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>dynamic-datasource-spring-boot-starter</artifactId>
+            <version>${dynamic-datasource.version}</version>
         </dependency>
         <dependency>
             <groupId>com.baomidou</groupId>

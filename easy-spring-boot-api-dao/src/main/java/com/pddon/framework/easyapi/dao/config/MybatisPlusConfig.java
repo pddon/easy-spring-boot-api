@@ -10,6 +10,7 @@ package com.pddon.framework.easyapi.dao.config;
 
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.extension.injector.LogicSqlInjector;
+import com.baomidou.mybatisplus.extension.plugins.IllegalSQLInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.OptimisticLockerInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.InsertCommentInterceptor;
@@ -52,6 +53,16 @@ public class MybatisPlusConfig {
     	log.info("Init OptimisticLocker Plugin ...");
         return new OptimisticLockerInterceptor();
     }
+	/**
+	 * 非法SQL拦截
+	 * @return
+	 * @author allen
+	 */
+	//@Bean
+	public IllegalSQLInterceptor illegalSQLInterceptor() {
+		log.info("Init IllegalSQLInterceptor Plugin ...");
+		return new IllegalSQLInterceptor();
+	}
 
 	@Bean
 	public UpdateCommentInterceptor updateCommentInterceptor() {

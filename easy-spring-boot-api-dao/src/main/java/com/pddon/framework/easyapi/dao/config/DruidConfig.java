@@ -25,10 +25,11 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.util.Arrays;
 
-@Configuration
+//@Configuration
 @Data
 @Slf4j
-@ConditionalOnClass(DruidDataSource.class)
+//@ConditionalOnClass(DruidDataSource.class)
+@Deprecated
 public class DruidConfig {
 
     @Value("${spring.datasource.url}")
