@@ -102,12 +102,12 @@ public class TestParamAndResponseInvalidController {
 			name="测试设置系统响应参数")
 	@ApiOperation(value="测试设置系统响应参数", notes="测试设置系统响应参数")
 	public void testAddSystemResponseParams() {
-		RequestContext.getContext().setResonseSystemParamValue("traceId", "0001");
+		RequestContext.getContext().setResponseSystemParamValue("traceId", "0001");
 		ParamsCheckDto dto = new ParamsCheckDto();
 		dto.setAccount("111222");
 		dto.setAge(25);
 		dto.setEmail("xxx");
 		dto.setLikes(Arrays.asList("football","watch movie","swiming","book"));
-		RequestContext.getContext().setResonseSystemParamValue("userInfo", dto);
+		RequestContext.getContext().setResponseSystemParamValue("userInfo", dto);
 	}
 }

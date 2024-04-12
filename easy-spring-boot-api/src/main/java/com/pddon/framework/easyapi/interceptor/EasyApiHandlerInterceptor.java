@@ -19,6 +19,7 @@ import com.pddon.framework.easyapi.properties.EasyApiConfig;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import lombok.extern.slf4j.Slf4j;
 
+import org.slf4j.MDC;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.http.MediaType;
@@ -73,7 +74,18 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 					//throw new ApiBusinessException(ErrorCodes.INVALID_METHOD).setParam(request.getRequestURI());
 				}
 			}
-					
+			//设置日志中的requestId
+			String requestId = request.getHeader("X-Trace-Id");
+			if(StringUtils.isEmpty(requestId)){
+				requestId = request.getHeader("X-Request-Id");
+			}
+			if(!StringUtils.isEmpty(requestId)){
+				String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.REQUEST_ID);
+				RequestContext.getContext().setAttachment(key, requestId);
+			}else{
+				requestId = RequestContext.getContext().getRequestId();
+			}
+			MDC.put("requestId", requestId);
 		}
 		
 		return HandlerInterceptor.super.preHandle(request, response, handler);
@@ -140,6 +152,8 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
+		//增加链路追踪ID返回
+		response.addHeader("X-Request-Id", RequestContext.getContext().getRequestId());
 		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);
 	}
 	

@@ -8,6 +8,7 @@
 */ 
 package com.pddon.framework.easyapi.annotation;
 
+import com.pddon.framework.easyapi.config.EasyApiAsyncConfigurer;
 import org.springframework.context.annotation.Import;
 
 import com.pddon.framework.easyapi.config.EasyApiBeanConfigurer;
@@ -20,7 +21,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({EasyApiWebConfigurer.class, EasyApiSwaggerConfigurer.class, EasyApiBeanConfigurer.class})
+@Import({EasyApiWebConfigurer.class, EasyApiSwaggerConfigurer.class, EasyApiBeanConfigurer.class, EasyApiAsyncConfigurer.class})
 public @interface EnableEasyApi {
     
 }

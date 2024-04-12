@@ -24,6 +24,7 @@ public class SystemParameterRenameProperties implements InitializingBean{
 	public static final Map<String, String> DEFAULT_PARAM_MAP = new HashMap<>();
 	
 	public static final String SECRET_ID = "secretId";
+	public static final String REQUEST_ID = "requestId";
 	public static final String APP_ID = "appId";
 	public static final String CHANNEL_ID = "channelId";
 	public static final String SESSION_ID = "sessionId";
@@ -38,7 +39,11 @@ public class SystemParameterRenameProperties implements InitializingBean{
 	public static final String TIME_ZONE = "timeZone";
 	public static final String CLIENT_ID = "clientId";
 	public static final String CLIENT_IP = "clientIp";
-	
+
+	/**
+	 * 接口调用链追踪ID，该参数用于服务间调用时传递，否则无需传递该参数，服务内自动生成
+	 */
+	private String requestId = REQUEST_ID;
 	/**
 	 * 秘钥ID，可以按秘钥维度控制api的访问权限
 	 */
@@ -104,6 +109,7 @@ public class SystemParameterRenameProperties implements InitializingBean{
 	private String timeZone = TIME_ZONE;
 
 	static {//初始化默认值
+		DEFAULT_PARAM_MAP.put(REQUEST_ID, REQUEST_ID);
 		DEFAULT_PARAM_MAP.put(LOCALE, LOCALE);
 		DEFAULT_PARAM_MAP.put(APP_ID, APP_ID);
 		DEFAULT_PARAM_MAP.put(CURRENCY, CURRENCY);
@@ -125,6 +131,7 @@ public class SystemParameterRenameProperties implements InitializingBean{
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {//允许自定义系统参数名
+		DEFAULT_PARAM_MAP.put(REQUEST_ID, REQUEST_ID);
 		DEFAULT_PARAM_MAP.put(LOCALE, locale);
 		DEFAULT_PARAM_MAP.put(APP_ID, appId);
 		DEFAULT_PARAM_MAP.put(CURRENCY, currency);

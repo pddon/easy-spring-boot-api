@@ -22,9 +22,9 @@
 		<module>easy-spring-boot-api-base</module>
 		<module>easy-spring-boot-api</module>
         <module>easy-spring-boot-api-client</module>
-		<module>easy-spring-boot-api-demo</module>
 		<module>easy-spring-boot-api-dao</module>
         <module>easy-spring-boot-api-service</module>
+		<module>easy-spring-boot-api-demo</module>
     </modules>
 
 	<!-- 定义公共变量 -->

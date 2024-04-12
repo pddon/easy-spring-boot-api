@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.client.consts.HttpMethod;
 import com.pddon.framework.easyapi.client.impl.ClientSecretManagerImpl;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -15,10 +16,7 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * @ClassName: ApiClient
@@ -72,6 +70,13 @@ public class ApiClient implements ApplicationContextAware {
         }
         if(apiInfo.getContentType() == null){
             apiInfo.setContentType("application/json");
+        }
+        if(headers == null){
+            headers = new HashMap<>();
+        }
+        //添加链路追踪ID
+        if(!headers.containsKey("X-Request-Id")){
+            headers.put("X-Request-Id", RequestContext.getContext().getRequestId());
         }
         CloseableHttpResponse httpResponse = handler.request(config.getBaseUrl() + apiInfo.getApiName(), paramsMap, headers, apiInfo.getContentType());
         String strData = ResponseParser.parse(httpResponse);

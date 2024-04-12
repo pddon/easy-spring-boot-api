@@ -14,6 +14,9 @@ import java.util.Map;
 
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
+import com.pddon.framework.easyapi.utils.StringUtils;
+import com.pddon.framework.easyapi.utils.UUIDGenerator;
+import org.slf4j.MDC;
 import org.springframework.web.method.HandlerMethod;
 
 import com.pddon.framework.easyapi.dto.ApiInfo;
@@ -79,7 +82,7 @@ public class RequestContext {
     /**
      * 附带属性
      */
-    private final Map<String, Object> attachments = new HashMap<>();
+    private Map<String, Object> attachments = new HashMap<>();
  
     public static RequestContext getContext() {
         return (RequestContext)LOCAL.get();
@@ -96,6 +99,10 @@ public class RequestContext {
         if(value == null) {
             this.attachments.remove(key);
         } else {
+            String requestIdKey = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.REQUEST_ID);
+            if(key.equalsIgnoreCase(requestIdKey)){
+                MDC.put("requestId",value);
+            }
             this.attachments.put(key, value);
         } 
         return this;
@@ -113,10 +120,22 @@ public class RequestContext {
         this.handler = null;
         this.request = null;
         this.response = null;
+        this.ignoreTenant = false;
     }
     
+    public String getRequestId(){
+        String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.REQUEST_ID);
+    	String requestId = this.getAttachment(key);
+        if(StringUtils.isEmpty(requestId)){
+            //生成调用链ID
+            requestId = UUIDGenerator.getUUID();
+            RequestContext.getContext().setAttachment(key, requestId);
+        }
+        return requestId;
+    }
+
     public String getLocale(){
-    	return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE));
+        return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE));
     }
     
     public String getTimeZone(){
@@ -179,7 +198,7 @@ public class RequestContext {
      * 设置响应系统参数信息
      * @author danyuan
      */
-    public void setResonseSystemParamValue(String key, Object value){
+    public void setResponseSystemParamValue(String key, Object value){
     	responseSystemParams.put(key, value);
     }
     
@@ -187,7 +206,7 @@ public class RequestContext {
      * 设置响应系统参数信息
      * @author danyuan
      */
-    public Object getResonseSystemParamValue(String key){
+    public Object getResponseSystemParamValue(String key){
     	return responseSystemParams.get(key);
     }
 
