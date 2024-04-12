@@ -53,13 +53,13 @@ import com.pddon.framework.easyapi.impl.DefaultSignManagerImpl;
 @AutoConfigureAfter(EasyApiWebConfigurer.class)
 public class EasyApiBeanConfigurer {
 
-	@Bean(name="defaultApplicationManager")
+	@Bean(name="applicationManager")
 	@ConditionalOnMissingBean(ApplicationManager.class)
 	public ApplicationManager applicationManager(@Autowired ChannelConfigProperties channelConfigProperties, @Autowired SystemParameterRenameProperties systemParameterProperties) {
 		return new DefaultApplicationManagerImpl(channelConfigProperties, systemParameterProperties);
 	}
 
-	@Bean(name="defaultInvokeTimesManager")
+	@Bean(name="invokeTimesManager")
 	@ConditionalOnMissingBean(InvokeTimesManager.class)
 	public InvokeTimesManager invokeTimesManager(@Autowired ApplicationManager applicationManager, @Autowired InvokeApiLogManager invokeApiLogManager) {
 		InvokeTimesManager manager = new DefaultInvokeTimesManagerImpl();
@@ -69,7 +69,7 @@ public class EasyApiBeanConfigurer {
 		return manager;
 	}
 
-	@Bean(name="defaultCheckRepeatManager")
+	@Bean(name="checkRepeatManager")
 	@ConditionalOnMissingBean(CheckRepeatManager.class)
 	public CheckRepeatManager checkRepeatManager(@Autowired EasyApiConfig easyApiConfig, @Autowired CacheManager cacheManager) {
 		DefaultCheckRepeatManagerImpl checkRepeatManager= new DefaultCheckRepeatManagerImpl();
@@ -78,13 +78,13 @@ public class EasyApiBeanConfigurer {
 		return checkRepeatManager;
 	}
 
-	@Bean(name="defaultInvokeApiLogManager")
+	@Bean(name="invokeApiLogManager")
 	@ConditionalOnMissingBean(InvokeApiLogManager.class)
 	public InvokeApiLogManager invokeApiLogManager() {
 		return new DefaultInvokeApiLogManagerImpl();
 	}
 
-	@Bean(name="defaultSessionManager")
+	@Bean(name="sessionManager")
 	@ConditionalOnMissingBean(SessionManager.class)
 	public SessionManager sessionManager(@Autowired CacheManager cacheManager, @Autowired EasyApiConfig easyApiConfig) {
 		DefaultSessionManagerImpl sessionManager = new DefaultSessionManagerImpl();
@@ -93,7 +93,7 @@ public class EasyApiBeanConfigurer {
 		return sessionManager;
 	}
 	
-	@Bean(name="defaultSignManager")
+	@Bean(name="signManager")
 	@ConditionalOnMissingBean(SignManager.class)
 	public SignManager signManager(@Autowired SignEncryptHandler signEncryptHandler) {
 		DefaultSignManagerImpl signManager = new DefaultSignManagerImpl();
@@ -101,31 +101,31 @@ public class EasyApiBeanConfigurer {
 	}
 	
 	//默认国际化处理器
-	@Bean(name="defaultLanguageTranslateManager")
-	public LanguageTranslateManager defaultLanguageTranslateManager(@Autowired MessageSource messageSource, @Autowired EasyApiConfig easyApiConfig) {
+	@Bean(name="languageTranslateManager")
+	public LanguageTranslateManager languageTranslateManager(@Autowired MessageSource messageSource, @Autowired EasyApiConfig easyApiConfig) {
 		return new DefaultLanguageTranslateManagerImpl(messageSource, new Locale(easyApiConfig.getLocale()));
 	}
 	
-	@Bean(name="defaultSignEncryptHandler")
+	@Bean(name="signEncryptHandler")
 	@ConditionalOnMissingBean(SignEncryptHandler.class)
 	public SignEncryptHandler signEncryptHandler() {
 		return new Sha1SignEncryptHandler();
 	}
 	
-	@Bean(name="defaultDataEncryptHandler")
+	@Bean(name="dataEncryptHandler")
 	@ConditionalOnMissingBean(AESDataEncryptHandler.class)
 	public DataEncryptHandler dataEncryptHandler(@Autowired SecretManager secretManager) {
 		return new AESDataEncryptHandler().setSecretManager(secretManager);
 	}
 	
-	@Bean(name="defaultSecretManager")
+	@Bean(name="secretManager")
 	@ConditionalOnMissingBean(SecretManager.class)
 	public SecretManager secretManager(@Autowired ApplicationManager applicationManager) {
 		DefaultSecretManagerImpl secretManager = new DefaultSecretManagerImpl(applicationManager);
 		return secretManager;
 	}
 	
-	@Bean(name="defaultCacheManager")
+	@Bean(name="cacheManager")
 	@ConditionalOnMissingBean(CacheManager.class)
 	public CacheManager cacheManager(@Autowired LocalReadCacheContainer localReadCacheContainer,
 			@Autowired LocalWriteCacheContainer localWriteCacheContainer) {

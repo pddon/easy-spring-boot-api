@@ -1,9 +1,9 @@
 package com.pddon.framework.easyapi.client.apitools.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.pddon.framework.easyapi.client.ClientSignEncryptHandler;
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
-import com.pddon.framework.easyapi.encrypt.SignEncryptHandler;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
@@ -26,7 +26,7 @@ import java.util.stream.Collectors;
 public class ApiSignPreHandler implements ApiPreHandler {
 
     @Autowired
-    private SignEncryptHandler signEncryptHandler;
+    private ClientSignEncryptHandler clientSignEncryptHandler;
 
     @Override
     public int order() {
@@ -58,7 +58,7 @@ public class ApiSignPreHandler implements ApiPreHandler {
         String content = EncryptUtils.sortAndMontage(nameValueMap);
         String timestamp = String.valueOf(System.currentTimeMillis());
         String data = timestamp + content + timestamp;
-        String sign = signEncryptHandler.sign(config.getSecret(), data);
+        String sign = clientSignEncryptHandler.sign(config.getSecret(), data);
         paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.SIGN), sign);
         paramMap.put(SystemParameterRenameProperties.getSysParamName(SystemParameterRenameProperties.TIMESTAMP), timestamp);
         return paramMap;

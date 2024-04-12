@@ -10,5 +10,5 @@ package com.pddon.framework.easyapi.encrypt;
 
 public interface SignEncryptHandler {
 	
-	String sign(String secrect, String body);
+	String sign(String secret, String body);
 }

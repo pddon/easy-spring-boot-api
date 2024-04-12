@@ -2,7 +2,12 @@ package com.pddon.framework.easyapi.client.config;
 
 import com.pddon.framework.easyapi.ApplicationManager;
 import com.pddon.framework.easyapi.SecretManager;
+import com.pddon.framework.easyapi.client.ClientDataEncryptHandler;
+import com.pddon.framework.easyapi.client.ClientSecretManager;
+import com.pddon.framework.easyapi.client.ClientSignEncryptHandler;
+import com.pddon.framework.easyapi.client.impl.ClientAESDataEncryptHandler;
 import com.pddon.framework.easyapi.client.impl.ClientSecretManagerImpl;
+import com.pddon.framework.easyapi.client.impl.ClientSha1SignEncryptHandler;
 import com.pddon.framework.easyapi.encrypt.DataEncryptHandler;
 import com.pddon.framework.easyapi.encrypt.SignEncryptHandler;
 import com.pddon.framework.easyapi.encrypt.impl.AESDataEncryptHandler;
@@ -23,22 +28,22 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan("com.pddon.framework.easyapi.client")
 public class ClientConfigurer {
-    @Bean(name="defaultSignEncryptHandler")
-    @ConditionalOnMissingBean(SignEncryptHandler.class)
-    public SignEncryptHandler signEncryptHandler() {
-        return new Sha1SignEncryptHandler();
+    @Bean(name="clientSignEncryptHandler")
+    @ConditionalOnMissingBean(ClientSignEncryptHandler.class)
+    public ClientSignEncryptHandler clientSignEncryptHandler() {
+        return new ClientSha1SignEncryptHandler();
     }
 
-    @Bean(name="defaultDataEncryptHandler")
-    @ConditionalOnMissingBean(AESDataEncryptHandler.class)
-    public DataEncryptHandler dataEncryptHandler(@Autowired SecretManager secretManager) {
-        return new AESDataEncryptHandler().setSecretManager(secretManager);
+    @Bean(name="clientDataEncryptHandler")
+    @ConditionalOnMissingBean(ClientAESDataEncryptHandler.class)
+    public ClientDataEncryptHandler clientSignEncryptHandler(@Autowired ClientSecretManager clientSecretManager) {
+        return new ClientAESDataEncryptHandler().setClientSecretManager(clientSecretManager);
     }
 
-    @Bean(name="defaultSecretManager")
-    @ConditionalOnMissingBean(SecretManager.class)
-    public SecretManager secretManager(@Autowired ApplicationConfig applicationConfig) {
-        ClientSecretManagerImpl secretManager = new ClientSecretManagerImpl(applicationConfig);
+    @Bean(name="clientSecretManager")
+    @ConditionalOnMissingBean(ClientSecretManagerImpl.class)
+    public ClientSecretManager clientSecretManager() {
+        ClientSecretManagerImpl secretManager = new ClientSecretManagerImpl();
         return secretManager;
     }
 }

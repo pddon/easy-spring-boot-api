@@ -5,6 +5,7 @@ import com.pddon.framework.easyapi.client.apitools.*;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.client.consts.HttpMethod;
+import com.pddon.framework.easyapi.client.impl.ClientSecretManagerImpl;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
@@ -45,7 +46,7 @@ public class ApiClient implements ApplicationContextAware {
     public static ApiClient newInstance(ApplicationConfig config){
         ApiClient client = new ApiClient();
         client.setConfig(config);
-
+        ClientSecretManagerImpl.addApplicationConfig(config);
         return client;
     }
 

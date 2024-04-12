@@ -1,10 +1,9 @@
 package com.pddon.framework.easyapi.client.apitools.impl;
 
+import com.pddon.framework.easyapi.client.ClientDataEncryptHandler;
 import com.pddon.framework.easyapi.client.apitools.ApiPreHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
-import com.pddon.framework.easyapi.encrypt.DataEncryptHandler;
-import com.pddon.framework.easyapi.utils.EncryptUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -23,7 +22,7 @@ import java.util.Map;
 public class ApiEncryptPreHandler implements ApiPreHandler {
 
     @Autowired
-    private DataEncryptHandler dataEncryptHandler;
+    private ClientDataEncryptHandler clientSignEncryptHandler;
 
     @Override
     public int order() {
@@ -41,7 +40,7 @@ public class ApiEncryptPreHandler implements ApiPreHandler {
                 //字符串类型才可以加密
                 try {
                     //String data = EncryptUtils.encodeAES128(config.getSecret(), value.toString());
-                    String data = dataEncryptHandler.encrypt(config.getAppId(), config.getChannelId(), null, value.toString());
+                    String data = clientSignEncryptHandler.encrypt(config.getAppId(), config.getChannelId(), value.toString());
                     paramMap.put(paramKey, data);
                 } catch (Exception e) {
                     log.warn("参数{}加密失败!", value);

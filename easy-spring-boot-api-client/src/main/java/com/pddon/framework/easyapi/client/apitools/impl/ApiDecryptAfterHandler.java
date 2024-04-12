@@ -1,13 +1,12 @@
 package com.pddon.framework.easyapi.client.apitools.impl;
 
 import cn.hutool.core.collection.CollectionUtil;
+import com.pddon.framework.easyapi.client.ClientDataEncryptHandler;
 import com.pddon.framework.easyapi.client.apitools.ApiAfterHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
-import com.pddon.framework.easyapi.encrypt.DataEncryptHandler;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
-import com.pddon.framework.easyapi.utils.EncryptUtils;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +26,7 @@ import java.util.Collections;
 public class ApiDecryptAfterHandler implements ApiAfterHandler {
 
     @Autowired
-    private DataEncryptHandler dataEncryptHandler;
+    private ClientDataEncryptHandler clientSignEncryptHandler;
 
     @Override
     public int order() {
@@ -47,7 +46,7 @@ public class ApiDecryptAfterHandler implements ApiAfterHandler {
             obj = (T) BeanPropertyUtil.decorateObj("", obj, Collections.emptyMap(),  (fieldName, data, annotations)->{
                 if(apiInfo.getDecryptParams().contains(fieldName)){
                     //data = EncryptUtils.decodeAES128(config.getSecret(), data.toString());
-                    data = dataEncryptHandler.decrypt(config.getAppId(), config.getChannelId(), null, data.toString());
+                    data = clientSignEncryptHandler.decrypt(config.getAppId(), config.getChannelId(), data.toString());
                 }
                 return data;
             });

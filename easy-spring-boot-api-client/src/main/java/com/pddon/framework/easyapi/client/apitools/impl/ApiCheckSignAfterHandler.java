@@ -1,10 +1,10 @@
 package com.pddon.framework.easyapi.client.apitools.impl;
 
+import com.pddon.framework.easyapi.client.ClientSignEncryptHandler;
 import com.pddon.framework.easyapi.client.apitools.ApiAfterHandler;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.consts.ErrorCodes;
-import com.pddon.framework.easyapi.encrypt.SignEncryptHandler;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
@@ -28,7 +28,7 @@ import java.util.Map;
 public class ApiCheckSignAfterHandler implements ApiAfterHandler {
 
     @Autowired
-    private SignEncryptHandler signEncryptHandler;
+    private ClientSignEncryptHandler clientSignEncryptHandler;
 
     @Override
     public int order() {
@@ -50,7 +50,7 @@ public class ApiCheckSignAfterHandler implements ApiAfterHandler {
         String content = EncryptUtils.sortAndMontage(nameValueMap);
         String timestamp = response.getTimestamp() != null ? response.getTimestamp().toString() : "";
         content = timestamp + content + timestamp;
-        String sign = signEncryptHandler.sign(config.getSecret(), content);
+        String sign = clientSignEncryptHandler.sign(config.getSecret(), content);
         if(!sign.equalsIgnoreCase(response.getSign())){
             log.warn("content: {}", content);
             throw new BusinessException(ErrorCodes.ERROR_SIGN.getCode(), ErrorCodes.ERROR_SIGN.getMsgCode());
