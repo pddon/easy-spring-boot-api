@@ -16,7 +16,7 @@ import java.util.Date;
 @Setter
 @ToString
 @Accessors(chain=true)
-public class BaseUser extends BaseEntity{
+public class BaseUser extends BaseTenantEntity{
     
     /**
      * 用户账号唯一标识

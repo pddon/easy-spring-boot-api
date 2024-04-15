@@ -152,6 +152,7 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 	public void afterCompletion(HttpServletRequest request,
 			HttpServletResponse response, Object handler, Exception ex)
 			throws Exception {
+		response.setHeader("Access-Control-Expose-Headers","X-Request-Id");
 		//增加链路追踪ID返回
 		response.addHeader("X-Request-Id", RequestContext.getContext().getRequestId());
 		HandlerInterceptor.super.afterCompletion(request, response, handler, ex);

@@ -24,6 +24,8 @@
         <module>easy-spring-boot-api-client</module>
 		<module>easy-spring-boot-api-dao</module>
         <module>easy-spring-boot-api-service</module>
+        <module>easy-spring-boot-api-perm-dao</module>
+        <module>easy-spring-boot-api-perm-service</module>
 		<module>easy-spring-boot-api-demo</module>
     </modules>
 

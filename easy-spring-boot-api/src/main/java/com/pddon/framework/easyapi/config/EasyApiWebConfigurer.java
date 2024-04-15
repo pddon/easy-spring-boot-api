@@ -111,6 +111,8 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
         RepeatedlyReadFilter repeatedlyReadFilter = new RepeatedlyReadFilter();
         registration.setFilter(repeatedlyReadFilter);
         registration.addUrlPatterns("/*");
+		registration.setOrder(Integer.MAX_VALUE);
+		registration.setEnabled(true);
         return registration;
     }
 

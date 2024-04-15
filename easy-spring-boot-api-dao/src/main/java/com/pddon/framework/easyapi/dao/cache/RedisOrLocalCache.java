@@ -40,8 +40,9 @@ public class RedisOrLocalCache implements Cache {
     }
 
     private static Boolean isConnected() {
+        Jedis jedis = null;
         try{
-            Jedis jedis = RedisOrLocalCache.pool.getResource();
+            jedis = RedisOrLocalCache.pool.getResource();
             Boolean flag = jedis.isConnected();
             if (!flag) {
                 log.info("time: [{}] Redis Connection is Closed.", new Date());
@@ -49,6 +50,9 @@ public class RedisOrLocalCache implements Cache {
             return flag;
         }catch (Exception e){
             log.warn("Redis Server connect failed, cause: {}", e.getMessage());
+            if(jedis != null){
+                jedis.close();
+            }
         }
         return false;
     }
@@ -58,7 +62,9 @@ public class RedisOrLocalCache implements Cache {
         try {
             return callback.doWithRedis(jedis);
         } finally {
-            jedis.close();
+            if(jedis != null){
+                jedis.close();
+            }
         }
     }
 
