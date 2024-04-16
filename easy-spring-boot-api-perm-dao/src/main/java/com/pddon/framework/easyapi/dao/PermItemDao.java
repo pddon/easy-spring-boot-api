@@ -1,5 +1,9 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.pddon.framework.easyapi.dao.entity.PermItem;
+
+import java.util.List;
+
 /**
  * @ClassName: PermItemDao
  * @Description:
@@ -8,4 +12,5 @@ package com.pddon.framework.easyapi.dao;
  * @Addr: https://pddon.cn
  */
 public interface PermItemDao {
+    List<PermItem> getAllPerms();
 }

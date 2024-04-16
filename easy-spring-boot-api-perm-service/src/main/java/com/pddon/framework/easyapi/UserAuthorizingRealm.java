@@ -68,6 +68,6 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
             throw new LockedAccountException("账号已被冻结,请联系管理员");
         }
 
-        return new SimpleAuthenticationInfo(user, sessionId, getName());
+        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
     }
 }

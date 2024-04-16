@@ -15,6 +15,7 @@ import org.apache.shiro.authc.AuthenticationToken;
 @NoArgsConstructor
 public class UserAuthenticationToken implements AuthenticationToken {
     private String sessionId;
+    private Session session;
     @Override
     public Object getPrincipal() {
         return sessionId;

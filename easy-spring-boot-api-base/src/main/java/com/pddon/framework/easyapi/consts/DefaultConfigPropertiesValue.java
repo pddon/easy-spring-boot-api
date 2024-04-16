@@ -34,6 +34,12 @@ public enum DefaultConfigPropertiesValue {
 	,KNIFE4J_DOCUMENTS_0_GROUP("knife4j.documents[0].group","使用说明文档", DefaultConfigValueMode.OPTION)
 	,KNIFE4J_DOCUMENTS_0_NAME("knife4j.documents[0].name","全局通用接口调用说明", DefaultConfigValueMode.OPTION)
 	,KNIFE4J_DOCUMENTS_0_LOCATIONS("knife4j.documents[0].locations","classpath*:markdown/*", DefaultConfigValueMode.OPTION)
+	,MYBATIS_PLUS_CONFIG_LOCATION("mybatis-plus.config-location","classpath:mybatis/mybatis-config.xml", DefaultConfigValueMode.OPTION)
+	,MYBATIS_PLUS_MAPPER_LOCATIONS("mybatis-plus.mapper-locations","classpath*:mybatis/mappers/*.xml", DefaultConfigValueMode.OPTION)
+	,MYBATIS_PLUS_TYPE_ALIASES_PKG("mybatis-plus.type-aliases-package","com.pddon.framework.easyapi.dao.entity", DefaultConfigValueMode.PREPEND)
+	,MYBATIS_PLUS_TYPE_ALIASES_SUPER_TYPE("mybatis-plus.type-aliases-super-type","com.pddon.framework.easyapi.dao.entity.BaseEntity", DefaultConfigValueMode.PREPEND)
+	,MYBATIS_PLUS_DB_CONFIG_LOGIC_DELETE_VALUE("mybatis-plus.global-config.db-config.logic-delete-value","1", DefaultConfigValueMode.PREPEND)
+	,MYBATIS_PLUS_DB_CONFIG_LOGIC_NOT_DELETE_VALUE("mybatis-plus.global-config.db-config.logic-not-delete-value","0", DefaultConfigValueMode.PREPEND)
 	;
 	private String key;
 	

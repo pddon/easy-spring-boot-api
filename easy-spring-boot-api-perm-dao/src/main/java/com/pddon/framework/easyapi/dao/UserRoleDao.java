@@ -1,5 +1,9 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.pddon.framework.easyapi.dao.entity.UserRole;
+
+import java.util.List;
+
 /**
  * @ClassName: UserRoleDao
  * @Description:
@@ -8,4 +12,5 @@ package com.pddon.framework.easyapi.dao;
  * @Addr: https://pddon.cn
  */
 public interface UserRoleDao {
+    List<UserRole> getRolesByUserId(String userId);
 }

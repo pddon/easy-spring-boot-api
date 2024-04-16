@@ -7,6 +7,8 @@ import com.pddon.framework.easyapi.dao.mapper.PermItemMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.List;
+
 /**
  * @ClassName: PermItemDaoImpl
  * @Description:
@@ -18,4 +20,8 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class PermItemDaoImpl extends ServiceImpl<PermItemMapper, PermItem> implements PermItemDao {
 
+    @Override
+    public List<PermItem> getAllPerms() {
+        return this.list();
+    }
 }

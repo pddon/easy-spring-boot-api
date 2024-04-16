@@ -1,5 +1,9 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.pddon.framework.easyapi.dao.entity.RolePerm;
+
+import java.util.List;
+
 /**
  * @ClassName: RolePermDao
  * @Description:
@@ -8,4 +12,5 @@ package com.pddon.framework.easyapi.dao;
  * @Addr: https://pddon.cn
  */
 public interface RolePermDao {
+    List<RolePerm> getByRoleIds(List<String> roleIds);
 }

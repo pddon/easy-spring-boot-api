@@ -28,7 +28,7 @@ public class UserPerm extends BaseTenantEntity{
      * 用户ID
      * @author pddon.com
      */
-     private String userId;
+    private String userId;
 
     /**
      * 权限ID

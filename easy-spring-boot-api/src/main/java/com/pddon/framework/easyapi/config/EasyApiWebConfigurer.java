@@ -14,6 +14,7 @@ import java.util.List;
 
 import javax.validation.Valid;
 
+import com.pddon.framework.easyapi.filter.ExceptionFilter;
 import com.pddon.framework.easyapi.filter.RepeatedlyReadFilter;
 import com.pddon.framework.easyapi.interceptor.EasyApiHandlerInterceptor;
 import lombok.Data;
@@ -115,6 +116,18 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
 		registration.setEnabled(true);
         return registration;
     }
+
+	@Bean
+	public FilterRegistrationBean exceptionFilterRegistration(@Autowired ExceptionFilter exceptionFilter) {
+		FilterRegistrationBean registration = new FilterRegistrationBean();
+		registration.setFilter(exceptionFilter);
+		registration.setName("exceptionFilter");
+		//此处尽量小，要比其他Filter靠前
+		registration.setOrder(Integer.MIN_VALUE);
+		registration.addUrlPatterns("/*");
+		registration.setEnabled(true);
+		return registration;
+	}
 
 	@Override
 	public void addArgumentResolvers(

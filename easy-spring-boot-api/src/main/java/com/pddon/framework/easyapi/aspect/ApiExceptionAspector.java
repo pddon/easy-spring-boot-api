@@ -48,7 +48,7 @@ public class ApiExceptionAspector implements HandlerExceptionResolver{
 
 	@ExceptionHandler
 	public DefaultResponseWrapper<?> resolveRestControllerException(HttpServletRequest request,
-                                                                    HttpServletResponse response, Object handler, Exception e) throws ClassNotFoundException {
+                                                                    HttpServletResponse response, Object handler, Exception e) {
 		
 		response.setStatus(HttpServletResponse.SC_OK);
 		Exception ex = e;
@@ -80,7 +80,7 @@ public class ApiExceptionAspector implements HandlerExceptionResolver{
 		Object resp = null;
 		try {
 			resp = this.resolveRestControllerException(request, response, handler, ex);
-		} catch (ClassNotFoundException e) {
+		} catch (Exception e) {
 			log.error(IOUtils.getThrowableInfo(e));	
 			resp = defaultExceptionHandler.handle(request, response, e);
 		}

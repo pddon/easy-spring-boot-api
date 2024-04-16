@@ -33,7 +33,8 @@ public enum ErrorCodes {
 	
 	//系统业务错误码
 	FORCEOUT_SESSION_ID(130001),//被踢出的会话ID
-	INVALID_SESSION_ID(130002),//无效的会话ID	
+	INVALID_SESSION_ID(130002),//无效的会话ID
+	NEED_SESSION_ID(130003),//需要会话ID（需要登录）
 	ERROR_SIGN(130005),//验签失败
 	UNIQUE_TOKEN_USING(130006),//您提交的请求正在处理，请勿重复提交
 	UNIQUE_TOKEN_USED(130007),//你的请求数据已提交成功，请勿重复提交

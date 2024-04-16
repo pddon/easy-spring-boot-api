@@ -7,6 +7,7 @@ import com.pddon.framework.easyapi.cache.LocalWriteCacheContainer;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.dao.utils.RedisUtil;
 import com.pddon.framework.easyapi.dto.CacheManagerState;
+import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -125,6 +126,7 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
                 Object value = forValue.get(key);
                 return value;
             }catch (Exception e){
+                log.warn(IOUtils.getThrowableInfo(e));
                 return null;
             }finally {
                 if(CacheExpireMode.EXPIRE_AFTER_REDA.equals(mode)){
@@ -140,11 +142,16 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public <T> T get(String key, Class<T> type) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
-            Object value = forValue.get(key);
             try{
-                return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                Object value = forValue.get(key);
+                try{
+                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                }catch (Exception e){
+                    return (T) value;
+                }
             }catch (Exception e){
-                return (T) value;
+                log.warn(IOUtils.getThrowableInfo(e));
+                return null;
             }
         }else {
             return this.defaultCacheManager.get(key, type);
@@ -155,14 +162,19 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public <T> T get(String key, Class<T> type, Long expireSeconds) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
-            Object value = forValue.get(key);
-            if(value == null){
-                return null;
-            }
             try{
-                return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                Object value = forValue.get(key);
+                if(value == null){
+                    return null;
+                }
+                try{
+                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                }catch (Exception e){
+                    return (T) value;
+                }
             }catch (Exception e){
-                return (T) value;
+                log.warn(IOUtils.getThrowableInfo(e));
+                return null;
             }
         }else {
             return this.defaultCacheManager.get(key, type, expireSeconds);
@@ -173,14 +185,19 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public <T> T get(String key, Class<T> type, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
-            Object value = forValue.get(key);
-            if(value == null){
-                return null;
-            }
             try{
-                return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                Object value = forValue.get(key);
+                if(value == null){
+                    return null;
+                }
+                try{
+                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                }catch (Exception e){
+                    return (T) value;
+                }
             }catch (Exception e){
-                return (T) value;
+                log.warn(IOUtils.getThrowableInfo(e));
+                return null;
             }
         }else {
             return this.defaultCacheManager.get(key, type, mode);
@@ -191,18 +208,23 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public <T> T get(String key, Class<T> type, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
-            Object value = forValue.get(key);
-            if(value == null){
-                return null;
-            }
             try{
-                return JSONUtil.toBean(JSONUtil.parseObj(value), type);
-            }catch (Exception e){
-                return (T) value;
-            }finally {
-                if(CacheExpireMode.EXPIRE_AFTER_REDA.equals(mode)){
-                    this.setExpire(key, expireSeconds);
+                Object value = forValue.get(key);
+                if(value == null){
+                    return null;
                 }
+                try{
+                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                }catch (Exception e){
+                    return (T) value;
+                }finally {
+                    if(CacheExpireMode.EXPIRE_AFTER_REDA.equals(mode)){
+                        this.setExpire(key, expireSeconds);
+                    }
+                }
+            }catch (Exception e){
+                log.warn(IOUtils.getThrowableInfo(e));
+                return null;
             }
         }else {
             return this.defaultCacheManager.get(key, type, expireSeconds, mode);

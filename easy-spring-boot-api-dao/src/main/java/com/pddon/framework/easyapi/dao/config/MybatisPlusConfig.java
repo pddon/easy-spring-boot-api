@@ -26,6 +26,7 @@ import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
+import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -33,6 +34,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
+@MapperScan({"com.**.dao.mapper", "org.**.dao.mapper"})
 @Slf4j
 public class MybatisPlusConfig {
 
