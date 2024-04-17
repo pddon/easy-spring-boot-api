@@ -1,6 +1,6 @@
 package com.pddon.framework.easyapi.impl;
 
-import cn.hutool.json.JSONUtil;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.cache.LocalReadCacheContainer;
 import com.pddon.framework.easyapi.cache.LocalWriteCacheContainer;
@@ -36,6 +36,9 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Lazy
     private LocalWriteCacheContainer localWriteCacheContainer;
 
+    @Autowired
+    private ObjectMapper objectMapper;
+
     private DefaultCacheManagerImpl defaultCacheManager = new DefaultCacheManagerImpl();
 
     private static Boolean connected = null;
@@ -50,12 +53,12 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     }
 
     @Override
-    public void set(String key, Object value, Long expireSeconds) {
+    public <T> void set(String key, T value, Long expireSeconds) {
         this.set(key, value, expireSeconds, CacheExpireMode.EXPIRE_AFTER_WRITE);
     }
 
     @Override
-    public void set(String key, Object value, Long expireSeconds, CacheExpireMode mode) {
+    public <T> void set(String key, T value, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
@@ -69,7 +72,7 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     }
 
     @Override
-    public void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
+    public <T> void set(String key, T value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
@@ -144,8 +147,12 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
             try{
                 Object value = forValue.get(key);
+                if(value == null){
+                    return null;
+                }
                 try{
-                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                    String result = objectMapper.writeValueAsString(value);
+                    return objectMapper.readValue(result, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -168,7 +175,8 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
                     return null;
                 }
                 try{
-                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                    String result = objectMapper.writeValueAsString(value);
+                    return objectMapper.readValue(result, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -191,7 +199,8 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
                     return null;
                 }
                 try{
-                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                    String result = objectMapper.writeValueAsString(value);
+                    return objectMapper.readValue(result, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -214,7 +223,8 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
                     return null;
                 }
                 try{
-                    return JSONUtil.toBean(JSONUtil.parseObj(value), type);
+                    String result = objectMapper.writeValueAsString(value);
+                    return objectMapper.readValue(result, type);
                 }catch (Exception e){
                     return (T) value;
                 }finally {

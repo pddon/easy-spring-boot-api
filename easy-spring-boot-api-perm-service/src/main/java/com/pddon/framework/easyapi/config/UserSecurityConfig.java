@@ -75,6 +75,7 @@ public class UserSecurityConfig {
         filterMap.put("/druid/**", "anon");
         filterMap.put("/login", "anon");
 
+        filterMap.put("/favicon.ico", "anon");
         filterMap.put("/doc.html", "anon");
         filterMap.put("/v3/api-docs", "anon");
         filterMap.put("/v3/api-docs-ext", "anon");

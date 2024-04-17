@@ -29,12 +29,12 @@ public class DefaultCacheManagerImpl implements CacheManager {
 	 * @author danyuan
 	 */
 	@Override
-	public void set(String key, Object value, Long expireSeconds) {
+	public <T> void set(String key, T value, Long expireSeconds) {
 		this.set(key, value, expireSeconds, CacheExpireMode.EXPIRE_AFTER_WRITE);
 	}
 
 	@Override
-	public void set(String key, Object value, Long expireSeconds, CacheExpireMode mode) {
+	public <T> void set(String key, T value, Long expireSeconds, CacheExpireMode mode) {
 		if(CacheExpireMode.EXPIRE_AFTER_WRITE.equals(mode)){
 			localWriteCacheContainer.set(key, value, expireSeconds);
 		}else{
@@ -43,7 +43,7 @@ public class DefaultCacheManagerImpl implements CacheManager {
 	}
 
 	@Override
-	public void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
+	public <T> void set(String key, T value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
 		if(CacheExpireMode.EXPIRE_AFTER_WRITE.equals(mode)){
 			localWriteCacheContainer.set(key, value, expireSeconds, oldExpireSeconds);
 		}else{

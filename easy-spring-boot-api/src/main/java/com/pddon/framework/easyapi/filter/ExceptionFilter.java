@@ -41,8 +41,10 @@ public class ExceptionFilter implements Filter {
             try{
                 ((HttpServletResponse) response).setHeader("Content-Type", "application/json;charset=utf-8");
                 response.setContentType("application/json;charset=utf-8");
-                response.getWriter().print(objectMapper.writeValueAsString(responseWrapper));
-                response.getWriter().flush();
+                if(!response.isCommitted()){
+                    response.getWriter().print(objectMapper.writeValueAsString(responseWrapper));
+                    response.getWriter().flush();
+                }
             }catch (Exception ex){
                 log.warn(IOUtils.getThrowableInfo(ex));
                 throw ex;

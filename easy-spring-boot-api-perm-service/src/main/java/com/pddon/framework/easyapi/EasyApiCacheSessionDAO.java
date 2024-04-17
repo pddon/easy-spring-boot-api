@@ -1,7 +1,9 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.dto.UserSimpleSession;
 import lombok.AllArgsConstructor;
 import org.apache.shiro.session.Session;
+import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
 import java.io.Serializable;
@@ -37,7 +39,7 @@ public class EasyApiCacheSessionDAO extends EnterpriseCacheSessionDAO {
         if(session != null){
             return session;
         }
-        return cacheManager.get(String.format(SHIRO_SESSION_KEY, sessionId), Session.class);
+        return cacheManager.get(String.format(SHIRO_SESSION_KEY, sessionId), UserSimpleSession.class);
     }
 
     @Override
