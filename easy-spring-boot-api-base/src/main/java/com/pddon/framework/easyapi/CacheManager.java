@@ -19,18 +19,18 @@ public interface CacheManager {
 	 * 保存一个缓存，并设置过期时间,默认为写后超时模式
 	 * @author danyuan
 	 */
-	<T> void set(String key, T value, Long expireSeconds);
+	void set(String key, Object value, Long expireSeconds);
 	/**
 	 * 保存一个缓存，并设置过期时间
 	 * @author danyuan
 	 */
-	<T> void set(String key, T value, Long expireSeconds, CacheExpireMode mode);
+	void set(String key, Object value, Long expireSeconds, CacheExpireMode mode);
 	
 	/**
 	 * 保存一个缓存，并设置过期时间
 	 * @author danyuan
 	 */
-	<T> void set(String key, T value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode);
+	void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode);
 	/**
 	 * 是否存在该缓存,默认为写后超时模式
 	 * @author danyuan

@@ -1,11 +1,10 @@
 package com.pddon.framework.easyapi.client.apitools;
 
-import cn.hutool.json.JSONObject;
-import cn.hutool.json.JSONUtil;
+
+import cn.hutool.core.lang.ParameterizedTypeImpl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.IOUtils;
@@ -16,7 +15,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.util.EntityUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
-import sun.reflect.generics.reflectiveObjects.ParameterizedTypeImpl;
 
 import java.io.IOException;
 import java.lang.reflect.Type;
@@ -47,8 +45,8 @@ public class ResponseParser {
         try {
             Type[] types = new Type[1];
             types[0] = tClass;
-            final ParameterizedTypeImpl type = ParameterizedTypeImpl.make(DefaultResponseWrapper.class, types,
-                    DefaultResponseWrapper.class.getDeclaringClass());
+            final ParameterizedTypeImpl type = new ParameterizedTypeImpl(types,
+                    DefaultResponseWrapper.class.getDeclaringClass(), DefaultResponseWrapper.class);
             TypeReference<DefaultResponseWrapper> typeReference = new TypeReference<DefaultResponseWrapper>() {
                 @Override
                 public Type getType() {

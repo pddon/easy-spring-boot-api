@@ -1,7 +1,6 @@
 package com.pddon.framework.easyapi.client;
 
 import com.pddon.framework.easyapi.client.apitools.*;
-import com.pddon.framework.easyapi.client.apitools.*;
 import com.pddon.framework.easyapi.client.config.ApplicationConfig;
 import com.pddon.framework.easyapi.client.config.dto.ApiInfo;
 import com.pddon.framework.easyapi.client.consts.HttpMethod;
@@ -14,7 +13,6 @@ import org.apache.http.client.methods.CloseableHttpResponse;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.stereotype.Component;
 
 import java.util.*;
 
@@ -26,7 +24,6 @@ import java.util.*;
  * @Addr: https://pddon.cn
  */
 @Data
-@Component
 @Slf4j
 public class ApiClient implements ApplicationContextAware {
 

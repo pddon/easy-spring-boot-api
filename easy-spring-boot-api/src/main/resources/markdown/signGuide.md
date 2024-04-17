@@ -73,7 +73,7 @@ API调用过程中传递的数据的安全性可以利用数字签名机制防�
 
 paramsContent=`"description请我喝杯饮料！orderId202404101615191350returnPageUrlhttp://localhost:8088/payment-demo/payResult.html?orderId=202404101615191350totalAmount1userNickname游客"`; 
 
-#### 1.3.2 第二步
+##### 1.3.2 第二步
 
 拼接时间戳和API密钥： 
 
@@ -89,7 +89,7 @@ signContent=`secretKey+timestamp+paramsContent+timestamp+secretKey`;
 
 signContent=`NKVNcuwwEF3sc22A1712736928277description请我喝杯饮料！orderId202404101615191350returnPageUrlhttp://localhost:8088/payment-demo/payResult.html?orderId=202404101615191350totalAmount1userNickname游客1712736928277NKVNcuwwEF3sc22A`;
 
-#### 1.3.3 生成数字签名
+##### 1.3.3 生成数字签名
 
 对signContent进行SHA1签名
 

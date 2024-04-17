@@ -53,12 +53,12 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     }
 
     @Override
-    public <T> void set(String key, T value, Long expireSeconds) {
+    public void set(String key, Object value, Long expireSeconds) {
         this.set(key, value, expireSeconds, CacheExpireMode.EXPIRE_AFTER_WRITE);
     }
 
     @Override
-    public <T> void set(String key, T value, Long expireSeconds, CacheExpireMode mode) {
+    public void set(String key, Object value, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
@@ -72,7 +72,7 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     }
 
     @Override
-    public <T> void set(String key, T value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
+    public void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){

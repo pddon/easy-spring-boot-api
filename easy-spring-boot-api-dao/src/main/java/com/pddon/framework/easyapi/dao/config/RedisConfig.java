@@ -12,8 +12,13 @@
 package com.pddon.framework.easyapi.dao.config;
 
 import com.fasterxml.jackson.annotation.JsonAutoDetect;
+import com.fasterxml.jackson.annotation.JsonInclude;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
+import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
 import com.pddon.framework.easyapi.dao.cache.RedisOrLocalCache;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
@@ -29,6 +34,9 @@ import org.springframework.data.redis.serializer.RedisSerializer;
 import org.springframework.data.redis.serializer.StringRedisSerializer;
 import redis.clients.jedis.JedisPool;
 import redis.clients.jedis.JedisPoolConfig;
+
+import java.text.SimpleDateFormat;
+import java.util.TimeZone;
 
 
 /**
@@ -96,14 +104,20 @@ public class RedisConfig {
 
     @SuppressWarnings("all")
     @Bean //该方法的返回对象交于spring容器管理
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory, @Autowired ObjectMapper objectMapper) {
+    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, Object> template = new RedisTemplate<>();
         RedisSerializer<String> redisSerializer = new StringRedisSerializer();
         Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
-        //ObjectMapper om = new ObjectMapper();
-        //om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        //om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
-        jackson2JsonRedisSerializer.setObjectMapper(objectMapper);
+        ObjectMapper om = new ObjectMapper();
+        om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
+        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        om.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        om.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        om.setTimeZone(TimeZone.getTimeZone("GMT+0"));
+        om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
+        jackson2JsonRedisSerializer.setObjectMapper(om);
         template.setConnectionFactory(factory);
         //key序列化方式
         template.setKeySerializer(redisSerializer);

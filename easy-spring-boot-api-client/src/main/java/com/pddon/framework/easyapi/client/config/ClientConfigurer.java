@@ -2,6 +2,7 @@ package com.pddon.framework.easyapi.client.config;
 
 import com.pddon.framework.easyapi.ApplicationManager;
 import com.pddon.framework.easyapi.SecretManager;
+import com.pddon.framework.easyapi.client.ApiClient;
 import com.pddon.framework.easyapi.client.ClientDataEncryptHandler;
 import com.pddon.framework.easyapi.client.ClientSecretManager;
 import com.pddon.framework.easyapi.client.ClientSignEncryptHandler;
@@ -28,6 +29,12 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ComponentScan("com.pddon.framework.easyapi.client")
 public class ClientConfigurer {
+    @Bean
+    @ConditionalOnMissingBean(ApiClient.class)
+    public ApiClient apiClient(@Autowired ApplicationConfig applicationConfig){
+        return ApiClient.newInstance(applicationConfig);
+    }
+
     @Bean(name="clientSignEncryptHandler")
     @ConditionalOnMissingBean(ClientSignEncryptHandler.class)
     public ClientSignEncryptHandler clientSignEncryptHandler() {
