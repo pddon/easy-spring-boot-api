@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi.impl;
 
+import cn.hutool.json.JSONUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.cache.LocalReadCacheContainer;
@@ -26,7 +27,7 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     //因为springboot整合redis时会把StringRedisTemplate创建并交于spring容器管理
     @Autowired
     @Lazy
-    private RedisTemplate<String, Object> redisTemplate;
+    private RedisTemplate<String, String> redisTemplate;
 
     @Autowired
     @Lazy
@@ -60,11 +61,17 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public void set(String key, Object value, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            String jsonStr = value.toString();
+            try{
+                jsonStr = objectMapper.writeValueAsString(value);
+            }catch (Exception e){
+                //
+            }
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
-                forValue.set(key, value, expireSeconds, TimeUnit.SECONDS);
+                forValue.set(key, jsonStr, expireSeconds, TimeUnit.SECONDS);
             }else{
-                forValue.set(key, value);
+                forValue.set(key, jsonStr);
             }
         }else{
             this.defaultCacheManager.set(key, value, expireSeconds, mode);
@@ -74,11 +81,17 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            String jsonStr = value.toString();
+            try{
+                jsonStr = objectMapper.writeValueAsString(value);
+            }catch (Exception e){
+                //
+            }
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
-                forValue.set(key, value, expireSeconds, TimeUnit.SECONDS);
+                forValue.set(key, jsonStr, expireSeconds, TimeUnit.SECONDS);
             }else{
-                forValue.set(key, value);
+                forValue.set(key, jsonStr);
             }
         }else{
             this.defaultCacheManager.set(key, value, expireSeconds, oldExpireSeconds, mode);
@@ -125,9 +138,13 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public Object get(String key, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             try{
-                ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
-                Object value = forValue.get(key);
-                return value;
+                ValueOperations<String, String> forValue = redisTemplate.opsForValue();
+                String value = forValue.get(key);
+                try{
+                    return JSONUtil.parseObj(value);
+                }catch (Exception e){
+                    return value;
+                }
             }catch (Exception e){
                 log.warn(IOUtils.getThrowableInfo(e));
                 return null;
@@ -144,15 +161,14 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public <T> T get(String key, Class<T> type) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             try{
-                Object value = forValue.get(key);
+                String value = forValue.get(key);
                 if(value == null){
                     return null;
                 }
                 try{
-                    String result = objectMapper.writeValueAsString(value);
-                    return objectMapper.readValue(result, type);
+                    return objectMapper.readValue(value, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -168,15 +184,14 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public <T> T get(String key, Class<T> type, Long expireSeconds) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             try{
-                Object value = forValue.get(key);
+                String value = forValue.get(key);
                 if(value == null){
                     return null;
                 }
                 try{
-                    String result = objectMapper.writeValueAsString(value);
-                    return objectMapper.readValue(result, type);
+                    return objectMapper.readValue(value, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -192,15 +207,14 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public <T> T get(String key, Class<T> type, CacheExpireMode mode) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             try{
-                Object value = forValue.get(key);
+                String value = forValue.get(key);
                 if(value == null){
                     return null;
                 }
                 try{
-                    String result = objectMapper.writeValueAsString(value);
-                    return objectMapper.readValue(result, type);
+                    return objectMapper.readValue(value, type);
                 }catch (Exception e){
                     return (T) value;
                 }
@@ -216,15 +230,14 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     @Override
     public <T> T get(String key, Class<T> type, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
-            ValueOperations<String, Object> forValue = redisTemplate.opsForValue();
+            ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             try{
-                Object value = forValue.get(key);
+                String value = forValue.get(key);
                 if(value == null){
                     return null;
                 }
                 try{
-                    String result = objectMapper.writeValueAsString(value);
-                    return objectMapper.readValue(result, type);
+                    return objectMapper.readValue(value, type);
                 }catch (Exception e){
                     return (T) value;
                 }finally {

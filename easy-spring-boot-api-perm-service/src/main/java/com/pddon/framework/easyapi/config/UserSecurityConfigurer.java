@@ -5,13 +5,15 @@ import com.pddon.framework.easyapi.EasyApiCacheSessionDAO;
 import com.pddon.framework.easyapi.UserAuthorizingRealm;
 import com.pddon.framework.easyapi.filter.UserAuthenticatingFilter;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
+import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.session.mgt.SessionManager;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.apache.shiro.web.session.mgt.DefaultWebSessionManager;
 import org.mybatis.spring.mapper.MapperScannerConfigurer;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -42,13 +44,33 @@ public class UserSecurityConfigurer {
         return configurer;
     }
 
+    // Cookie生成器
     @Bean
-    public EasyApiCacheSessionDAO sessionDAO(@Autowired com.pddon.framework.easyapi.SessionManager sessionManager, @Autowired CacheManager cacheManager) {
+    public SimpleCookie simpleCookie(SecurityConfigProperties securityConfigProperties) {
+        SimpleCookie simpleCookie = new SimpleCookie("rememberMe");
+        // Cookie有效时间，单位：秒
+        simpleCookie.setMaxAge(securityConfigProperties.getRememberMeSeconds());
+        return simpleCookie;
+    }
+
+    // 记住我管理器
+    @Bean
+    public CookieRememberMeManager cookieRememberMeManager(SimpleCookie simpleCookie) {
+        CookieRememberMeManager cookieRememberMeManager = new CookieRememberMeManager();
+        // Cookie生成器
+        cookieRememberMeManager.setCookie(simpleCookie);
+        // Cookie加密的密钥
+        cookieRememberMeManager.setCipherKey(Base64.decode("6ZmI6I2j3Y+R1aSn5BOlAA=="));
+        return cookieRememberMeManager;
+    }
+
+    @Bean
+    public EasyApiCacheSessionDAO sessionDAO(com.pddon.framework.easyapi.SessionManager sessionManager, CacheManager cacheManager) {
         return new EasyApiCacheSessionDAO(sessionManager, cacheManager);
     }
 
     @Bean("shiroSessionManager")
-    public SessionManager shiroSessionManager(@Autowired EasyApiCacheSessionDAO sessionDAO) {
+    public SessionManager shiroSessionManager(EasyApiCacheSessionDAO sessionDAO) {
         DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
         sessionManager.setSessionValidationSchedulerEnabled(true);
         sessionManager.setSessionIdCookieEnabled(true);
@@ -57,11 +79,15 @@ public class UserSecurityConfigurer {
     }
 
     @Bean("securityManager")
-    public SecurityManager securityManager(UserAuthorizingRealm userAuthorizingRealm, HashedCredentialsMatcher credentialsMatcher, SessionManager shiroSessionManager) {
+    public SecurityManager securityManager(UserAuthorizingRealm userAuthorizingRealm,
+                                           HashedCredentialsMatcher credentialsMatcher,
+                                           SessionManager shiroSessionManager,
+                                           CookieRememberMeManager rememberMeManager) {
         userAuthorizingRealm.setCredentialsMatcher(credentialsMatcher);
         DefaultWebSecurityManager securityManager = new DefaultWebSecurityManager();
         securityManager.setRealm(userAuthorizingRealm);
         securityManager.setSessionManager(shiroSessionManager);
+        securityManager.setRememberMeManager(rememberMeManager);
 
         return securityManager;
     }
@@ -76,11 +102,13 @@ public class UserSecurityConfigurer {
     }
 
     @Bean("shiroFilter")
-    public ShiroFilterFactoryBean shirFilter(@Autowired SecurityConfigProperties securityConfigProperties, @Autowired SecurityManager securityManager, @Autowired com.pddon.framework.easyapi.SessionManager sessionManager) {
+    public ShiroFilterFactoryBean shiroFilter(SecurityConfigProperties securityConfigProperties,
+                                             SecurityManager securityManager,
+                                             com.pddon.framework.easyapi.SessionManager sessionManager) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
 
-        //oauth过滤
+        //auth过滤
         Map<String, Filter> filters = new HashMap<>(16);
         filters.put("userAuthFilter", new UserAuthenticatingFilter(sessionManager));
         shiroFilter.setFilters(filters);
@@ -88,6 +116,8 @@ public class UserSecurityConfigurer {
         Map<String, String> filterMap = new LinkedHashMap<>();
         filterMap.put("/druid/**", "anon");
         filterMap.put("/login", "anon");
+        filterMap.put(securityConfigProperties.getLoginUrl(), "anon");
+        filterMap.put(securityConfigProperties.getUnauthorizedUrl(), "anon");
 
         filterMap.put("/favicon.ico", "anon");
         filterMap.put("/doc.html", "anon");
@@ -96,6 +126,7 @@ public class UserSecurityConfigurer {
         filterMap.put("/swagger-ui/**", "anon");
         filterMap.put("/swagger-resources", "anon");
         filterMap.put("/webjars/**", "anon");
+        filterMap.put("/druid/**", "anon");
         filterMap.put("/assets/**", "anon");
         filterMap.put("/css/**", "anon");
         filterMap.put("/js/**", "anon");
@@ -106,7 +137,7 @@ public class UserSecurityConfigurer {
         });
         //需要认证后才能访问的业务资源
         Arrays.stream(securityConfigProperties.getAuthAccessResourceUrls()).forEach(url -> {
-            filterMap.put(url, "authc");
+            filterMap.put(url, "userAuthFilter");
         });
         //需要特殊权限访问用户资源
         securityConfigProperties.getResourcePerms().forEach((url, permArr) -> {

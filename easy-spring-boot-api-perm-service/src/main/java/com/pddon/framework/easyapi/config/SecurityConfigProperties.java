@@ -44,19 +44,23 @@ public class SecurityConfigProperties implements Serializable {
     /**
      * 当无权限时跳转的页面
      */
-    private String loginUrl = "login.html";
+    private String loginUrl = "/login.html";
     /**
      * 当无权限时跳转的页面
      */
-    private String unauthorizedUrl = "login.html";
+    private String unauthorizedUrl = "/unauthorized.html";
     /**
      * 成功时跳转的页面
      */
-    private String successUrl = "index.html";
+    private String successUrl = "/index.html";
     /**
-     * 会话最大存货时间，秒，默认1天过期，为负数时则代表会话不过期
+     * 会话最大存活时间，秒，默认1天过期，为负数时则代表会话不过期
      */
-    private Integer sessionLiveTimeSeconds = 86400;
+    private Integer sessionLiveTimeSeconds = 24 * 60 * 60;
+    /**
+     * 认证结果存储最大时长，默认7小时有效
+     */
+    private Integer rememberMeSeconds = 7 * 60 * 60;
     /**
      * 是否缓存用户权限信息
      */

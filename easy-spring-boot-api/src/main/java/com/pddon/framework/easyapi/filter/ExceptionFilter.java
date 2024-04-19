@@ -39,9 +39,9 @@ public class ExceptionFilter implements Filter {
             DefaultResponseWrapper<?> responseWrapper = apiExceptionAspector.resolveRestControllerException((HttpServletRequest) request, (HttpServletResponse) response, null, e);
             //返回错误信息
             try{
-                ((HttpServletResponse) response).setHeader("Content-Type", "application/json;charset=utf-8");
-                response.setContentType("application/json;charset=utf-8");
                 if(!response.isCommitted()){
+                    ((HttpServletResponse) response).setHeader("Content-Type", "application/json;charset=utf-8");
+                    response.setContentType("application/json;charset=utf-8");
                     response.getWriter().print(objectMapper.writeValueAsString(responseWrapper));
                     response.getWriter().flush();
                 }

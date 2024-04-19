@@ -16,9 +16,13 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.annotation.PropertyAccessor;
 import com.fasterxml.jackson.databind.DeserializationFeature;
+import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.fasterxml.jackson.databind.jsontype.impl.LaissezFaireSubTypeValidator;
+import com.fasterxml.jackson.datatype.jdk8.Jdk8Module;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.module.paramnames.ParameterNamesModule;
 import com.pddon.framework.easyapi.dao.cache.RedisOrLocalCache;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
@@ -104,27 +108,37 @@ public class RedisConfig {
 
     @SuppressWarnings("all")
     @Bean //该方法的返回对象交于spring容器管理
-    public RedisTemplate<String, Object> redisTemplate(RedisConnectionFactory factory) {
-        RedisTemplate<String, Object> template = new RedisTemplate<>();
+    public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, String> template = new RedisTemplate<>();
         RedisSerializer<String> redisSerializer = new StringRedisSerializer();
-        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(Object.class);
+        /*Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(String.class);
         ObjectMapper om = new ObjectMapper();
+        // 给JsonMapper显示注册上此模块
+        om.registerModule(new ParameterNamesModule());
+        om.registerModule(new JavaTimeModule());
+        om.registerModule(new Jdk8Module());
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
         om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         om.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
+        om.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
+        om.configure(DeserializationFeature.FAIL_ON_UNRESOLVED_OBJECT_IDS, false);
+        om.configure(DeserializationFeature.FAIL_ON_MISSING_EXTERNAL_TYPE_ID_PROPERTY, false);
+        om.configure(DeserializationFeature.FAIL_ON_MISSING_CREATOR_PROPERTIES, false);
         om.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        om.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
+        om.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, true);
         om.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         om.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        jackson2JsonRedisSerializer.setObjectMapper(om);
+        jackson2JsonRedisSerializer.setObjectMapper(om);*/
         template.setConnectionFactory(factory);
         //key序列化方式
         template.setKeySerializer(redisSerializer);
         //value序列化
-        template.setValueSerializer(jackson2JsonRedisSerializer);
+        template.setValueSerializer(redisSerializer);
         //value hashmap序列化
-        template.setHashValueSerializer(jackson2JsonRedisSerializer);
+        template.setHashValueSerializer(redisSerializer);
         //field序列化  key field  value
         template.setHashKeySerializer(redisSerializer);
         return template;

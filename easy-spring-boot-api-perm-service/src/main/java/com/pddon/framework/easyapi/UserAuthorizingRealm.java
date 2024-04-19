@@ -57,20 +57,20 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
 
         //根据sessionId，查询用户信息
         BaseUser user = userSecurityService.queryBySessionId(sessionId);
-        //需要登录
+        //账户未找到
         if (user == null) {
-            throw new BusinessException(ErrorCodes.NEED_SESSION_ID);
+            throw new UnknownAccountException(ErrorCodes.ACCOUNT_NOT_FOUND.getMsgCode());
         }
         //token失效
         if(securityConfigProperties.sessionCanExpire() && ((user.getLastLoginTime().getTime() + securityConfigProperties.getSessionLiveTimeSeconds() * 1000) < System.currentTimeMillis())){
-            throw new BusinessException(ErrorCodes.INVALID_SESSION_ID);
+            throw new ExpiredCredentialsException(ErrorCodes.INVALID_SESSION_ID.getMsgCode());
         }
 
         //账号锁定
         if (UserAccountStatus.DISABLE.name().equalsIgnoreCase(user.getAccountStatus())) {
-            throw new LockedAccountException("账号已被禁用,请联系管理员");
+            throw new DisabledAccountException(ErrorCodes.ACCOUNT_DISABLED.getMsgCode());
         }else if (UserAccountStatus.FROZEN.name().equalsIgnoreCase(user.getAccountStatus())) {
-            throw new LockedAccountException("账号已被冻结,请联系管理员");
+            throw new LockedAccountException(ErrorCodes.ACCOUNT_LOCKED.getMsgCode());
         }
 
         return new SimpleAuthenticationInfo(user, user.getPassword(), getName());

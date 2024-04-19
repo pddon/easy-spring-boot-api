@@ -8,11 +8,14 @@ import com.pddon.framework.easyapi.dto.UserAuthenticationToken;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.utils.HttpHelper;
+import com.pddon.framework.easyapi.utils.StaticResourceUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.AllArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authc.AuthenticationToken;
 import org.apache.shiro.web.filter.authc.AuthenticatingFilter;
+import org.apache.shiro.web.util.WebUtils;
+import org.springframework.stereotype.Component;
 import org.springframework.web.bind.ServletRequestBindingException;
 import org.springframework.web.bind.ServletRequestUtils;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -33,7 +36,8 @@ import javax.servlet.http.HttpServletRequest;
 @Slf4j
 public class UserAuthenticatingFilter extends AuthenticatingFilter {
 
-    private SessionManager sessionManager;
+    private final SessionManager sessionManager;
+
     private String getParam(ServletRequest request, String paramName){
         String paramValue = null;
         String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(paramName);
@@ -85,6 +89,10 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
             RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE), locale);
         }
         if (StringUtils.isBlank(sessionId)) {
+            if(StaticResourceUtils.isStaticResourceRequest(WebUtils.toHttp(request))){
+                super.redirectToLogin(request, response);
+                return false;
+            }
             throw new BusinessException(ErrorCodes.NEED_SESSION_ID);
         }
 

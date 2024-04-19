@@ -23,6 +23,7 @@ public enum DefaultConfigPropertiesValue {
 	,EASYAPI_BASE_PACKAGES("easyapi.basePackages","com.pddon.framework.easyapi", DefaultConfigValueMode.PREPEND)
 	,EASYAPI_DEFAULT_LOG_LEVEL("logging.level.com.pddon.framework.easyapi","INFO", DefaultConfigValueMode.OPTION)
 	,EASYAPI_ENABLE("easyapi.enable",true, DefaultConfigValueMode.OPTION)
+	,EASYAPI_LOCALE("easyapi.locale","zh_CN", DefaultConfigValueMode.OPTION)
 	,EASYAPI_ENABLE_SWAGGER("easyapi.enableSwagger",true, DefaultConfigValueMode.OPTION)
 	,EASYAPI_ENABLE_PERSIST_SESSION("easyapi.enablePersistSession",false, DefaultConfigValueMode.OPTION)
 	,SRPRING_MSG_USE_CODE_AS_DEFAULT_MESSAGE("spring.messages.useCodeAsDefaultMessage",false, DefaultConfigValueMode.FORCE_DEFAULT)

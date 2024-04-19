@@ -38,6 +38,10 @@ public enum ErrorCodes {
 	ERROR_SIGN(130005),//验签失败
 	UNIQUE_TOKEN_USING(130006),//您提交的请求正在处理，请勿重复提交
 	UNIQUE_TOKEN_USED(130007),//你的请求数据已提交成功，请勿重复提交
+
+	ACCOUNT_DISABLED(130011),//账户被禁用
+	ACCOUNT_LOCKED(130012),//账户被锁定
+	ACCOUNT_NOT_FOUND(130013),//账户未找到
 	
 	//接口权限相关错误码	
 	NOT_PERMIT_APPID(140001),//该渠道禁止访问	
@@ -59,6 +63,7 @@ public enum ErrorCodes {
         this.code = code;
         this.msgCode = "system."+BeanPropertyUtil.lineToHump(this.name());
     }
+
 	public Integer getCode(){
 		return this.code;
 	}
@@ -68,6 +73,14 @@ public enum ErrorCodes {
 	public static ErrorCodes getByCode(Integer code){
 		for(ErrorCodes error :ErrorCodes.values()){
 			if(code.equals(error.getCode()))
+				return error;
+		}
+		return ErrorCodes.BUSINNES_ERROR;
+	}
+
+	public static ErrorCodes getByMsgCode(String message) {
+		for(ErrorCodes error :ErrorCodes.values()){
+			if(message.equals(error.getMsgCode()))
 				return error;
 		}
 		return ErrorCodes.BUSINNES_ERROR;

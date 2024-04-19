@@ -3,12 +3,10 @@ package com.pddon.framework.easyapi;
 import com.pddon.framework.easyapi.dto.UserSimpleSession;
 import lombok.AllArgsConstructor;
 import org.apache.shiro.session.Session;
-import org.apache.shiro.session.mgt.SimpleSession;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+
 
 /**
  * @ClassName: EasyApiCacheSessionDAO
