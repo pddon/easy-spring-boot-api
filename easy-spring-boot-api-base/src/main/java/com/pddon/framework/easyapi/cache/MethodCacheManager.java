@@ -32,7 +32,26 @@ public class MethodCacheManager {
 
 	@Autowired
 	private SystemParameterRenameProperties systemParameterRenameProperties;
-	
+
+	public String getFieldValue(String keyId, String[] parameters, Object [] args, Method method){
+		//提取参数信息
+		Map<String, String> nameValueMap = new HashMap<>();
+		int i = 0;
+		String paramName = "";
+		for(Object param : args){
+			paramName = MethodInvokeUtil.getBaseTypeParamName(method.getParameterAnnotations()[i]);
+			if(StringUtils.isBlank(paramName)){
+				if(parameters != null){
+					paramName = parameters[i];
+				}else{
+					paramName = "p"+i;
+				}
+			}
+			nameValueMap.putAll(BeanPropertyUtil.objToStringMap(param, paramName));
+			i++;
+		}
+		return nameValueMap.get(keyId);
+	}
 	public String getCacheKey(String prefix, CacheKeyMode mode, String keyId, String[] parameters, Object [] args, Class<?> targetClass, Method method){
 		//先提取缓存前缀
 		if(StringUtils.isBlank(prefix)){

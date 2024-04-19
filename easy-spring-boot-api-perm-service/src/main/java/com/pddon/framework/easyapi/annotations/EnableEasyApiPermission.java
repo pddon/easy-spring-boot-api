@@ -8,9 +8,7 @@
 */ 
 package com.pddon.framework.easyapi.annotations;
 
-import com.pddon.framework.easyapi.config.UserSecurityConfig;
-import com.pddon.framework.easyapi.dao.config.MybatisPlusConfig;
-import com.pddon.framework.easyapi.dao.config.RedisConfig;
+import com.pddon.framework.easyapi.config.UserSecurityConfigurer;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -19,7 +17,7 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({UserSecurityConfig.class})
+@Import({UserSecurityConfigurer.class})
 public @interface EnableEasyApiPermission {
     
 }

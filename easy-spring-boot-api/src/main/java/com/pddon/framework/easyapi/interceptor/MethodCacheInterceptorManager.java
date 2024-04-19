@@ -63,13 +63,21 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 		CacheMethodResult cacheMethodResult = AnnotationUtils.findAnnotation(method, CacheMethodResult.class);
 		CacheMethodResultEvict cacheMethodResultEvict = AnnotationUtils.findAnnotation(method, CacheMethodResultEvict.class);
 		if(cacheMethodResult != null){
+			//获取缓存key
+			String cacheKey = methodCacheManager.getCacheKey(cacheMethodResult.prefix(), cacheMethodResult.keyMode(), cacheMethodResult.id(), parameters, args, targetClass, method);
+			String needCacheFlag = methodCacheManager.getFieldValue(cacheMethodResult.needCacheField(), parameters, args, method);
+			if(StringUtils.isNotEmpty(needCacheFlag) && needCacheFlag.equalsIgnoreCase(Boolean.FALSE.toString())){
+				//关闭缓存功能
+				if(log.isTraceEnabled()){
+					log.trace("缓存方法{}的执行结果功能已关闭，直接执行业务!", cacheKey);
+				}
+				return invocation.proceed();
+			}
 			//缓存
 			cacheManager = SpringBeanUtil.getBean(cacheMethodResult.cacheManager());
 			if(cacheManager == null){
 				throw new BusinessException(ErrorCodes.NOT_FOUND_CONFIG).setParam(cacheMethodResult.cacheManager().toString());
 			}
-			//获取缓存key
-			String cacheKey = methodCacheManager.getCacheKey(cacheMethodResult.prefix(), cacheMethodResult.keyMode(), cacheMethodResult.id(), parameters, args, targetClass, method);
 
 			if(StringUtils.isNotEmpty(cacheKey)){
 				//检查是否存在方法结果缓存

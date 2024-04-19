@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 
 import java.util.Set;
@@ -24,9 +25,11 @@ public interface UserSecurityService {
     /**
      * 通过用户ID查询用户权限信息
      * @param userId
+     * @param cacheable
      * @return {@link Set<String>}
      * @author: Allen
      * @Date: 2024/4/16 0:13
      */
-    Set<String> getUserPermissions(String userId);
+    @CacheMethodResult(prefix = "User:Perms", id = "userId", needCacheField = "cacheable", expireSeconds = 3600)
+    Set<String> getUserPermissions(String userId, boolean cacheable);
 }

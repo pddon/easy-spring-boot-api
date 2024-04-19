@@ -38,6 +38,14 @@ public @interface CacheMethodResult {
 	 */
 	@AliasFor("value")
 	String id() default "";
+
+	/**
+	 * 通过参数值觉得是否启用缓存功能
+	 * @return {@link String}
+	 * @author: Allen
+	 * @Date: 2024/4/19 17:25
+	 */
+	String needCacheField() default "";
 	
 	/**
 	 * 缓存前缀标识,如果不指定则自动生成

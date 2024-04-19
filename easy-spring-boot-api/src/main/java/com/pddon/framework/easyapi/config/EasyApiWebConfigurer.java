@@ -112,7 +112,7 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
         RepeatedlyReadFilter repeatedlyReadFilter = new RepeatedlyReadFilter();
         registration.setFilter(repeatedlyReadFilter);
         registration.addUrlPatterns("/*");
-		registration.setOrder(Integer.MAX_VALUE);
+		registration.setOrder(Ordered.HIGHEST_PRECEDENCE + 1);
 		registration.setEnabled(true);
         return registration;
     }
@@ -123,7 +123,7 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
 		registration.setFilter(exceptionFilter);
 		registration.setName("exceptionFilter");
 		//此处尽量小，要比其他Filter靠前
-		registration.setOrder(Integer.MIN_VALUE);
+		registration.setOrder(Ordered.HIGHEST_PRECEDENCE);
 		registration.addUrlPatterns("/*");
 		registration.setEnabled(true);
 		return registration;

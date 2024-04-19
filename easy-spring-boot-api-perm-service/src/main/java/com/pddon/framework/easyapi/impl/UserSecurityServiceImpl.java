@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.pddon.framework.easyapi.UserSecurityService;
+import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.entity.*;
 import com.pddon.framework.easyapi.utils.StringUtils;
@@ -51,11 +52,13 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     }
 
     @Override
-    public Set<String> getUserPermissions(String userId) {
+    @CacheMethodResult(prefix = "User:Perms", id = "userId", needCacheField = "cacheable", expireSeconds = 3600)
+    public Set<String> getUserPermissions(String userId, boolean cacheable) {
         if(StringUtils.isEmpty(userId)){
             return new HashSet<>();
         }
         if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId)){
+            //超级管理员具有所有权限
             return getAllPermissions();
         }
         Set<String> perms = new HashSet<>();

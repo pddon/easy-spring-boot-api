@@ -1,8 +1,11 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.config.SecurityConfigProperties;
+import com.pddon.framework.easyapi.consts.ErrorCodes;
 import com.pddon.framework.easyapi.dao.consts.UserAccountStatus;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dto.UserAuthenticationToken;
+import com.pddon.framework.easyapi.exception.BusinessException;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -23,11 +26,9 @@ import java.util.Set;
  */
 @Component
 public class UserAuthorizingRealm extends AuthorizingRealm {
-    /**
-     * 默认会话ID一天时间过期
-     */
-    @Value("${easyapi.session.liveTimeSeconds:86400}")
-    private Long sessionLiveTimeSeconds;
+
+    @Autowired
+    private SecurityConfigProperties securityConfigProperties;
 
     @Autowired
     private UserSecurityService userSecurityService;
@@ -43,7 +44,7 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
         String userId = user.getUserId();
 
         //用户权限列表
-        Set<String> permsSet = userSecurityService.getUserPermissions(userId);
+        Set<String> permsSet = userSecurityService.getUserPermissions(userId, securityConfigProperties.isCacheable());
 
         SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
         info.setStringPermissions(permsSet);
@@ -56,9 +57,13 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
 
         //根据sessionId，查询用户信息
         BaseUser user = userSecurityService.queryBySessionId(sessionId);
+        //需要登录
+        if (user == null) {
+            throw new BusinessException(ErrorCodes.NEED_SESSION_ID);
+        }
         //token失效
-        if (user == null || (user.getLastLoginTime().getTime() + sessionLiveTimeSeconds * 1000) < System.currentTimeMillis()) {
-            throw new IncorrectCredentialsException("sessionId失效，请重新登录");
+        if(securityConfigProperties.sessionCanExpire() && ((user.getLastLoginTime().getTime() + securityConfigProperties.getSessionLiveTimeSeconds() * 1000) < System.currentTimeMillis())){
+            throw new BusinessException(ErrorCodes.INVALID_SESSION_ID);
         }
 
         //账号锁定
