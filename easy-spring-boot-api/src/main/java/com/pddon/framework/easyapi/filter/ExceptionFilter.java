@@ -2,6 +2,7 @@ package com.pddon.framework.easyapi.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pddon.framework.easyapi.aspect.ApiExceptionAspector;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -49,6 +50,9 @@ public class ExceptionFilter implements Filter {
                 log.warn(IOUtils.getThrowableInfo(ex));
                 throw ex;
             }
+        }finally {
+            //清理数据
+            RequestContext.getContext().clear();
         }
     }
 

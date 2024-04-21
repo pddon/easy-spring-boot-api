@@ -38,43 +38,21 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
 
     private final SessionManager sessionManager;
 
-    private String getParam(ServletRequest request, String paramName){
-        String paramValue = null;
-        String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(paramName);
-        //从query参数中获取
-        try {
-            paramValue = ServletRequestUtils.getStringParameter(request, key);
-            if(paramValue != null){
-                return paramValue;
-            }
-        } catch (ServletRequestBindingException e) {
-            //
-        }
-        if(request instanceof HttpServletRequest){
-            //从header中获取
-            paramValue = ((HttpServletRequest)request).getHeader(key);
-            if(paramValue != null){
-                return paramValue;
-            }
-            //从body中获取
-            String method = ((HttpServletRequest) request).getMethod();
-            if(RequestMethod.GET.name().equals(method) || RequestMethod.HEAD.name().equals(method) || RequestMethod.TRACE.name().equals(method)){
-                return paramValue;
-            }
-            paramValue = HttpHelper.getJsonBodyStringParam(request, key);
-        }
-        return paramValue;
-    }
     @Override
     protected AuthenticationToken createToken(ServletRequest request, ServletResponse response) throws Exception {
-        String sessionId = getParam(request, SystemParameterRenameProperties.SESSION_ID);
-        String locale = getParam(request, SystemParameterRenameProperties.LOCALE);
+        //获取请求会话ID
+        String[] params = HttpHelper.getParams(request,
+                SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID),
+                SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE));
+        String sessionId = params[0];
+        String locale = params[1];
         if(StringUtils.isNotEmpty(locale)){
             RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE), locale);
         }
         if(StringUtils.isEmpty(sessionId)){
             return null;
         }
+        RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID), sessionId);
         Session session = sessionManager.get(sessionId);
         UserAuthenticationToken token = new UserAuthenticationToken(sessionId, session);
         return token;
@@ -82,9 +60,12 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
 
     @Override
     protected boolean onAccessDenied(ServletRequest request, ServletResponse response) throws Exception {
-        //获取请求token，如果token不存在，直接返回401
-        String sessionId = getParam(request, SystemParameterRenameProperties.SESSION_ID);
-        String locale = getParam(request, SystemParameterRenameProperties.LOCALE);
+        //获取请求会话ID
+        String[] params = HttpHelper.getParams(request,
+                SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID),
+                SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE));
+        String sessionId = params[0];
+        String locale = params[1];
         if(StringUtils.isNotEmpty(locale)){
             RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.LOCALE), locale);
         }
@@ -95,7 +76,7 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
             }
             throw new BusinessException(ErrorCodes.NEED_SESSION_ID);
         }
-
+        RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID), sessionId);
         return executeLogin(request, response);
     }
 }

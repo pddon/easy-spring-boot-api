@@ -20,6 +20,8 @@ import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.SessionManager;
 import com.pddon.framework.easyapi.dto.Session;
 
+import java.util.Date;
+
 @Setter
 public class DefaultSessionManagerImpl implements SessionManager {
 
@@ -54,12 +56,16 @@ public class DefaultSessionManagerImpl implements SessionManager {
 				.setTimeZone(context.getTimeZone())
 				.setUserId(context.getUserId())
 				.setVersionCode(context.getVersionCode())
+				.setNewSession(true)
+				.setCreateTime(new Date())
 				;
 			
 			cacheManager.set(sessionId, session, expireSeconds, CacheExpireMode.EXPIRE_AFTER_REDA);
 			RequestContext.getContext().setSession(session);
 			RequestContext.getContext().setAttachment(
 					SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID), sessionId);
+		}else{
+			session.setNewSession(false).setLastTime(new Date());
 		}
 		return session;
 	}

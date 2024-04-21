@@ -11,4 +11,6 @@ import com.pddon.framework.easyapi.dao.entity.BaseUser;
  */
 public interface BaseUserDao<K extends BaseUser> {
     BaseUser getBySessionId(String sessionId);
+
+    BaseUser getByUserId(String userId);
 }

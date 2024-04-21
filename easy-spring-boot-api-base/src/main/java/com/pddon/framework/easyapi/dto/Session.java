@@ -9,14 +9,20 @@
 package com.pddon.framework.easyapi.dto;
 
 import java.io.Serializable;
-import java.util.Map;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpSession;
+import javax.servlet.http.HttpSessionContext;
+
 @Data
 @Accessors(chain = true)
-public class Session implements Serializable{
+public class Session implements HttpSession, Serializable{
 	/** 
 	 *serialVersionUID
 	 */
@@ -72,5 +78,119 @@ public class Session implements Serializable{
 	/**
 	 * 其他可自定义配置的额外参数
 	 */
-	private Map<String, Object> expandParams;
+	private Map<String, Object> expandParams = new HashMap<>();
+
+	private Date createTime;
+
+	private Date lastTime;
+
+	private ServletContext servletContext;
+
+	private HttpSessionContext sessionContext;
+
+	private int maxInactiveInterval;
+
+	private boolean newSession;
+
+	@JsonIgnore
+	@Override
+	public long getCreationTime() {
+		return createTime.getTime();
+	}
+
+	@JsonIgnore
+	@Override
+	public String getId() {
+		return sessionId;
+	}
+
+	@JsonIgnore
+	@Override
+	public long getLastAccessedTime() {
+		return lastTime.getTime();
+	}
+
+	@JsonIgnore
+	@Override
+	public ServletContext getServletContext() {
+		return servletContext;
+	}
+
+	@Override
+	public void setMaxInactiveInterval(int interval) {
+		this.maxInactiveInterval = interval;
+	}
+
+	@Override
+	public int getMaxInactiveInterval() {
+		return maxInactiveInterval;
+	}
+
+	@JsonIgnore
+	@Override
+	public HttpSessionContext getSessionContext() {
+		return sessionContext;
+	}
+
+	@JsonIgnore
+	@Override
+	public Object getAttribute(String name) {
+		return this.expandParams.get(name);
+	}
+
+	@JsonIgnore
+	@Override
+	public Object getValue(String name) {
+		return this.expandParams.get(name);
+	}
+
+	@JsonIgnore
+	@Override
+	public Enumeration<String> getAttributeNames() {
+		return Collections.enumeration(this.expandParams.keySet());
+	}
+
+	@JsonIgnore
+	@Override
+	public String[] getValueNames() {
+		Set<String> keys = this.expandParams.keySet();
+		String[] stringArray = keys.toArray(new String[keys.size()]);
+		return stringArray;
+	}
+
+	@JsonIgnore
+	@Override
+	public void setAttribute(String name, Object value) {
+		this.expandParams.put(name, value);
+	}
+
+	@JsonIgnore
+	@Override
+	public void putValue(String name, Object value) {
+		this.expandParams.put(name, value);
+	}
+
+	@JsonIgnore
+	@Override
+	public void removeAttribute(String name) {
+		this.expandParams.remove(name);
+	}
+
+	@JsonIgnore
+	@Override
+	public void removeValue(String name) {
+		this.expandParams.remove(name);
+	}
+
+	@JsonIgnore
+	@Override
+	public void invalidate() {
+
+	}
+
+	@JsonIgnore
+	@Override
+	public boolean isNew() {
+		return newSession;
+	}
 }

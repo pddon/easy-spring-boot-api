@@ -8,6 +8,7 @@ import com.pddon.framework.easyapi.cache.LocalWriteCacheContainer;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.dao.utils.RedisUtil;
 import com.pddon.framework.easyapi.dto.CacheManagerState;
+import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.InitializingBean;
@@ -62,10 +63,12 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public void set(String key, Object value, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             String jsonStr = value.toString();
-            try{
-                jsonStr = objectMapper.writeValueAsString(value);
-            }catch (Exception e){
-                //
+            if(!BeanPropertyUtil.isBaseType(value)){
+                try{
+                    jsonStr = objectMapper.writeValueAsString(value);
+                }catch (Exception e){
+                    log.warn(IOUtils.getThrowableInfo(e));
+                }
             }
             ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){
@@ -82,10 +85,12 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     public void set(String key, Object value, Long expireSeconds, Long oldExpireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             String jsonStr = value.toString();
-            try{
-                jsonStr = objectMapper.writeValueAsString(value);
-            }catch (Exception e){
-                //
+            if(!BeanPropertyUtil.isBaseType(value)){
+                try{
+                    jsonStr = objectMapper.writeValueAsString(value);
+                }catch (Exception e){
+                    log.warn(IOUtils.getThrowableInfo(e));
+                }
             }
             ValueOperations<String, String> forValue = redisTemplate.opsForValue();
             if(expireSeconds != null && expireSeconds > 0){

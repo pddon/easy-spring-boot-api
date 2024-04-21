@@ -4,6 +4,7 @@ import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.EasyApiCacheSessionDAO;
 import com.pddon.framework.easyapi.UserAuthorizingRealm;
 import com.pddon.framework.easyapi.filter.UserAuthenticatingFilter;
+import com.pddon.framework.easyapi.impl.EasyApiWebSessionManager;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
@@ -70,8 +71,8 @@ public class UserSecurityConfigurer {
     }
 
     @Bean("shiroSessionManager")
-    public SessionManager shiroSessionManager(EasyApiCacheSessionDAO sessionDAO) {
-        DefaultWebSessionManager sessionManager = new DefaultWebSessionManager();
+    public SessionManager shiroSessionManager(EasyApiCacheSessionDAO sessionDAO, com.pddon.framework.easyapi.SessionManager easyApiSessionManager) {
+        EasyApiWebSessionManager sessionManager = new EasyApiWebSessionManager(easyApiSessionManager);
         sessionManager.setSessionValidationSchedulerEnabled(true);
         sessionManager.setSessionIdCookieEnabled(true);
         sessionManager.setSessionDAO(sessionDAO);

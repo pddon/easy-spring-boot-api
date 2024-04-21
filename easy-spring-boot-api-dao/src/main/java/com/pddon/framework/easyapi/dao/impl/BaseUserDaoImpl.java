@@ -23,4 +23,10 @@ public class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends BaseUser> ex
         List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getSessionId, sessionId).ne(BaseUser::getDeleted, 1));
         return list.size() > 0 ? list.get(0) : null;
     }
+
+    @Override
+    public BaseUser getByUserId(String userId) {
+        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getUserId, userId).ne(BaseUser::getDeleted, 1));
+        return list.size() > 0 ? list.get(0) : null;
+    }
 }

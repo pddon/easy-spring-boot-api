@@ -113,8 +113,6 @@ public class ApiResponseAspector implements ResponseBodyAdvice {
 		} catch (Throwable e) {
 			log.warn(IOUtils.getThrowableInfo(e));
 		}
-		//清理数据
-		RequestContext.getContext().clear();
 		return resp;
 	}
 

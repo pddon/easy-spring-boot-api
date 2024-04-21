@@ -1,6 +1,8 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dto.UserSimpleSession;
+import com.pddon.framework.easyapi.utils.UUIDGenerator;
 import lombok.AllArgsConstructor;
 import org.apache.shiro.session.Session;
 import org.apache.shiro.session.mgt.eis.EnterpriseCacheSessionDAO;
@@ -25,10 +27,14 @@ public class EasyApiCacheSessionDAO extends EnterpriseCacheSessionDAO {
 
     @Override
     protected Serializable doCreate(Session session) {
-        com.pddon.framework.easyapi.dto.Session sessionDto = sessionManager.getCurrentSession(true);
-        this.assignSessionId(session, sessionDto.getSessionId());
-        cacheManager.set(String.format(SHIRO_SESSION_KEY, sessionDto.getSessionId()), session, null);
-        return sessionDto.getSessionId();
+        if(RequestContext.getContext().isShiroSessionEnable()){
+            com.pddon.framework.easyapi.dto.Session sessionDto = sessionManager.getCurrentSession(true);
+            this.assignSessionId(session, sessionDto.getSessionId());
+            cacheManager.set(String.format(SHIRO_SESSION_KEY, sessionDto.getSessionId()), session, null);
+        }else{
+            this.assignSessionId(session, UUIDGenerator.getUUID());
+        }
+        return session.getId();
     }
 
     @Override
@@ -37,13 +43,18 @@ public class EasyApiCacheSessionDAO extends EnterpriseCacheSessionDAO {
         if(session != null){
             return session;
         }
-        return cacheManager.get(String.format(SHIRO_SESSION_KEY, sessionId), UserSimpleSession.class);
+        if(RequestContext.getContext().isShiroSessionEnable()){
+            return cacheManager.get(String.format(SHIRO_SESSION_KEY, sessionId), UserSimpleSession.class);
+        }
+        return null;
     }
 
     @Override
     protected void doUpdate(Session session) {
         super.doUpdate(session);
-        cacheManager.set(String.format(SHIRO_SESSION_KEY, session.getId().toString()), session, null);
+        if(RequestContext.getContext().isShiroSessionEnable()){
+            cacheManager.set(String.format(SHIRO_SESSION_KEY, session.getId().toString()), session, null);
+        }
     }
 
     @Override
@@ -52,7 +63,9 @@ public class EasyApiCacheSessionDAO extends EnterpriseCacheSessionDAO {
             return;
         }
         super.doDelete(session);
-        sessionManager.remove(session.getId().toString());
-        cacheManager.remove(String.format(SHIRO_SESSION_KEY, session.getId().toString()));
+        if(RequestContext.getContext().isShiroSessionEnable()){
+            sessionManager.remove(session.getId().toString());
+            cacheManager.remove(String.format(SHIRO_SESSION_KEY, session.getId().toString()));
+        }
     }
 }

@@ -70,6 +70,10 @@ public class RequestContext {
      */
     private boolean ignoreTenant = false;
     /**
+     * 是否已启用shiro会话
+     */
+    private boolean shiroSessionEnable = false;
+    /**
 	 * 对响应信息进行数字签名的结果
 	 */
 	private DefaultResponseWrapper<?> responseWrapper;
@@ -121,6 +125,7 @@ public class RequestContext {
         this.request = null;
         this.response = null;
         this.ignoreTenant = false;
+        this.shiroSessionEnable = false;
     }
     
     public String getRequestId(){
@@ -143,6 +148,9 @@ public class RequestContext {
     }
     
     public String getSessionId(){
+        if(session != null){
+            return session.getSessionId();
+        }
     	return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID));
     }
     

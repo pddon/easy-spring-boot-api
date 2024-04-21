@@ -32,4 +32,20 @@ public interface UserSecurityService {
      */
     @CacheMethodResult(prefix = "User:Perms", id = "userId", needCacheField = "cacheable", expireSeconds = 3600)
     Set<String> getUserPermissions(String userId, boolean cacheable);
+
+    /**
+     * 用户登录
+     * @param username
+     * @param password
+     * @author: Allen
+     * @Date: 2024/4/21 22:27
+     */
+    void login(String username, String password);
+
+    /**
+     * 用户登出
+     * @author: Allen
+     * @Date: 2024/4/21 22:27
+     */
+    void logout();
 }
