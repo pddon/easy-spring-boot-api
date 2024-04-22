@@ -28,6 +28,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.core.MethodParameter;
 import org.springframework.core.Ordered;
 import org.springframework.format.FormatterRegistry;
@@ -63,6 +64,7 @@ import com.pddon.framework.easyapi.utils.ClassOriginCheckUtil;
 	})
 @ComponentScan("com.pddon.framework.easyapi")
 @ConditionalOnProperty(name={"easyapi.enable"},havingValue = "true")
+@EnableAspectJAutoProxy(exposeProxy = true)
 public class EasyApiWebConfigurer implements WebMvcConfigurer {
 
 	@Autowired

@@ -61,7 +61,7 @@ public class ApiExceptionAspector implements HandlerExceptionResolver{
 		DefaultResponseWrapper<?> responseWrapper = null;
 		
 		for(CommonExceptionHandler h : handlers){
-			if(h.support(ex)){
+			if(!(h instanceof DefaultExceptionHandler) && h.support(ex)){
 				responseWrapper = h.handle(request, response, ex);
 				break;
 			}
