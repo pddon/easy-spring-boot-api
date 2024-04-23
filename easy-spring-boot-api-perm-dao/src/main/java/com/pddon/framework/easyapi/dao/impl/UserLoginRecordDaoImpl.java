@@ -14,7 +14,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 /**
- * @ClassName: BaseUserDaoImpl
+ * @ClassName: UserLoginRecordDaoImpl
  * @Description:
  * @Author: Allen
  * @Date: 2024-04-09 21:54
@@ -24,4 +24,8 @@ import java.util.List;
 @Slf4j
 public class UserLoginRecordDaoImpl extends ServiceImpl<UserLoginRecordMapper, UserLoginRecord> implements UserLoginRecordDao {
 
+    @Override
+    public void addLoginRecord(UserLoginRecord record) {
+        this.save(record);
+    }
 }

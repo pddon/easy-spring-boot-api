@@ -5,7 +5,7 @@ import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.consts.EmailTemplateType;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.SendAuthCodeRequest;
-import com.pddon.framework.easyapi.email.EmailService;
+import com.pddon.framework.easyapi.EmailService;
 import com.pddon.framework.easyapi.email.dto.EmailAuthTokenDto;
 import com.pddon.framework.easyapi.email.dto.EmailTemplateConfig;
 import com.pddon.framework.easyapi.exception.BusinessException;

@@ -18,6 +18,7 @@ import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -53,6 +54,9 @@ public class UserSecurityServiceImpl implements UserSecurityService {
 
     @Autowired
     private PermItemDao permItemDao;
+
+    @Autowired
+    private UserLoginRecordDao userLoginRecordDao;
 
     @Override
     public BaseUser queryBySessionId(String sessionId) {
@@ -92,7 +96,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     }
 
     @Override
-    public void login(String userId, String password) {
+    public void login(String userId, String password, String loginType) {
         // 获取当前用户
         Subject currentUser = SecurityUtils.getSubject();
         // 创建用户令牌，通常是用户名和密码
@@ -111,6 +115,17 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         session.setCountryCode(user.getCountryCode())
                 .setUserId(user.getUserId());
         sessionManager.update(session);
+        Date loginTime = new Date();
+        baseUserDao.updateUserSession(session.getSessionId(), loginTime, user.getUserId());
+        UserLoginRecord record = new UserLoginRecord();
+        record.setUserId(user.getUserId())
+                 .setLoginTime(loginTime)
+                .setLoginType(loginType)
+                .setNickname(user.getNickname())
+                .setDeviceId(RequestContext.getContext().getClientId())
+                .setSessionId(session.getSessionId())
+                .setTenantId(user.getTenantId());
+        userLoginRecordDao.addLoginRecord(record);
     }
 
     @Override

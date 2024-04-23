@@ -2,6 +2,8 @@ package com.pddon.framework.easyapi.dao;
 
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 
+import java.util.Date;
+
 /**
  * @ClassName: BaseUserDao
  * @Description:
@@ -13,4 +15,6 @@ public interface BaseUserDao<K extends BaseUser> {
     BaseUser getBySessionId(String sessionId);
 
     BaseUser getByUserId(String userId);
+
+    boolean updateUserSession(String sessionId, Date loginTime, String userId);
 }

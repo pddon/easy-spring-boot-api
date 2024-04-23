@@ -1,4 +1,4 @@
-package com.pddon.framework.easyapi.email;
+package com.pddon.framework.easyapi;
 
 import com.pddon.framework.easyapi.controller.request.SendAuthCodeRequest;
 import org.springframework.scheduling.annotation.Async;

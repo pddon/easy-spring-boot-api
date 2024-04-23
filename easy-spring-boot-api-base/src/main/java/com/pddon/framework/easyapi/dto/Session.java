@@ -45,6 +45,10 @@ public class Session implements HttpSession, Serializable{
 	 */
 	private String userId;
 	/**
+	 * 用户账号名
+	 */
+	private String username;
+	/**
 	 * 客户端ID,用于区分是哪个APP或者其他客户端的不同分支
 	 */
 	private String clientId;

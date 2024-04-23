@@ -37,10 +37,11 @@ public interface UserSecurityService {
      * 用户登录
      * @param username
      * @param password
+     * @param loginType
      * @author: Allen
      * @Date: 2024/4/21 22:27
      */
-    void login(String username, String password);
+    void login(String username, String password, String loginType);
 
     /**
      * 用户登出
