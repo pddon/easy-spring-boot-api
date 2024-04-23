@@ -76,7 +76,7 @@ public class UserOperateRecord extends BaseTenantEntity{
      private Date operateTime;
 
     /**
-     * 操作时间
+     * 结束时间
      * @author pddon.com
      */
     private Date endTime;

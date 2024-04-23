@@ -32,8 +32,8 @@ public class IdsRequest implements Serializable{
 
 	@ApiModelProperty(
 			allowEmptyValue=false,
-			value="记录的id集合，以逗号分隔"
+			value="记录的id集合"
 			)
-	private String ids;
+	private String[] ids;
 	
 }

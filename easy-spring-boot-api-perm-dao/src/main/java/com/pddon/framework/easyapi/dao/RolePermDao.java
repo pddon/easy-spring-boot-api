@@ -13,4 +13,10 @@ import java.util.List;
  */
 public interface RolePermDao {
     List<RolePerm> getByRoleIds(List<String> roleIds);
+
+    void saveBatchItems(List<RolePerm> rolePermList);
+
+    boolean removeByRoleId(String roleId);
+
+    boolean removeByRoleIds(String[] ids);
 }

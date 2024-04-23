@@ -48,7 +48,7 @@ public class UserLoginRecord extends BaseTenantEntity{
      * 用户昵称
      * @author pddon.com
      */
-     private String nickname;
+     private String username;
 
     /**
      * 登录类型

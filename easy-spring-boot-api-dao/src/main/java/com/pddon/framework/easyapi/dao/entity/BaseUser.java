@@ -1,6 +1,5 @@
 package com.pddon.framework.easyapi.dao.entity;
 
-import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -131,10 +130,22 @@ public class BaseUser extends BaseTenantEntity{
      */
     private String intro;
 
+    /**
+     * 最近登录使用的应用ID
+     * @author pddon.com
+     */
     private String appId;
 
+    /**
+     * 用户使用的语言类型
+     * @author pddon.com
+     */
     private String locale;
 
+    /**
+     * 用户使用软件的版本号
+     * @author pddon.com
+     */
     private String appVersion;
 
 }

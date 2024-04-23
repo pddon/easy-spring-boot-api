@@ -8,6 +8,7 @@ import com.pddon.framework.easyapi.dao.mapper.RolePermMapper;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Repository;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -24,5 +25,20 @@ public class RolePermDaoImpl extends ServiceImpl<RolePermMapper, RolePerm> imple
     @Override
     public List<RolePerm> getByRoleIds(List<String> roleIds) {
         return this.list(new LambdaQueryWrapper<RolePerm>().in(RolePerm::getRoleId, roleIds));
+    }
+
+    @Override
+    public void saveBatchItems(List<RolePerm> rolePermList) {
+        this.saveBatch(rolePermList);
+    }
+
+    @Override
+    public boolean removeByRoleId(String roleId) {
+        return this.remove(new LambdaQueryWrapper<RolePerm>().eq(RolePerm::getRoleId, roleId));
+    }
+
+    @Override
+    public boolean removeByRoleIds(String[] ids) {
+        return this.remove(new LambdaQueryWrapper<RolePerm>().in(RolePerm::getRoleId, Arrays.asList(ids)));
     }
 }

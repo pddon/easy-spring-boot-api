@@ -113,7 +113,8 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         //创建会话信息
         Session session = sessionManager.getCurrentSession(true);
         session.setCountryCode(user.getCountryCode())
-                .setUserId(user.getUserId());
+                .setUserId(user.getUserId())
+                .setUsername(user.getUsername());
         sessionManager.update(session);
         Date loginTime = new Date();
         baseUserDao.updateUserSession(session.getSessionId(), loginTime, user.getUserId());
@@ -121,7 +122,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         record.setUserId(user.getUserId())
                  .setLoginTime(loginTime)
                 .setLoginType(loginType)
-                .setNickname(user.getNickname())
+                .setUsername(user.getUsername())
                 .setDeviceId(RequestContext.getContext().getClientId())
                 .setSessionId(session.getSessionId())
                 .setTenantId(user.getTenantId());

@@ -1,6 +1,8 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.dao.entity.PermItem;
+import com.pddon.framework.easyapi.dto.req.PermListRequest;
 
 import java.util.List;
 
@@ -13,4 +15,16 @@ import java.util.List;
  */
 public interface PermItemDao {
     List<PermItem> getAllPerms();
+
+    List<PermItem> getByPermIds(List<String> permIdList);
+
+    boolean saveItem(PermItem item);
+
+    PermItem geByItemId(String id);
+
+    boolean updateByItemId(PermItem permItem);
+
+    boolean removeByPermIds(String[] ids);
+
+    IPage<PermItem> pageQuery(PermListRequest req);
 }
