@@ -59,7 +59,7 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
         BaseUser user = userSecurityService.queryBySessionId(sessionId);
         //账户未找到
         if (user == null) {
-            throw new UnknownAccountException(ErrorCodes.ACCOUNT_NOT_FOUND.getMsgCode());
+            throw new UnknownAccountException(ErrorCodes.INVALID_SESSION_ID.getMsgCode());
         }
         //token失效
         if(securityConfigProperties.sessionCanExpire() && ((user.getLastLoginTime().getTime() + securityConfigProperties.getSessionLiveTimeSeconds() * 1000) < System.currentTimeMillis())){

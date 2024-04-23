@@ -3,6 +3,7 @@ package com.pddon.framework.easyapi.config;
 import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.EasyApiCacheSessionDAO;
 import com.pddon.framework.easyapi.UserAuthorizingRealm;
+import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.filter.UserAuthenticatingFilter;
 import com.pddon.framework.easyapi.impl.EasyApiWebSessionManager;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
@@ -104,14 +105,15 @@ public class UserSecurityConfigurer {
 
     @Bean("shiroFilter")
     public ShiroFilterFactoryBean shiroFilter(SecurityConfigProperties securityConfigProperties,
-                                             SecurityManager securityManager,
-                                             com.pddon.framework.easyapi.SessionManager sessionManager) {
+                                              SecurityManager securityManager,
+                                              com.pddon.framework.easyapi.SessionManager sessionManager,
+                                              UserSecurityService userSecurityService) {
         ShiroFilterFactoryBean shiroFilter = new ShiroFilterFactoryBean();
         shiroFilter.setSecurityManager(securityManager);
 
         //auth过滤
         Map<String, Filter> filters = new HashMap<>(16);
-        filters.put("userAuthFilter", new UserAuthenticatingFilter(sessionManager));
+        filters.put("userAuthFilter", new UserAuthenticatingFilter(sessionManager, userSecurityService));
         shiroFilter.setFilters(filters);
 
         Map<String, String> filterMap = new LinkedHashMap<>();

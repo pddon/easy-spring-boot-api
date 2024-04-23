@@ -14,15 +14,15 @@ import org.apache.shiro.authc.AuthenticationToken;
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserAuthenticationToken implements AuthenticationToken {
-    private String sessionId;
-    private Session session;
+    private String userId;
+    private String password;
     @Override
     public Object getPrincipal() {
-        return sessionId;
+        return userId;
     }
 
     @Override
     public Object getCredentials() {
-        return sessionId;
+        return password;
     }
 }
