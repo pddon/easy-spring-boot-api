@@ -87,9 +87,9 @@ public class RoleMntController {
         return roleMntService.addPerm(req);
     }
 
-    @PostMapping("update")
+    @PostMapping("updatePerm")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="更新角色", apiName = "role/update")
+    @OperateLog(type="更新角色", apiName = "role/updatePerm")
     @RequiresPermissions("perm:update")
     public void updatePerm(@RequestBody UpdatePermRequest req){
         roleMntService.updatePerm(req);

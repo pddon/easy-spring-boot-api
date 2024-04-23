@@ -9,7 +9,6 @@ import com.pddon.framework.easyapi.dao.BaseApplicationConfigDao;
 import com.pddon.framework.easyapi.dao.PartnerItemDao;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
-import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
