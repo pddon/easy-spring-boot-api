@@ -1,59 +1,55 @@
-package com.pddon.framework.easyapi.dao.entity;
+package com.pddon.framework.easyapi.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
-/**
- * 业务应用配置信息
- * @author pddon.com
- */
-@Getter
-@Setter
-@ToString
-@Accessors(chain=true)
-@TableName("application_config")
-public class BaseApplicationConfig extends BaseTenantEntity {
+import javax.validation.constraints.NotEmpty;
+import java.io.Serializable;
 
-    /**
-     * 记录ID
-     * @author pddon.com
-     */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+/**
+ * @ClassName: AddAppRequest
+ * @Description:
+ * @Author: Allen
+ * @Date: 2024-04-23 21:30
+ * @Addr: https://pddon.cn
+ */
+@Data
+@Accessors(chain = true)
+public class AddAppRequest implements Serializable {
 
     /**
      * 应用ID
      * @author pddon.com
      */
+    @NotEmpty
     private String appId;
 
     /**
      * 应用名
      * @author pddon.com
      */
+    @NotEmpty
     private String appName;
 
     /**
      * 用于对称加解密、生成数字签名、验证数字签名的秘钥
      * @author pddon.com
      */
+    @NotEmpty
     private String secret;
 
     /**
      * 私钥，用于非对称加解密的秘钥对
      * @author pddon.com
      */
+    @NotEmpty
     private String privateSecret;
 
     /**
      * 公钥，用于非对称加解密的秘钥对
      * @author pddon.com
      */
+    @NotEmpty
     private String publicSecret;
 
     /**

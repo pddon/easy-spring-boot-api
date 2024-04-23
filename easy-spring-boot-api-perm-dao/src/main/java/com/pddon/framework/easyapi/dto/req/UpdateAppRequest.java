@@ -1,31 +1,24 @@
-package com.pddon.framework.easyapi.dao.entity;
+package com.pddon.framework.easyapi.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 /**
- * 业务应用配置信息
- * @author pddon.com
+ * @ClassName: UpdateAppRequest
+ * @Description:
+ * @Author: Allen
+ * @Date: 2024-04-23 21:30
+ * @Addr: https://pddon.cn
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain=true)
-@TableName("application_config")
-public class BaseApplicationConfig extends BaseTenantEntity {
+@Data
+@Accessors(chain = true)
+public class UpdateAppRequest implements Serializable {
 
-    /**
-     * 记录ID
-     * @author pddon.com
-     */
-    @TableId(type = IdType.AUTO)
+    @NotNull
     private Long id;
-
     /**
      * 应用ID
      * @author pddon.com

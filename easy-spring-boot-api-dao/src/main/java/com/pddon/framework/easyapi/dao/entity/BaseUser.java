@@ -1,5 +1,8 @@
 package com.pddon.framework.easyapi.dao.entity;
 
+import com.baomidou.mybatisplus.annotation.IdType;
+import com.baomidou.mybatisplus.annotation.TableId;
+import com.baomidou.mybatisplus.annotation.TableName;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.ToString;
@@ -15,8 +18,15 @@ import java.util.Date;
 @Setter
 @ToString
 @Accessors(chain=true)
+@TableName("user")
 public class BaseUser extends BaseTenantEntity{
-    
+    /**
+     * 记录ID
+     * @author pddon.com
+     */
+    @TableId(type = IdType.AUTO)
+    private Long id;
+
     /**
      * 用户账号唯一标识
      * @author pddon.com

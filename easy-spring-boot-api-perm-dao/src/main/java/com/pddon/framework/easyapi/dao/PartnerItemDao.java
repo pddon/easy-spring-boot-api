@@ -1,6 +1,11 @@
 package com.pddon.framework.easyapi.dao;
 
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pddon.framework.easyapi.dao.entity.PartnerItem;
+import com.pddon.framework.easyapi.dto.req.PartnerListRequest;
+
+import java.util.List;
 
 /**
  * @ClassName: PartnerItemDao
@@ -11,4 +16,13 @@ package com.pddon.framework.easyapi.dao;
  */
 public interface PartnerItemDao {
 
+    boolean saveItem(PartnerItem item);
+
+    PartnerItem getByItemId(Long id);
+
+    boolean updateByItemId(PartnerItem item);
+
+    boolean removeByIds(List<String> asList);
+
+    IPage<PartnerItem> pageQuery(PartnerListRequest req);
 }
