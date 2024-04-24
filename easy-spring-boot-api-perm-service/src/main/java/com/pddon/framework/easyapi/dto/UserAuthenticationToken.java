@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.dto;
 
 import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.apache.shiro.authc.AuthenticationToken;
 
@@ -13,7 +14,9 @@ import org.apache.shiro.authc.AuthenticationToken;
  */
 @AllArgsConstructor
 @NoArgsConstructor
+@Getter
 public class UserAuthenticationToken implements AuthenticationToken {
+    private String sessionId;
     private String userId;
     private String password;
     @Override

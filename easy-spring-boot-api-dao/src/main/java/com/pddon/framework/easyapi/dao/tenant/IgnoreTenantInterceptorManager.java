@@ -36,6 +36,7 @@ public class IgnoreTenantInterceptorManager implements MethodInterceptor {
 		}
 		Class<?> targetClass = invocation.getThis().getClass();	
 		Method method = invocation.getMethod();
+		Boolean ignoreTenant = RequestContext.getContext().isIgnoreTenant();
 		if( AnnotationUtils.findAnnotation(targetClass, IgnoreTenant.class) != null
 				|| (AnnotationUtils.findAnnotation(method, IgnoreTenant.class) != null)){
 			RequestContext.getContext().setIgnoreTenant(true);
@@ -43,7 +44,7 @@ public class IgnoreTenantInterceptorManager implements MethodInterceptor {
 		try{
 			return invocation.proceed();
 		}finally {
-			RequestContext.getContext().setIgnoreTenant(false);
+			RequestContext.getContext().setIgnoreTenant(ignoreTenant);
 		}
 	}
 

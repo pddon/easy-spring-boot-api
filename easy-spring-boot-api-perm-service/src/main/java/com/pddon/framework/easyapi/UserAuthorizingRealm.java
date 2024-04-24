@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.dao.consts.UserAccountStatus;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dto.UserAuthenticationToken;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
 import org.apache.shiro.authz.SimpleAuthorizationInfo;
@@ -40,9 +41,7 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
 
     @Override
     protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals) {
-        BaseUser user = (BaseUser) principals.getPrimaryPrincipal();
-        String userId = user.getUserId();
-
+        String userId = (String) principals.getPrimaryPrincipal();
         //用户权限列表
         Set<String> permsSet = userSecurityService.getUserPermissions(userId, securityConfigProperties.isCacheable());
 
@@ -53,17 +52,21 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
 
     @Override
     protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException {
-        String sessionId = (String) token.getPrincipal();
+        UserAuthenticationToken userToken = (UserAuthenticationToken) token;
+        String userId = userToken.getUserId();
+        String sessionId = userToken.getSessionId();
 
         //根据sessionId，查询用户信息
-        BaseUser user = userSecurityService.queryBySessionId(sessionId);
+        BaseUser user = userSecurityService.queryByUserId(userId);
         //账户未找到
         if (user == null) {
-            throw new UnknownAccountException(ErrorCodes.INVALID_SESSION_ID.getMsgCode());
+            throw new UnknownAccountException(ErrorCodes.ACCOUNT_NOT_FOUND.getMsgCode());
         }
-        //token失效
-        if(securityConfigProperties.sessionCanExpire() && ((user.getLastLoginTime().getTime() + securityConfigProperties.getSessionLiveTimeSeconds() * 1000) < System.currentTimeMillis())){
-            throw new ExpiredCredentialsException(ErrorCodes.INVALID_SESSION_ID.getMsgCode());
+        if(StringUtils.isNotEmpty(sessionId)){
+            //非登录请求才需要判断会话是否需要失效
+            if(securityConfigProperties.sessionCanExpire() && ((user.getLastLoginTime().getTime() + securityConfigProperties.getSessionLiveTimeSeconds() * 1000) < System.currentTimeMillis())){
+                throw new ExpiredCredentialsException(ErrorCodes.INVALID_SESSION_ID.getMsgCode());
+            }
         }
 
         //账号锁定

@@ -1,13 +1,18 @@
 package com.pddon.framework.easyapi.impl;
 
+import com.pddon.framework.easyapi.ApplicationManager;
 import com.pddon.framework.easyapi.SessionManager;
 import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.annotation.CacheMethodResultEvict;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.*;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.consts.UserAccountStatus;
 import com.pddon.framework.easyapi.dao.entity.*;
 import com.pddon.framework.easyapi.dto.Session;
+import com.pddon.framework.easyapi.dto.UserAuthenticationToken;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
@@ -17,7 +22,9 @@ import org.apache.shiro.subject.Subject;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -33,6 +40,7 @@ import java.util.stream.Collectors;
  */
 @Service
 @Slf4j
+@IgnoreTenant
 public class UserSecurityServiceImpl implements UserSecurityService {
 
     private static final String SUPER_ADMIN_USER_ID = "EASY_API_SUPER_ADMIN";
@@ -57,6 +65,25 @@ public class UserSecurityServiceImpl implements UserSecurityService {
 
     @Autowired
     private UserLoginRecordDao userLoginRecordDao;
+
+    @Autowired
+    private ApplicationManager applicationManager;
+
+    @Override
+    @Transactional
+    public void checkAndCreateSuperManager(){
+        if(baseUserDao.existUserId(SUPER_ADMIN_USER_ID)){
+            return;
+        }
+        BaseUser user = new BaseUser();
+        user.setUserId(SUPER_ADMIN_USER_ID)
+                .setUsername("EasyApi超管")
+                .setAccountStatus(UserAccountStatus.ACTIVE.name())
+                .setPassword(EncryptUtils.encryptMD5Hex("88889999"))
+                .setTenantId("default")
+                .setCrtUserId("system");
+        baseUserDao.saveUser(user);
+    }
 
     @Override
     public BaseUser queryBySessionId(String sessionId) {
@@ -100,7 +127,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         // 获取当前用户
         Subject currentUser = SecurityUtils.getSubject();
         // 创建用户令牌，通常是用户名和密码
-        UsernamePasswordToken token = new UsernamePasswordToken(userId, password);
+        UserAuthenticationToken token = new UserAuthenticationToken(null, userId, password);
         try{
             currentUser.login(token);
         }catch (AuthenticationException e){
@@ -116,6 +143,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
                 .setUserId(user.getUserId())
                 .setUsername(user.getUsername());
         sessionManager.update(session);
+        RequestContext.getContext().setSession(session);
         Date loginTime = new Date();
         baseUserDao.updateUserSession(session.getSessionId(), loginTime, user.getUserId());
         UserLoginRecord record = new UserLoginRecord();
@@ -133,6 +161,11 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     public void logout() {
         SecurityUtils.getSubject().logout();
         ((UserSecurityServiceImpl)AopContext.currentProxy()).evictPermsCache(RequestContext.getContext().getUserId());
+    }
+
+    @Override
+    public BaseUser queryByUserId(String userId) {
+        return baseUserDao.getByUserId(userId);
     }
 
     @CacheMethodResultEvict(prefix = "User:Perms", id = "userId", expireSeconds = 3600)

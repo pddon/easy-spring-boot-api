@@ -13,6 +13,8 @@ import java.util.Set;
  * @Addr: https://pddon.cn
  */
 public interface UserSecurityService {
+    void checkAndCreateSuperManager();
+
     /**
      * 通过会话ID查询用户信息
      * @param sessionId
@@ -49,4 +51,6 @@ public interface UserSecurityService {
      * @Date: 2024/4/21 22:27
      */
     void logout();
+
+    BaseUser queryByUserId(String userId);
 }

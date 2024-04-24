@@ -42,17 +42,19 @@ public class EncryptUtils {
 	}
 
 	public static String encryptSHA1Hex(String key, String body) {
-		MessageDigest md = null;
 		String text = key + body + key;
+		return encryptSHA1Hex(text);
+	}
+
+	public static String encryptSHA1Hex(String content) {
 		String outStr = null;
 		try {
-			md = MessageDigest.getInstance("SHA-1");
-			byte[] digest = md.digest(text.getBytes());
+			MessageDigest md = MessageDigest.getInstance("SHA-1");
+			byte[] digest = md.digest(content.getBytes());
 			outStr = Hex.encodeHexString(digest).toUpperCase();
 			if (log.isTraceEnabled()) {
 				log.trace("sign:" + outStr);
 			}
-
 		} catch (NoSuchAlgorithmException e) {
 			log.error(IOUtils.getThrowableInfo(e));
 		} catch (Exception e) {
@@ -66,10 +68,14 @@ public class EncryptUtils {
 		if (body != null) {
 			data += body;
 		}
+		return encryptMD5Hex(data);
+	}
+
+	public static String encryptMD5Hex(String content) {
 		String outStr = null;
 		try {
 			MessageDigest digest = MessageDigest.getInstance("MD5");
-			byte[] md5Byte = digest.digest(data.getBytes());
+			byte[] md5Byte = digest.digest(content.getBytes());
 			outStr = Hex.encodeHexString(md5Byte).toUpperCase();
 		} catch (NoSuchAlgorithmException e) {
 			log.error(IOUtils.getThrowableInfo(e));

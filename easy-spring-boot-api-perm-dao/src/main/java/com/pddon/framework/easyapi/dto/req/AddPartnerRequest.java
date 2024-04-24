@@ -32,6 +32,25 @@ public class AddPartnerRequest implements Serializable {
     private String partnerType;
 
     /**
+     * 用于对称加解密、生成数字签名、验证数字签名的秘钥
+     * @author pddon.com
+     */
+    @NotEmpty
+    private String secret;
+
+    /**
+     * 私钥，用于非对称加解密的秘钥对
+     * @author pddon.com
+     */
+    private String privateSecret;
+
+    /**
+     * 公钥，用于非对称加解密的秘钥对
+     * @author pddon.com
+     */
+    private String publicSecret;
+
+    /**
      * 商户所属公司名
      * @author pddon.com
      */

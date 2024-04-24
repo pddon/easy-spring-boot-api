@@ -17,4 +17,8 @@ public interface BaseUserDao<K extends BaseUser> {
     BaseUser getByUserId(String userId);
 
     boolean updateUserSession(String sessionId, Date loginTime, String userId);
+
+    boolean existUserId(String userId);
+
+    boolean saveUser(BaseUser user);
 }

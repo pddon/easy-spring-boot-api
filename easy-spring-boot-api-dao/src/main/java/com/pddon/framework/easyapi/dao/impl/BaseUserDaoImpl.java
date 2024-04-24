@@ -6,6 +6,7 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dao.mapper.BaseUserMapper;
+import org.springframework.beans.BeanUtils;
 
 import java.util.Date;
 import java.util.List;
@@ -17,18 +18,19 @@ import java.util.List;
  * @Date: 2024-04-09 21:54
  * @Addr: https://pddon.cn
  */
-public class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends BaseUser> extends ServiceImpl<T, K> implements BaseUserDao<K> {
+public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends BaseUser> extends ServiceImpl<T, K> implements BaseUserDao<K> {
 
+    protected abstract K newEntityInstance();
 
     @Override
     public K getBySessionId(String sessionId) {
-        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getSessionId, sessionId).ne(BaseUser::getDeleted, 1));
+        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getSessionId, sessionId));
         return list.size() > 0 ? list.get(0) : null;
     }
 
     @Override
     public BaseUser getByUserId(String userId) {
-        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getUserId, userId).ne(BaseUser::getDeleted, 1));
+        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getUserId, userId));
         return list.size() > 0 ? list.get(0) : null;
     }
 
@@ -38,5 +40,17 @@ public class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends BaseUser> ex
                 .set(BaseUser::getSessionId, sessionId)
                 .set(BaseUser::getLastLoginTime, loginTime)
         );
+    }
+
+    @Override
+    public boolean existUserId(String userId) {
+        return this.count(new LambdaQueryWrapper<K>().eq(BaseUser::getUserId, userId)) > 0;
+    }
+
+    @Override
+    public boolean saveUser(BaseUser user) {
+        K entity = newEntityInstance();
+        BeanUtils.copyProperties(user, entity);
+        return this.save(entity);
     }
 }

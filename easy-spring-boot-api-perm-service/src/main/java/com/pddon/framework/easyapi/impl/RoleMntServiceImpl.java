@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.PermItemDao;
 import com.pddon.framework.easyapi.dao.RoleItemDao;
 import com.pddon.framework.easyapi.dao.RolePermDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.PermItem;
 import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dao.entity.RolePerm;
@@ -31,6 +32,7 @@ import java.util.stream.Collectors;
  * @Addr: https://pddon.cn
  */
 @Service
+@IgnoreTenant
 @Slf4j
 public class RoleMntServiceImpl implements RoleMntService {
     @Autowired

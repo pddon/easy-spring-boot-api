@@ -7,6 +7,7 @@ import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseApplicationConfigDao;
 import com.pddon.framework.easyapi.dao.PartnerItemDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
 import com.pddon.framework.easyapi.dto.req.*;
@@ -27,6 +28,7 @@ import java.util.Arrays;
  * @Addr: https://pddon.cn
  */
 @Service
+@IgnoreTenant
 @Slf4j
 public class PartnerServiceImpl implements PartnerService {
 

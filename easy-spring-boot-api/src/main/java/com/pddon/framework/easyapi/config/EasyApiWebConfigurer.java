@@ -64,7 +64,6 @@ import com.pddon.framework.easyapi.utils.ClassOriginCheckUtil;
 	})
 @ComponentScan("com.pddon.framework.easyapi")
 @ConditionalOnProperty(name={"easyapi.enable"},havingValue = "true")
-@EnableAspectJAutoProxy(exposeProxy = true)
 public class EasyApiWebConfigurer implements WebMvcConfigurer {
 
 	@Autowired

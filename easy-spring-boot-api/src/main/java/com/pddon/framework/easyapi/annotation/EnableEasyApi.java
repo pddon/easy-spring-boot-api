@@ -9,6 +9,7 @@
 package com.pddon.framework.easyapi.annotation;
 
 import com.pddon.framework.easyapi.config.EasyApiAsyncConfigurer;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
 import org.springframework.context.annotation.Import;
 
 import com.pddon.framework.easyapi.config.EasyApiBeanConfigurer;
@@ -22,6 +23,7 @@ import java.lang.annotation.*;
 @Documented
 @Inherited
 @Import({EasyApiWebConfigurer.class, EasyApiSwaggerConfigurer.class, EasyApiBeanConfigurer.class, EasyApiAsyncConfigurer.class})
+@EnableAspectJAutoProxy(exposeProxy = true)
 public @interface EnableEasyApi {
     
 }

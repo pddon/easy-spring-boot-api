@@ -63,7 +63,7 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
         if(user == null){
             throw new BusinessException(ErrorCodes.ACCOUNT_NOT_FOUND);
         }
-        UserAuthenticationToken token = new UserAuthenticationToken(user.getUserId(), user.getPassword());
+        UserAuthenticationToken token = new UserAuthenticationToken(sessionId, user.getUserId(), user.getPassword());
         return token;
     }
 
