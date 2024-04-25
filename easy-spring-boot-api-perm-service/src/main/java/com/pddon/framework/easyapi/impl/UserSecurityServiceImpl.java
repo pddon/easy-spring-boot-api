@@ -128,6 +128,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         Subject currentUser = SecurityUtils.getSubject();
         // 创建用户令牌，通常是用户名和密码
         UserAuthenticationToken token = new UserAuthenticationToken(null, userId, password);
+        RequestContext.getContext().setShiroSessionEnable(true);
         try{
             currentUser.login(token);
         }catch (AuthenticationException e){
@@ -135,8 +136,6 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         }
         //获取用户信息
         BaseUser user = baseUserDao.getByUserId(userId);
-        //更新信息
-        RequestContext.getContext().setShiroSessionEnable(true);
         //创建会话信息
         Session session = sessionManager.getCurrentSession(true);
         session.setCountryCode(user.getCountryCode())

@@ -46,13 +46,15 @@ public class SessionInterceptor extends AbstractApiMethodInterceptor {
 		if(log.isTraceEnabled()){
 			log.trace("开始校验接口会话信息！");
 		}
+		String sessionId = RequestContext.getContext().getSessionId();
+		Session session = sessionManager.get(sessionId);
 		if(RequestContext.getContext().getApiRestrictions().getSession()){
 			//检查会话信息
-			String sessionId = RequestContext.getContext().getSessionId();
-			Session session = sessionManager.get(sessionId);
 			if(session == null){
 				throw new BusinessException(ErrorCodes.INVALID_SESSION_ID).setParam(systemParameterProperties.getSessionId(), sessionId);
-			}			
+			}
+		}
+		if(session != null){
 			RequestContext.getContext().setSession(session);
 		}
 	}

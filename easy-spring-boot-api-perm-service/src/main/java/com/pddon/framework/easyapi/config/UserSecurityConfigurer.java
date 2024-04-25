@@ -75,7 +75,7 @@ public class UserSecurityConfigurer {
     public SessionManager shiroSessionManager(EasyApiCacheSessionDAO sessionDAO, com.pddon.framework.easyapi.SessionManager easyApiSessionManager) {
         EasyApiWebSessionManager sessionManager = new EasyApiWebSessionManager(easyApiSessionManager);
         sessionManager.setSessionValidationSchedulerEnabled(true);
-        sessionManager.setSessionIdCookieEnabled(true);
+        sessionManager.setSessionIdCookieEnabled(false);
         sessionManager.setSessionDAO(sessionDAO);
         return sessionManager;
     }
