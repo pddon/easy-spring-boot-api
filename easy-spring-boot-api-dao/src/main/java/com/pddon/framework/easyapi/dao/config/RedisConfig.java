@@ -31,6 +31,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 import org.springframework.data.redis.connection.RedisConnectionFactory;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer;
@@ -111,7 +112,24 @@ public class RedisConfig {
     public RedisTemplate<String, String> redisTemplate(RedisConnectionFactory factory) {
         RedisTemplate<String, String> template = new RedisTemplate<>();
         RedisSerializer<String> redisSerializer = new StringRedisSerializer();
-        /*Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(String.class);
+        template.setConnectionFactory(factory);
+        //key序列化方式
+        template.setKeySerializer(redisSerializer);
+        //value序列化
+        template.setValueSerializer(redisSerializer);
+        //value hashmap序列化
+        template.setHashValueSerializer(redisSerializer);
+        //field序列化  key field  value
+        template.setHashKeySerializer(redisSerializer);
+        return template;
+    }
+
+    //@Bean //该方法的返回对象交于spring容器管理
+    //@Primary
+    public RedisTemplate<String, Object> redisObjectTemplate(RedisConnectionFactory factory) {
+        RedisTemplate<String, Object> template = new RedisTemplate<>();
+        RedisSerializer<String> redisSerializer = new StringRedisSerializer();
+        Jackson2JsonRedisSerializer jackson2JsonRedisSerializer = new Jackson2JsonRedisSerializer(String.class);
         ObjectMapper om = new ObjectMapper();
         // 给JsonMapper显示注册上此模块
         om.registerModule(new ParameterNamesModule());
@@ -131,14 +149,14 @@ public class RedisConfig {
         om.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
         om.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
-        jackson2JsonRedisSerializer.setObjectMapper(om);*/
+        jackson2JsonRedisSerializer.setObjectMapper(om);
         template.setConnectionFactory(factory);
         //key序列化方式
         template.setKeySerializer(redisSerializer);
         //value序列化
-        template.setValueSerializer(redisSerializer);
+        template.setValueSerializer(jackson2JsonRedisSerializer);
         //value hashmap序列化
-        template.setHashValueSerializer(redisSerializer);
+        template.setHashValueSerializer(jackson2JsonRedisSerializer);
         //field序列化  key field  value
         template.setHashKeySerializer(redisSerializer);
         return template;

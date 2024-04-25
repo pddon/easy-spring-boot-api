@@ -111,9 +111,9 @@ public class MethodCacheManager {
 		return prefix;
 	}
 	
-	public Object getResult(String key, CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){
+	public Object getResult(String key, Class<?> classType, CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){
 		
-		return cacheManager.get(key, expireSeconds, expireMode);
+		return cacheManager.get(key, classType, expireSeconds, expireMode);
 	}
 	
 	public void cacheResult(String key ,Object result, CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){

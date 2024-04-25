@@ -56,7 +56,9 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 		Object response = null;
 		Object [] args=invocation.getArguments();		
 		Method method = invocation.getMethod();
-		String[] parameters = parameterNameDiscoverer.getParameterNames(method);    
+		Class<?> returnType = method.getReturnType();
+		String[] parameters = parameterNameDiscoverer.getParameterNames(method);
+
 	   
         //获取缓存注解信息
 		CacheManager cacheManager = null;
@@ -81,7 +83,7 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 
 			if(StringUtils.isNotEmpty(cacheKey)){
 				//检查是否存在方法结果缓存
-				response = methodCacheManager.getResult(cacheKey, cacheManager, cacheMethodResult.expireSeconds(), cacheMethodResult.expireMode());
+				response = methodCacheManager.getResult(cacheKey, returnType, cacheManager, cacheMethodResult.expireSeconds(), cacheMethodResult.expireMode());
 				if(response != null){
 					//存在则直接返回缓存结果
 					if(log.isTraceEnabled()){

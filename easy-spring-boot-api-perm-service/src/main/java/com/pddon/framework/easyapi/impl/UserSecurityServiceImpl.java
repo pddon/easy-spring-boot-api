@@ -79,7 +79,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         user.setUserId(SUPER_ADMIN_USER_ID)
                 .setUsername("EasyApi超管")
                 .setAccountStatus(UserAccountStatus.ACTIVE.name())
-                .setPassword(EncryptUtils.encryptMD5Hex("88889999"))
+                .setPassword(EncryptUtils.encryptMD5Hex(EncryptUtils.encryptMD5Hex("88889999")))
                 .setTenantId("default")
                 .setCrtUserId("system");
         baseUserDao.saveUser(user);

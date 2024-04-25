@@ -55,6 +55,7 @@ public interface CacheManager {
 	 * 获取原始类型的对象
 	 * @author danyuan
 	 */
+	@Deprecated
 	public Object get(String key, Long expireSeconds, CacheExpireMode mode);
 
 	/**

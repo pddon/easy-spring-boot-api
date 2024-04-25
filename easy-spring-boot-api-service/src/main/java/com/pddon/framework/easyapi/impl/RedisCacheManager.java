@@ -140,11 +140,15 @@ public class RedisCacheManager implements CacheManager, InitializingBean {
     }
 
     @Override
+    @Deprecated
     public Object get(String key, Long expireSeconds, CacheExpireMode mode) {
         if(this.isConnected()){
             try{
                 ValueOperations<String, String> forValue = redisTemplate.opsForValue();
                 String value = forValue.get(key);
+                if(value == null){
+                    return null;
+                }
                 try{
                     return JSONUtil.parseObj(value);
                 }catch (Exception e){
