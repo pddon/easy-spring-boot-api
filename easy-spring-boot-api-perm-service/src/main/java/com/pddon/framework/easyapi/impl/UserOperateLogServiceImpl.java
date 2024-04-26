@@ -1,9 +1,13 @@
 package com.pddon.framework.easyapi.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.UserOperateLogService;
 import com.pddon.framework.easyapi.context.RequestContext;
+import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.UserOperateRecordDao;
+import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dao.entity.UserOperateRecord;
+import com.pddon.framework.easyapi.dto.req.OperateLogListRequest;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -40,5 +44,17 @@ public class UserOperateLogServiceImpl implements UserOperateLogService {
         record.setEndTime(new Date());
 
         return userOperateRecordDao.saveLog(record);
+    }
+
+    @Override
+    public PaginationResponse<UserOperateRecord> list(OperateLogListRequest req) {
+        IPage<UserOperateRecord> itemPage = userOperateRecordDao.pageQuery(req);
+        PaginationResponse<UserOperateRecord> page = new PaginationResponse<>();
+        page.setSize(itemPage.getSize())
+                .setCurrent(itemPage.getCurrent())
+                .setTotal(itemPage.getTotal())
+                .setPages(itemPage.getPages())
+                .setRecords(itemPage.getRecords());
+        return page;
     }
 }

@@ -43,7 +43,8 @@ public class PaginationRequest extends BaseRequest {
 	public PaginationRequest(){
 		this.current=1;
 		this.size=8;
-		this.isAsc=true;
+		this.isAsc=false;
+		this.orderBy="crtTime";
 	}
 	
 }

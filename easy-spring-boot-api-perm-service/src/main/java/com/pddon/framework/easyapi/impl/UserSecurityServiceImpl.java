@@ -102,6 +102,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
             return new HashSet<>();
         }
         if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId)){
+            RequestContext.getContext().setSuperManager(true);
             //超级管理员具有所有权限
             return getAllPermissions();
         }
@@ -134,13 +135,17 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         }catch (AuthenticationException e){
             throw e;
         }
+        if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId)){
+            RequestContext.getContext().setSuperManager(true);
+        }
         //获取用户信息
         BaseUser user = baseUserDao.getByUserId(userId);
         //创建会话信息
         Session session = sessionManager.getCurrentSession(true);
         session.setCountryCode(user.getCountryCode())
                 .setUserId(user.getUserId())
-                .setUsername(user.getUsername());
+                .setUsername(user.getUsername())
+                .setSuperManager(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId));
         sessionManager.update(session);
         RequestContext.getContext().setSession(session);
         Date loginTime = new Date();

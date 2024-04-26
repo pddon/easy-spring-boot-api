@@ -74,6 +74,10 @@ public class RequestContext {
      */
     private boolean shiroSessionEnable = false;
     /**
+     * 是否是超级管理员
+     */
+    private boolean superManager = false;
+    /**
 	 * 对响应信息进行数字签名的结果
 	 */
 	private DefaultResponseWrapper<?> responseWrapper;
@@ -126,6 +130,11 @@ public class RequestContext {
         this.response = null;
         this.ignoreTenant = false;
         this.shiroSessionEnable = false;
+        this.superManager = false;
+    }
+
+    public boolean isSuperManager() {
+        return this.superManager || (this.session != null ? this.session.isSuperManager() : false);
     }
     
     public String getRequestId(){

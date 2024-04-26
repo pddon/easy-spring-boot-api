@@ -72,7 +72,7 @@ public class EntityManager {
     }
 
     public static boolean isIgnoreTable(String tableName){
-        if(RequestContext.getContext().isIgnoreTenant()){
+        if(RequestContext.getContext().isSuperManager() || RequestContext.getContext().isIgnoreTenant()){
             return true;
         }
         MybatisPlusProperties mybatisPlusProperties = SpringBeanUtil.getBean(MybatisPlusProperties.class);

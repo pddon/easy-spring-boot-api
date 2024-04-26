@@ -96,6 +96,8 @@ public class Session implements HttpSession, Serializable{
 
 	private boolean newSession;
 
+	private boolean isSuperManager;
+
 	@JsonIgnore
 	@Override
 	public long getCreationTime() {

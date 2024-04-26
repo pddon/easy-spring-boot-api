@@ -1,6 +1,8 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.dao.entity.UserOperateRecord;
+import com.pddon.framework.easyapi.dto.req.OperateLogListRequest;
 
 /**
  * @ClassName: UserLoginRecordDao
@@ -11,4 +13,6 @@ import com.pddon.framework.easyapi.dao.entity.UserOperateRecord;
  */
 public interface UserOperateRecordDao {
     boolean saveLog(UserOperateRecord record);
+
+    IPage<UserOperateRecord> pageQuery(OperateLogListRequest req);
 }

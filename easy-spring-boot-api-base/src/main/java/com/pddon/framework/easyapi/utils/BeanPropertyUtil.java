@@ -12,6 +12,7 @@ import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -78,7 +79,8 @@ public class BeanPropertyUtil {
                 //如果object是null/基本数据类型/包装类/日期类型，则不需要在递归调用
             	if(object != null){
 					if(object.getClass().equals(Date.class)){
-						resultMap.put(parentKey, String.valueOf(((Date)object).getTime()));
+						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+						resultMap.put(parentKey, sdf.format((Date)object));
 					}else{
 						resultMap.put(parentKey, object.toString());
 					}
