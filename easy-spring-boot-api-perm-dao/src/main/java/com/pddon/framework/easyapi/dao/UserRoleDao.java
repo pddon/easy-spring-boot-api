@@ -12,5 +12,7 @@ import java.util.List;
  * @Addr: https://pddon.cn
  */
 public interface UserRoleDao {
+
     List<UserRole> getRolesByUserId(String userId);
+
 }

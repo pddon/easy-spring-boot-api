@@ -1,13 +1,14 @@
-package com.pddon.framework.easyapi.dto.req;
+package com.pddon.framework.easyapi.dao.dto.request;
 
 import com.pddon.framework.easyapi.controller.request.PaginationRequest;
+import com.pddon.framework.easyapi.dao.consts.UserKeyType;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
 
 /**
- * @ClassName: OperateLogListRequest
+ * @ClassName: UserListRequest
  * @Description:
  * @Author: Allen
  * @Date: 2024-04-23 22:04
@@ -15,13 +16,15 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class OperateLogListRequest extends PaginationRequest {
+public class UserListRequest extends PaginationRequest {
     /**
-     * 是否操作完成了
+     * 应用所属渠道ID(租户ID)
+     * @author pddon.com
      */
-    private Boolean completed;
+    private String tenantId;
+    private String accountStatus;
+    private UserKeyType type;
     private String keyword;
-
     private Date startTime;
 
     private Date endTime;

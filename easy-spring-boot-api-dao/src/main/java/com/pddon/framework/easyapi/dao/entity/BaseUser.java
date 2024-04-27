@@ -45,7 +45,7 @@ public class BaseUser extends BaseTenantEntity{
     private String deviceId;
      
     /**
-     * 用户真实姓名
+     * 用户账号唯一标识名
      * @author pddon.com
      */
      private String username;

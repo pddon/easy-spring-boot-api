@@ -1,19 +1,29 @@
 package com.pddon.framework.easyapi.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.UserMntService;
 import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.context.RequestContext;
-import com.pddon.framework.easyapi.dao.UserPermDao;
+import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.PaginationResponse;
+import com.pddon.framework.easyapi.dao.BaseUserDao;
 import com.pddon.framework.easyapi.dao.UserRoleDao;
+import com.pddon.framework.easyapi.dao.dto.request.UpdateUserPassRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
-import com.pddon.framework.easyapi.dao.entity.UserPerm;
 import com.pddon.framework.easyapi.dao.entity.UserRole;
+import com.pddon.framework.easyapi.dao.dto.request.UserListRequest;
+import com.pddon.framework.easyapi.dao.dto.request.AddUserRequest;
+import com.pddon.framework.easyapi.dao.dto.request.UpdateUserRequest;
 import com.pddon.framework.easyapi.dto.resp.UserInfoDto;
+import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
+import com.pddon.framework.easyapi.utils.UUIDGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -34,6 +44,9 @@ public class UserMntServiceImpl implements UserMntService {
     @Autowired
     private UserRoleDao userRoleDao;
 
+    @Autowired
+    private BaseUserDao baseUserDao;
+
     @Override
     public UserInfoDto getCurrentUserInfo() {
         UserInfoDto userInfoDto = new UserInfoDto();
@@ -46,5 +59,68 @@ public class UserMntServiceImpl implements UserMntService {
         List<UserRole> userRoles = userRoleDao.getRolesByUserId(userId);
         userInfoDto.setRoleIds(userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet()));
         return userInfoDto;
+    }
+
+    @Override
+    public PaginationResponse<BaseUser> list(UserListRequest req) {
+        IPage<BaseUser> itemPage = baseUserDao.pageQuery(req);
+        PaginationResponse<BaseUser> page = new PaginationResponse<>();
+        page.setSize(itemPage.getSize())
+                .setCurrent(itemPage.getCurrent())
+                .setTotal(itemPage.getTotal())
+                .setPages(itemPage.getPages())
+                .setRecords(itemPage.getRecords());
+        return page;
+    }
+
+    @Override
+    public void add(AddUserRequest req) {
+        if(baseUserDao.existUsername(req.getUsername())){
+            throw new BusinessException("存在该用户名，请更换!");
+        }
+        BaseUser user = new BaseUser();
+        BeanUtils.copyProperties(req, user);
+        String userId = UUIDGenerator.getUUID();
+        user.setUserId(userId);
+        baseUserDao.saveUser(user);
+    }
+
+    @Override
+    public void update(UpdateUserRequest req) {
+        BaseUser user = baseUserDao.getByItemId(req.getId());
+        if(user == null){
+            throw new BusinessException("账号未找到，修改失败!");
+        }
+        BeanUtils.copyProperties(req, user);
+        baseUserDao.updateUser(user);
+    }
+
+    @Override
+    public void delete(IdsRequest req) {
+        baseUserDao.delete(Arrays.asList(req.getIds()));
+    }
+
+    @Override
+    public void updatePass(UpdateUserPassRequest req) {
+        BaseUser user = baseUserDao.getBySessionId(RequestContext.getContext().getSessionId());
+        if(user == null){
+            throw new BusinessException("账号未找到，修改失败!");
+        }
+        if(!req.getPassword().equalsIgnoreCase(user.getPassword())){
+            throw new BusinessException("原密码错误，修改失败！");
+        }
+        if(req.getNewPassword().equalsIgnoreCase(req.getPassword())){
+            throw new BusinessException("新密码与原密码相同！");
+        }
+        baseUserDao.updateUserPass(user.getId(), EncryptUtils.encryptMD5Hex(req.getNewPassword()));
+    }
+
+    @Override
+    public void resetPass(Long id) {
+        BaseUser user = baseUserDao.getByItemId(id);
+        if(user == null){
+            throw new BusinessException("账号未找到，修改失败!");
+        }
+        baseUserDao.updateUserPass(id, EncryptUtils.encryptMD5Hex(EncryptUtils.encryptMD5Hex("88888888")));
     }
 }

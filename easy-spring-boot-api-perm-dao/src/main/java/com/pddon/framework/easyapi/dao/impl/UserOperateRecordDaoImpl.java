@@ -34,6 +34,7 @@ public class UserOperateRecordDaoImpl extends ServiceImpl<UserOperateRecordMappe
     public IPage<UserOperateRecord> pageQuery(OperateLogListRequest req) {
         Page<UserOperateRecord> page = new Page<>(req.getCurrent(), req.getSize());
         Wrapper<UserOperateRecord> wrapper = new LambdaQueryWrapper<UserOperateRecord>()
+                .eq(req.getCompleted() != null, UserOperateRecord::getCompleted, req.getCompleted())
                 .gt(req.getStartTime() != null, UserOperateRecord::getOperateTime, req.getStartTime())
                 .lt(req.getEndTime() != null, UserOperateRecord::getEndTime, req.getEndTime())
                 .and(!StringUtils.isEmpty(req.getKeyword()), query -> {

@@ -18,6 +18,8 @@ import lombok.Setter;
 import lombok.ToString;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+
 @Getter
 @Setter
 @ToString
@@ -34,6 +36,7 @@ public class IdsRequest implements Serializable{
 			allowEmptyValue=false,
 			value="记录的id集合"
 			)
+	@NotNull
 	private String[] ids;
 	
 }
