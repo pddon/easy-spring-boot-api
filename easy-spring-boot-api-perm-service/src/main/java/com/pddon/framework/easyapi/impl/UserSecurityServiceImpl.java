@@ -128,7 +128,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         // 获取当前用户
         Subject currentUser = SecurityUtils.getSubject();
         // 创建用户令牌，通常是用户名和密码
-        UserAuthenticationToken token = new UserAuthenticationToken(null, userId, password);
+        UserAuthenticationToken token = new UserAuthenticationToken(null, userId, EncryptUtils.encryptMD5Hex(password));
         RequestContext.getContext().setShiroSessionEnable(true);
         try{
             currentUser.login(token);

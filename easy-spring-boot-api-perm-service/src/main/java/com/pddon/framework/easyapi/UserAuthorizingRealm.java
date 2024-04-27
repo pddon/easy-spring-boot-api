@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.dao.consts.UserAccountStatus;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dto.UserAuthenticationToken;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.EncryptUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import org.apache.shiro.authc.*;
 import org.apache.shiro.authz.AuthorizationInfo;
@@ -76,6 +77,6 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
             throw new LockedAccountException(ErrorCodes.ACCOUNT_LOCKED.getMsgCode());
         }
 
-        return new SimpleAuthenticationInfo(user, user.getPassword(), getName());
+        return new SimpleAuthenticationInfo(user, EncryptUtils.encryptMD5Hex(user.getPassword()), getName());
     }
 }

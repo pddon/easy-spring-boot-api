@@ -106,7 +106,7 @@ public class UserMntServiceImpl implements UserMntService {
         if(user == null){
             throw new BusinessException("账号未找到，修改失败!");
         }
-        if(!req.getPassword().equalsIgnoreCase(user.getPassword())){
+        if(!EncryptUtils.encryptMD5Hex(req.getPassword()).equalsIgnoreCase(user.getPassword())){
             throw new BusinessException("原密码错误，修改失败！");
         }
         if(req.getNewPassword().equalsIgnoreCase(req.getPassword())){
