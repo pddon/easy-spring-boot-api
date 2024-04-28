@@ -6,6 +6,8 @@ import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.dto.request.UpdateItemFlagRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
 import com.pddon.framework.easyapi.dto.req.*;
@@ -44,9 +46,17 @@ public class PartnerMntController {
     @PostMapping("update")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="修改商户", apiName = "partner/update")
-    @RequiresPermissions("partner:add")
+    @RequiresPermissions("partner:update")
     public void updatePartner(@RequestBody UpdatePartnerRequest req){
         partnerService.updatePartner(req);
+    }
+
+    @PostMapping("updateStatus")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="修改商户状态", apiName = "partner/updateStatus")
+    @RequiresPermissions("partner:update")
+    public void updatePartnerStatus(@RequestBody UpdatePartnerStatusRequest req){
+        partnerService.updatePartnerStatus(req);
     }
 
     @PostMapping("delete")
@@ -59,7 +69,7 @@ public class PartnerMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="商户列表", apiName = "partner/list")
+    //@OperateLog(type="商户列表", apiName = "partner/list")
     @RequiresPermissions("partner:query")
     public PaginationResponse<PartnerItem> listPartner(@RequestBody PartnerListRequest req){
         return partnerService.listPartner(req);
@@ -81,6 +91,13 @@ public class PartnerMntController {
         partnerService.updateApp(req);
     }
 
+    @PostMapping("updateAppStatus")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="修改应用状态", apiName = "partner/updateAppStatus")
+    @RequiresPermissions("application:update")
+    public void updateAppStatus(@RequestBody UpdateItemFlagRequest req){
+        partnerService.updateAppStatus(req);
+    }
     @PostMapping("deleteApp")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="删除应用", apiName = "partner/deleteApp")
@@ -91,7 +108,7 @@ public class PartnerMntController {
 
     @PostMapping("listApp")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="应用列表", apiName = "partner/listApp")
+    //@OperateLog(type="应用列表", apiName = "partner/listApp")
     @RequiresPermissions("application:query")
     public PaginationResponse<BaseApplicationConfig> listApp(@RequestBody AppListRequest req){
         return partnerService.listApp(req);

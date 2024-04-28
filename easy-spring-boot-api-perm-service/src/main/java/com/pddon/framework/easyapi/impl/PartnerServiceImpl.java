@@ -8,11 +8,14 @@ import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseApplicationConfigDao;
 import com.pddon.framework.easyapi.dao.PartnerItemDao;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.dto.request.UpdateItemFlagRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.RandomTokenGenerator;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,11 +41,28 @@ public class PartnerServiceImpl implements PartnerService {
     @Autowired
     private BaseApplicationConfigDao baseApplicationConfigDao;
 
+    private String generateTenantId(){
+        String tenantId = RandomTokenGenerator.generateToken(8);
+        if(partnerItemDao.existsTenantId(tenantId)){
+            return generateTenantId();
+        }
+        return tenantId;
+    }
+
+    private String generateAppId(){
+        String appId = RandomTokenGenerator.generateToken(10);
+        if(baseApplicationConfigDao.existsAppId(appId)){
+            return generateTenantId();
+        }
+        return appId;
+    }
+
     @Override
     public IdResponse addPartner(AddPartnerRequest req) {
         PartnerItem item = new PartnerItem();
         BeanUtils.copyProperties(req, item);
         item.setPartnerStatus(PartnerStatus.TEST.name());
+        item.setTenantId(generateTenantId());
         partnerItemDao.saveItem(item);
         return new IdResponse(item.getId());
     }
@@ -54,6 +74,9 @@ public class PartnerServiceImpl implements PartnerService {
             throw new BusinessException("商户不存在!");
         }
         BeanUtils.copyProperties(req, item);
+        if(StringUtils.isEmpty(item.getTenantId())){
+            item.setTenantId(generateTenantId());
+        }
         partnerItemDao.updateByItemId(item);
     }
 
@@ -78,6 +101,7 @@ public class PartnerServiceImpl implements PartnerService {
     public IdResponse addApp(AddAppRequest req) {
         BaseApplicationConfig applicationConfig = new BaseApplicationConfig();
         BeanUtils.copyProperties(req, applicationConfig);
+        applicationConfig.setAppId(generateAppId());
         baseApplicationConfigDao.saveItem(applicationConfig);
         return new IdResponse(applicationConfig.getId());
     }
@@ -107,5 +131,24 @@ public class PartnerServiceImpl implements PartnerService {
                 .setPages(itemPage.getPages())
                 .setRecords(itemPage.getRecords());
         return page;
+    }
+
+    @Override
+    public void updatePartnerStatus(UpdatePartnerStatusRequest req) {
+        PartnerItem item = partnerItemDao.getByItemId(req.getId());
+        if(item == null){
+            throw new BusinessException("商户不存在!");
+        }
+        partnerItemDao.updateStatus(req.getId(), req.getPartnerStatus().name());
+    }
+
+    @Override
+    public void updateAppStatus(UpdateItemFlagRequest req) {
+        BaseApplicationConfig config = baseApplicationConfigDao.getByItemId(req.getId());
+        if(config == null){
+            throw new BusinessException("应用信息未找到!");
+        }
+        config.setEnable(req.getFlag());
+        baseApplicationConfigDao.updateByItemId(config);
     }
 }

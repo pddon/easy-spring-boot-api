@@ -14,6 +14,7 @@ import com.pddon.framework.easyapi.dao.dto.request.AddUserRequest;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserRequest;
 import com.pddon.framework.easyapi.dto.resp.UserInfoDto;
 import io.swagger.annotations.Api;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -35,12 +36,13 @@ public class UserMntController {
     @GetMapping("info")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
-    public UserInfoDto info(){
-        return userMntService.getCurrentUserInfo();
+    public UserInfoDto info(@RequestParam(value = "id", required = false) String id){
+        return userMntService.getUserInfo(id);
     }
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
+    @RequiresPermissions("user:query")
     @RequiredSession
     public PaginationResponse<BaseUser> list(@RequestBody UserListRequest req){
         return userMntService.list(req);
@@ -49,6 +51,7 @@ public class UserMntController {
     @PostMapping("add")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
+    @RequiresPermissions("user:add")
     @OperateLog(type="新增用户账号", apiName = "user/add")
     public void add(@RequestBody AddUserRequest req){
         userMntService.add(req);
@@ -73,6 +76,7 @@ public class UserMntController {
     @PostMapping("resetPass")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
+    @RequiresPermissions("user:update")
     @OperateLog(type="重置密码", apiName = "user/resetPass")
     public void resetPass(@RequestParam(value = "id") Long id){
         userMntService.resetPass(id);
@@ -81,6 +85,7 @@ public class UserMntController {
     @PostMapping("delete")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
+    @RequiresPermissions("user:delete")
     @OperateLog(type="删除用户账号", apiName = "user/delete")
     public void delete(@RequestBody IdsRequest req){
         userMntService.delete(req);

@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 @TableName("role_perm")
-public class RolePerm extends BaseTenantEntity{
+public class RolePerm extends BaseEntity{
     /**
      * 记录ID
      * @author pddon.com

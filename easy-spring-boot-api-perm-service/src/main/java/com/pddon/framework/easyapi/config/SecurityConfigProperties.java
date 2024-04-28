@@ -41,6 +41,8 @@ public class SecurityConfigProperties implements Serializable {
      * 访问资源需要的权限配置，支持单个资源配置多个权限
      */
     private Map<String, String[]> resourcePerms = new HashMap<>();
+
+    private Map<String,String> apiPermTypes = new HashMap<>();
     /**
      * 当无权限时跳转的页面
      */

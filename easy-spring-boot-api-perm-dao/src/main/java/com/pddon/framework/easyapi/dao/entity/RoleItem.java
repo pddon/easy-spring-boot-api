@@ -19,7 +19,7 @@ import java.util.Date;
 @ToString
 @Accessors(chain=true)
 @TableName("role_item")
-public class RoleItem extends BaseTenantEntity{
+public class RoleItem extends BaseEntity{
     /**
      * 记录ID
      * @author pddon.com
@@ -31,6 +31,11 @@ public class RoleItem extends BaseTenantEntity{
      * @author pddon.com
      */
      private String roleId;
+    /**
+     * 权限名
+     * @author pddon.com
+     */
+     private String roleName;
 
     /**
      * 角色简介

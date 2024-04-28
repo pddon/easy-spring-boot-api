@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi.dto.resp;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -17,6 +18,8 @@ import java.util.Set;
 @Data
 @Accessors(chain = true)
 public class UserInfoDto implements Serializable {
+
+    private Long id;
     /**
      * 用户最近一次登录会话ID
      * @author pddon.com
@@ -87,6 +90,7 @@ public class UserInfoDto implements Serializable {
      * 用户生日
      * @author pddon.com
      */
+    @JsonFormat(pattern = "yyyy-MM-dd")
     private Date birthday;
 
     /**

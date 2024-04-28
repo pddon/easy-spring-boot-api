@@ -22,7 +22,11 @@ public interface PartnerItemDao {
 
     boolean updateByItemId(PartnerItem item);
 
-    boolean removeByIds(List<String> asList);
+    boolean removeByIds(List<String> ids);
 
     IPage<PartnerItem> pageQuery(PartnerListRequest req);
+
+    boolean existsTenantId(String tenantId);
+
+    boolean updateStatus(Long id, String name);
 }

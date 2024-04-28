@@ -21,8 +21,12 @@ public class AddAppRequest implements Serializable {
      * 应用ID
      * @author pddon.com
      */
-    @NotEmpty
     private String appId;
+
+    /**
+     * 应用归属的商户ID
+     */
+    private String tenantId;
 
     /**
      * 应用名

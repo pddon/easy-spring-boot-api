@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.RoleMntService;
+import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
@@ -10,11 +11,14 @@ import com.pddon.framework.easyapi.dao.entity.PermItem;
 import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dto.resp.PermTreeDataDto;
 import com.pddon.framework.easyapi.dto.resp.RoleDetailDto;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @ClassName: RoleMntController
@@ -57,10 +61,16 @@ public class RoleMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="查询角色列表", apiName = "role/list")
     @RequiresPermissions("role:query")
     public PaginationResponse<RoleItem> listRole(@RequestBody RoleListRequest req){
         return roleMntService.listRole(req);
+    }
+
+    @GetMapping("getUserPerms")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @RequiredSession
+    public List<PermTreeDataDto> getUserPerms(@RequestParam(value = "userId", required = false) String userId){
+        return roleMntService.getUserPerms(userId);
     }
 
     @GetMapping("get")
@@ -73,7 +83,6 @@ public class RoleMntController {
 
     @PostMapping("listPerm")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="查询权限列表", apiName = "role/listPerm")
     @RequiresPermissions("perm:query")
     public PaginationResponse<PermItem> listPerm(@RequestBody PermListRequest req){
         return roleMntService.listPerm(req);

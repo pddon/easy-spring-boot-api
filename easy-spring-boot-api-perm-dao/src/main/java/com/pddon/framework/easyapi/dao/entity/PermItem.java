@@ -29,7 +29,20 @@ public class PermItem extends BaseEntity{
      * @author pddon.com
      */
      private String permId;
-
+    /**
+     * 父权限Id
+     */
+    private String parentPermId;
+    /**
+     * 权限名
+     * @author pddon.com
+     */
+    private String permName;
+    /**
+     * 资源类型
+     * @author pddon.com
+     */
+     private String resourceType;
     /**
      * 权限简介
      * @author pddon.com

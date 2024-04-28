@@ -7,9 +7,11 @@ import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
+import com.pddon.framework.easyapi.dao.UserPermDao;
 import com.pddon.framework.easyapi.dao.UserRoleDao;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserPassRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
+import com.pddon.framework.easyapi.dao.entity.UserPerm;
 import com.pddon.framework.easyapi.dao.entity.UserRole;
 import com.pddon.framework.easyapi.dao.dto.request.UserListRequest;
 import com.pddon.framework.easyapi.dao.dto.request.AddUserRequest;
@@ -17,11 +19,13 @@ import com.pddon.framework.easyapi.dao.dto.request.UpdateUserRequest;
 import com.pddon.framework.easyapi.dto.resp.UserInfoDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.utils.EncryptUtils;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import com.pddon.framework.easyapi.utils.UUIDGenerator;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -45,12 +49,17 @@ public class UserMntServiceImpl implements UserMntService {
     private UserRoleDao userRoleDao;
 
     @Autowired
+    private UserPermDao userPermDao;
+
+    @Autowired
     private BaseUserDao baseUserDao;
 
     @Override
-    public UserInfoDto getCurrentUserInfo() {
+    public UserInfoDto getUserInfo(String userId) {
         UserInfoDto userInfoDto = new UserInfoDto();
-        String userId = RequestContext.getContext().getSession().getUserId();
+        if(StringUtils.isEmpty(userId)){
+            userId = RequestContext.getContext().getSession().getUserId();
+        }
         Set<String> perms = userSecurityService.getUserPermissions(userId, true);
         BaseUser user = userSecurityService.queryByUserId(userId);
         BeanUtils.copyProperties(user, userInfoDto);
@@ -73,6 +82,7 @@ public class UserMntServiceImpl implements UserMntService {
         return page;
     }
 
+    @Transactional
     @Override
     public void add(AddUserRequest req) {
         if(baseUserDao.existUsername(req.getUsername())){
@@ -83,8 +93,27 @@ public class UserMntServiceImpl implements UserMntService {
         String userId = UUIDGenerator.getUUID();
         user.setUserId(userId);
         baseUserDao.saveUser(user);
+        if(req.getRoleIds() != null && !req.getRoleIds().isEmpty()){
+            List<UserRole> userRoles = req.getRoleIds().stream().map(roleId -> {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId)
+                        .setRoleId(roleId);
+                return userRole;
+            }).collect(Collectors.toList());
+            userRoleDao.saveItems(userRoles);
+        }
+        if(req.getPermIds() != null && !req.getPermIds().isEmpty()){
+            List<UserPerm> userPerms = req.getPermIds().stream().map(permId -> {
+                UserPerm userPerm = new UserPerm();
+                userPerm.setUserId(userId)
+                        .setPermId(permId);
+                return userPerm;
+            }).collect(Collectors.toList());
+            userPermDao.saveItems(userPerms);
+        }
     }
 
+    @Transactional
     @Override
     public void update(UpdateUserRequest req) {
         BaseUser user = baseUserDao.getByItemId(req.getId());
@@ -93,6 +122,27 @@ public class UserMntServiceImpl implements UserMntService {
         }
         BeanUtils.copyProperties(req, user);
         baseUserDao.updateUser(user);
+        String userId = user.getUserId();
+        userRoleDao.removeByUserId(userId);
+        userPermDao.removeByUserId(userId);
+        if(req.getRoleIds() != null && !req.getRoleIds().isEmpty()){
+            List<UserRole> userRoles = req.getRoleIds().stream().map(roleId -> {
+                UserRole userRole = new UserRole();
+                userRole.setUserId(userId)
+                        .setRoleId(roleId);
+                return userRole;
+            }).collect(Collectors.toList());
+            userRoleDao.saveItems(userRoles);
+        }
+        if(req.getPermIds() != null && !req.getPermIds().isEmpty()){
+            List<UserPerm> userPerms = req.getPermIds().stream().map(permId -> {
+                UserPerm userPerm = new UserPerm();
+                userPerm.setUserId(userId)
+                        .setPermId(permId);
+                return userPerm;
+            }).collect(Collectors.toList());
+            userPermDao.saveItems(userPerms);
+        }
     }
 
     @Override

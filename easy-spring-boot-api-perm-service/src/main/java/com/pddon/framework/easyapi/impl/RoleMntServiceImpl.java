@@ -2,6 +2,12 @@ package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.RoleMntService;
+import com.pddon.framework.easyapi.UserSecurityService;
+import com.pddon.framework.easyapi.annotation.LockDistributed;
+import com.pddon.framework.easyapi.config.SecurityConfigProperties;
+import com.pddon.framework.easyapi.consts.ApiPermOperateType;
+import com.pddon.framework.easyapi.consts.PermissionResourceType;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.PermItemDao;
 import com.pddon.framework.easyapi.dao.RoleItemDao;
@@ -12,16 +18,17 @@ import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dao.entity.RolePerm;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dto.resp.PermTreeDataDto;
 import com.pddon.framework.easyapi.dto.resp.RoleDetailDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -43,6 +50,12 @@ public class RoleMntServiceImpl implements RoleMntService {
 
     @Autowired
     private PermItemDao permItemDao;
+
+    @Autowired
+    private UserSecurityService userSecurityService;
+
+    @Autowired
+    private SecurityConfigProperties securityConfigProperties;
 
     @Transactional
     @Override
@@ -117,7 +130,7 @@ public class RoleMntServiceImpl implements RoleMntService {
         List<RolePerm> rolePermList = rolePermDao.getByRoleIds(Arrays.asList(roleId));
         List<String> permIdList = rolePermList.stream().map(RolePerm::getPermId).collect(Collectors.toList());
         List<PermItem> items = permItemDao.getByPermIds(permIdList);
-        dto.setPermIds(items);
+        dto.setPerms(items);
         return dto;
     }
 
@@ -135,10 +148,27 @@ public class RoleMntServiceImpl implements RoleMntService {
 
     @Override
     public IdResponse addPerm(AddPermRequest req) {
-        PermItem item = new PermItem();
-        BeanUtils.copyProperties(req, item);
-        permItemDao.saveItem(item);
-        return new IdResponse(item.getId());
+        String permId = String.format("%s:*", req.getPermId());
+        if(permItemDao.existsPermId(permId)){
+            throw new BusinessException("权限{0}已存在，请检查").setParam(req.getPermId());
+        }
+        List<PermItem> perms = new ArrayList<>();
+        PermItem permItem = new PermItem();
+        permItem.setPermId(permId)
+                .setPermName(req.getPermName())
+                .setResourceType(req.getResourceType())
+                .setIntro(req.getIntro());
+        perms.add(permItem);
+        Arrays.stream(ApiPermOperateType.values()).forEach(type -> {
+            PermItem item = new PermItem();
+            item.setPermId(String.format("%s:%s", req.getPermId(), type.getKey()))
+                    .setPermName(String.format("%s%s", type.getName(), req.getPermName()))
+                    .setResourceType(req.getResourceType())
+                    .setParentPermId(permId);
+            perms.add(item);
+        });
+        permItemDao.saveItems(perms);
+        return new IdResponse(permItem.getId());
     }
 
     @Override
@@ -154,5 +184,83 @@ public class RoleMntServiceImpl implements RoleMntService {
     @Override
     public boolean removePermByIds(String[] ids) {
         return permItemDao.removeByPermIds(ids);
+    }
+
+    @Override
+    public List<PermTreeDataDto> getUserPerms(String userId) {
+        if(StringUtils.isEmpty(userId)){
+            userId = RequestContext.getContext().getSession().getUserId();
+        }
+        List<String> permIds = new ArrayList<>(userSecurityService.getUserPermissions(userId, false));
+        List<PermItem> perms = permItemDao.getByPermIds(permIds);
+        Map<String, Set<String>> map = new HashMap<>();
+        perms.forEach(perm -> {
+            String rootPermId = perm.getParentPermId();
+            if(StringUtils.isEmpty(perm.getParentPermId())){
+                rootPermId = perm.getPermId() ;
+            }
+            Set<String> subs = map.get(rootPermId);
+            if(subs == null){
+                subs = new HashSet<>();
+            }
+            if(StringUtils.isNotEmpty(perm.getParentPermId())){
+                subs.add(perm.getPermId()) ;
+            }
+            map.put(rootPermId, subs);
+        });
+        List<PermTreeDataDto> dtos = perms.stream().filter(perm -> map.containsKey(perm.getPermId())).map(perm -> {
+            PermTreeDataDto rootDto = new PermTreeDataDto();
+            rootDto.setValue(perm.getPermId())
+                    .setLabel(perm.getPermName());
+            Set<String> subs = map.get(perm.getPermId());
+            if(subs != null && !subs.isEmpty()){
+                rootDto.setChildren(perms.stream().filter(subPerm -> subs.contains(subPerm.getPermId())).map(subPerm -> {
+                    PermTreeDataDto dto = new PermTreeDataDto();
+                    dto.setLabel(subPerm.getPermName())
+                            .setValue(subPerm.getPermId());
+                    return dto;
+                }).collect(Collectors.toList()));
+            }else{
+                rootDto.setChildren(new ArrayList<>());
+            }
+            return rootDto;
+        }).collect(Collectors.toList());
+        return dtos;
+    }
+
+    @Override
+    @LockDistributed
+    public void checkAndInitPerms(){
+        Map<String, String> types = securityConfigProperties.getApiPermTypes();
+        types.put("user", "用户信息");
+        types.put("role", "角色信息");
+        types.put("perm", "权限信息");
+        types.put("partner", "商户信息");
+        types.put("application", "应用信息");
+        types.put("log", "系统日志");
+        List<String[]> rootPermIds = types.keySet().stream().map(key -> new String[]{String.format("%s:*", key), key}).collect(Collectors.toList());
+        List<PermItem> perms = new ArrayList<>();
+        rootPermIds.forEach(items -> {
+            if(permItemDao.existsPermId(items[0])){
+                return;
+            }
+            //初始化权限和子权限
+            PermItem permItem = new PermItem();
+            permItem.setPermId(items[0])
+                    .setPermName(types.get(items[1]))
+                    .setResourceType(PermissionResourceType.API.name());
+            perms.add(permItem);
+            Arrays.stream(ApiPermOperateType.values()).forEach(type -> {
+                PermItem item = new PermItem();
+                item.setPermId(String.format("%s:%s", items[1], type.getKey()))
+                        .setPermName(String.format("%s%s", type.getName(), types.get(items[1])))
+                        .setResourceType(PermissionResourceType.API.name())
+                        .setParentPermId(items[0]);
+                perms.add(item);
+            });
+        });
+        if(!perms.isEmpty()){
+            permItemDao.saveItems(perms);
+        }
     }
 }

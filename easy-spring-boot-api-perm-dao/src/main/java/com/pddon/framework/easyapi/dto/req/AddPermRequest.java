@@ -22,6 +22,16 @@ public class AddPermRequest implements Serializable {
      * @author pddon.com
      */
     private String permId;
+    /**
+     * 权限名
+     * @author pddon.com
+     */
+    private String permName;
+    /**
+     * 资源类型
+     * @author pddon.com
+     */
+    private String resourceType;
 
     /**
      * 权限简介

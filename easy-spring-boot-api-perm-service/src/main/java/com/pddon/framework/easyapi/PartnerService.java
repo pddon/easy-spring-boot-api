@@ -2,6 +2,7 @@ package com.pddon.framework.easyapi;
 
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
+import com.pddon.framework.easyapi.dao.dto.request.UpdateItemFlagRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
 import com.pddon.framework.easyapi.dto.req.*;
@@ -30,4 +31,8 @@ public interface PartnerService {
     void deleteApp(IdsRequest req);
 
     PaginationResponse<BaseApplicationConfig> listApp(AppListRequest req);
+
+    void updatePartnerStatus(UpdatePartnerStatusRequest req);
+
+    void updateAppStatus(UpdateItemFlagRequest req);
 }

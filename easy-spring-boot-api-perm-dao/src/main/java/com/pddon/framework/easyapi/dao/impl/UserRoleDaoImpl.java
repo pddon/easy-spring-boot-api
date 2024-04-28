@@ -25,4 +25,14 @@ public class UserRoleDaoImpl extends ServiceImpl<UserRoleMapper, UserRole> imple
     public List<UserRole> getRolesByUserId(String userId) {
         return this.list(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
     }
+
+    @Override
+    public boolean removeByUserId(String userId) {
+        return this.remove(new LambdaQueryWrapper<UserRole>().eq(UserRole::getUserId, userId));
+    }
+
+    @Override
+    public boolean saveItems(List<UserRole> userRoles) {
+        return this.saveBatch(userRoles);
+    }
 }

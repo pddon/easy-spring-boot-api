@@ -27,4 +27,8 @@ public interface PermItemDao {
     boolean removeByPermIds(String[] ids);
 
     IPage<PermItem> pageQuery(PermListRequest req);
+
+    boolean existsPermId(String item);
+
+    void saveItems(List<PermItem> perms);
 }

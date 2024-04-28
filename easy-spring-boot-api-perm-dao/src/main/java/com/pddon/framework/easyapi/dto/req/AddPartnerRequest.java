@@ -4,6 +4,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
 /**
@@ -93,6 +94,7 @@ public class AddPartnerRequest implements Serializable {
      * 是否已启用API调用权限
      * @author pddon.com
      */
+    @NotNull
     private Boolean enableApi;
 
     /**

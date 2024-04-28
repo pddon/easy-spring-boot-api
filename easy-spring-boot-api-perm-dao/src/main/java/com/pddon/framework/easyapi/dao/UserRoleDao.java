@@ -15,4 +15,7 @@ public interface UserRoleDao {
 
     List<UserRole> getRolesByUserId(String userId);
 
+    boolean removeByUserId(String userId);
+
+    boolean saveItems(List<UserRole> userRoles);
 }

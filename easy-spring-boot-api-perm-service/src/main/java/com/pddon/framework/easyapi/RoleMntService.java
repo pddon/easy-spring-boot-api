@@ -5,7 +5,10 @@ import com.pddon.framework.easyapi.dao.entity.PermItem;
 import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dto.resp.PermTreeDataDto;
 import com.pddon.framework.easyapi.dto.resp.RoleDetailDto;
+
+import java.util.List;
 
 /**
  * @ClassName: RoleMntService
@@ -32,4 +35,8 @@ public interface RoleMntService {
     boolean updatePerm(UpdatePermRequest req);
 
     boolean removePermByIds(String[] ids);
+
+    List<PermTreeDataDto> getUserPerms(String userId);
+
+    void checkAndInitPerms();
 }

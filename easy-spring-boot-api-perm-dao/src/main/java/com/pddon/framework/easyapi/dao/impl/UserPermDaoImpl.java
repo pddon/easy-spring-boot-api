@@ -25,4 +25,14 @@ public class UserPermDaoImpl extends ServiceImpl<UserPermMapper, UserPerm> imple
     public List<UserPerm> getPermsByUserId(String userId) {
         return this.list(new LambdaQueryWrapper<UserPerm>().eq(UserPerm::getUserId, userId));
     }
+
+    @Override
+    public boolean removeByUserId(String userId) {
+        return this.remove(new LambdaQueryWrapper<UserPerm>().eq(UserPerm::getUserId, userId));
+    }
+
+    @Override
+    public boolean saveItems(List<UserPerm> userPerms) {
+        return this.saveBatch(userPerms);
+    }
 }

@@ -55,7 +55,7 @@ public class PermItemDaoImpl extends ServiceImpl<PermItemMapper, PermItem> imple
 
     @Override
     public boolean removeByPermIds(String[] ids) {
-        return this.remove(new LambdaQueryWrapper<PermItem>().in(PermItem::getPermId, Arrays.asList(ids)));
+        return this.remove(new LambdaQueryWrapper<PermItem>().in(PermItem::getId, Arrays.asList(ids)));
     }
 
     @Override
@@ -72,10 +72,21 @@ public class PermItemDaoImpl extends ServiceImpl<PermItemMapper, PermItem> imple
         Wrapper<PermItem> wrapper = new LambdaQueryWrapper<PermItem>()
                 .eq(!StringUtils.isEmpty(req.getPermId()), PermItem::getPermId, req.getPermId())
                 .and(!StringUtils.isEmpty(req.getKeyword()), query -> {
-                    return query.likeLeft(PermItem::getPermId, req.getKeyword()).or()
-                            .likeLeft(PermItem::getIntro, req.getKeyword());
+                    return query.like(PermItem::getPermId, req.getKeyword()).or()
+                            .like(PermItem::getPermName, req.getKeyword()).or()
+                            .like(PermItem::getIntro, req.getKeyword());
                 })
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? PermItem::getCrtTime : PermItem::getChgTime);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public boolean existsPermId(String permId) {
+        return this.count(new LambdaQueryWrapper<PermItem>().eq(PermItem::getPermId, permId)) > 0;
+    }
+
+    @Override
+    public void saveItems(List<PermItem> perms) {
+        this.saveBatch(perms);
     }
 }

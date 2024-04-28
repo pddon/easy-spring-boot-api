@@ -5,6 +5,7 @@ import com.pddon.framework.easyapi.SessionManager;
 import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.annotation.CacheMethodResultEvict;
+import com.pddon.framework.easyapi.annotation.LockDistributed;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
@@ -70,6 +71,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     private ApplicationManager applicationManager;
 
     @Override
+    @LockDistributed
     @Transactional
     public void checkAndCreateSuperManager(){
         if(baseUserDao.existUserId(SUPER_ADMIN_USER_ID)){

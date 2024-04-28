@@ -29,7 +29,7 @@ public class PartnerItem extends BaseTenantEntity{
     private Long id;
 
     /**
-     * 业务应用名
+     * 商户名
      * @author pddon.com
      */
     private String partnerName;

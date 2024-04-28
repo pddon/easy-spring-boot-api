@@ -17,7 +17,7 @@ import com.pddon.framework.easyapi.dto.resp.UserInfoDto;
  * @Addr: https://pddon.cn
  */
 public interface UserMntService {
-    UserInfoDto getCurrentUserInfo();
+    UserInfoDto getUserInfo(String userId);
 
     PaginationResponse<BaseUser> list(UserListRequest req);
 

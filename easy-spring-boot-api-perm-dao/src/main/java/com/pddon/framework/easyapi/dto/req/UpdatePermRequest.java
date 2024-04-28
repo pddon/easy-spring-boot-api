@@ -24,6 +24,16 @@ public class UpdatePermRequest implements Serializable {
      */
     private String permId;
     /**
+     * 权限名
+     * @author pddon.com
+     */
+    private String permName;
+    /**
+     * 资源类型
+     * @author pddon.com
+     */
+    private String resourceType;
+    /**
      * 权限简介
      */
     private String intro;

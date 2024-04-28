@@ -16,7 +16,6 @@ import javax.validation.constraints.NotEmpty;
 @Data
 @Accessors(chain = true)
 public class AppListRequest extends PaginationRequest {
-    @NotEmpty
     private String tenantId;
 
     private String keyword;

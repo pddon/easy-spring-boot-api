@@ -38,7 +38,7 @@ public class RoleItemDaoImpl extends ServiceImpl<RoleItemMapper, RoleItem> imple
 
     @Override
     public RoleItem getByItemId(Long id) {
-        return this.getByItemId(id);
+        return this.getById(id);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class RoleItemDaoImpl extends ServiceImpl<RoleItemMapper, RoleItem> imple
 
     @Override
     public boolean removeByIds(String[] ids) {
-        return this.remove(new LambdaQueryWrapper<RoleItem>().in(RoleItem::getRoleId, Arrays.asList(ids)));
+        return this.remove(new LambdaQueryWrapper<RoleItem>().in(RoleItem::getId, Arrays.asList(ids)));
     }
 
     @Override
@@ -70,8 +70,9 @@ public class RoleItemDaoImpl extends ServiceImpl<RoleItemMapper, RoleItem> imple
         Wrapper<RoleItem> wrapper = new LambdaQueryWrapper<RoleItem>()
                 .eq(!StringUtils.isEmpty(req.getRoleId()), RoleItem::getRoleId, req.getRoleId())
                 .and(!StringUtils.isEmpty(req.getKeyword()), query -> {
-                    return query.likeLeft(RoleItem::getRoleId, req.getKeyword()).or()
-                            .likeLeft(RoleItem::getIntro, req.getKeyword());
+                    return query.like(RoleItem::getRoleId, req.getKeyword()).or()
+                            .like(RoleItem::getRoleName, req.getKeyword()).or()
+                            .like(RoleItem::getIntro, req.getKeyword());
                 })
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? RoleItem::getCrtTime : RoleItem::getChgTime);
         return this.page(page, wrapper);

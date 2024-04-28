@@ -27,6 +27,11 @@ public class RoleDetailDto extends BaseEntity {
      * @author pddon.com
      */
     private String roleId;
+    /**
+     * 角色名
+     * @author pddon.com
+     */
+    private String roleName;
 
     /**
      * 角色简介
@@ -43,5 +48,5 @@ public class RoleDetailDto extends BaseEntity {
     /**
      * 角色拥有的权限ID列表
      */
-    private List<PermItem> permIds;
+    private List<PermItem> perms;
 }

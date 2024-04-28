@@ -14,4 +14,8 @@ import java.util.List;
  */
 public interface UserPermDao {
     List<UserPerm> getPermsByUserId(String userId);
+
+    boolean removeByUserId(String userId);
+
+    boolean saveItems(List<UserPerm> userPerms);
 }

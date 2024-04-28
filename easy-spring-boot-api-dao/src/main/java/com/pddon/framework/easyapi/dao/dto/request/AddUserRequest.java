@@ -7,6 +7,7 @@ import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -100,9 +101,9 @@ public class AddUserRequest implements Serializable {
     /**
      * 拥有的角色
      */
-    private Set<String> roleIds;
+    private List<String> roleIds;
     /**
      * 拥有的权限
      */
-    private Set<String> perms;
+    private List<String> permIds;
 }

@@ -10,6 +10,7 @@ import com.pddon.framework.easyapi.dto.req.OperateLogListRequest;
 import com.pddon.framework.easyapi.dto.resp.UserInfoDto;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresAuthentication;
+import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -30,6 +31,7 @@ public class OperateLogMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
+    @RequiresPermissions("log:query")
     @RequiresAuthentication
     public PaginationResponse<UserOperateRecord> list(@RequestBody OperateLogListRequest req){
         return userOperateLogService.list(req);

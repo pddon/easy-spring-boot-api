@@ -28,6 +28,12 @@ public class UpdateRoleRequest implements Serializable {
     private String roleId;
 
     /**
+     * 权限名
+     * @author pddon.com
+     */
+    private String roleName;
+
+    /**
      * 角色简介
      * @author pddon.com
      */

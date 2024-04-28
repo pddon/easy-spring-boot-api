@@ -54,7 +54,7 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
 
     @Override
     public boolean removeByAppIds(List<String> list) {
-        return this.remove(new LambdaQueryWrapper<K>().in(BaseApplicationConfig::getAppId, list));
+        return this.remove(new LambdaQueryWrapper<K>().in(BaseApplicationConfig::getId, list));
     }
 
     @Override
@@ -71,10 +71,15 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
         Wrapper<K> wrapper = new LambdaQueryWrapper<K>()
                 .eq(!StringUtils.isEmpty(tenantId), BaseApplicationConfig::getTenantId, tenantId)
                 .and(!StringUtils.isEmpty(keyword), query -> {
-                    return query.likeLeft(BaseApplicationConfig::getAppName, keyword).or()
-                            .likeLeft(BaseApplicationConfig::getDescription, keyword);
+                    return query.likeRight(BaseApplicationConfig::getAppName, keyword).or()
+                            .likeRight(BaseApplicationConfig::getDescription, keyword);
                 })
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? BaseApplicationConfig::getCrtTime : BaseApplicationConfig::getChgTime);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public boolean existsAppId(String appId) {
+        return this.count(new LambdaQueryWrapper<K>().eq(BaseApplicationConfig::getAppId, appId)) > 0;
     }
 }
