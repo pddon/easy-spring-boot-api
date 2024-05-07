@@ -3,12 +3,14 @@ package com.pddon.framework.easyapi.impl;
 import com.pddon.framework.easyapi.CacheManager;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dto.Session;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
@@ -18,6 +20,8 @@ import javax.annotation.Resource;
  */
 @Service
 @ConditionalOnProperty(name={"easyapi.enablePersistSession"},havingValue = "true")
+@Primary
+@IgnoreTenant
 @Slf4j
 public class PersistSessionManager extends DefaultSessionManagerImpl {
 
@@ -52,7 +56,9 @@ public class PersistSessionManager extends DefaultSessionManagerImpl {
                 .setVersionCode(context.getVersionCode())
         ;
         session.setUserId(user.getUserId().toString())
-                .setCountryCode(user.getCountryCode());
+                .setCountryCode(user.getCountryCode())
+                .setNewSession(false)
+                .setRecoverFromDB(true);
 
         this.update(session);
         return session;

@@ -23,7 +23,7 @@ public class UpdateAppRequest implements Serializable {
      * 应用ID
      * @author pddon.com
      */
-    private String appId;
+    private String partnerAppId;
 
     private String tenantId;
 

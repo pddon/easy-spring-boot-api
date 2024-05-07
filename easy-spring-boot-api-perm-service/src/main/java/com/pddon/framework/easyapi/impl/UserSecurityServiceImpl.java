@@ -18,14 +18,12 @@ import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authc.AuthenticationException;
-import org.apache.shiro.authc.UsernamePasswordToken;
 import org.apache.shiro.subject.Subject;
 import org.springframework.aop.framework.AopContext;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.annotation.PostConstruct;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
@@ -69,6 +67,11 @@ public class UserSecurityServiceImpl implements UserSecurityService {
 
     @Autowired
     private ApplicationManager applicationManager;
+
+    @Override
+    public boolean isSuperManager(String userId){
+        return SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId);
+    }
 
     @Override
     @LockDistributed

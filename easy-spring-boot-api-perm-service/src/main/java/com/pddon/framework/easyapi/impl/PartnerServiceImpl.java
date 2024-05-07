@@ -101,7 +101,11 @@ public class PartnerServiceImpl implements PartnerService {
     public IdResponse addApp(AddAppRequest req) {
         BaseApplicationConfig applicationConfig = new BaseApplicationConfig();
         BeanUtils.copyProperties(req, applicationConfig);
-        applicationConfig.setAppId(generateAppId());
+        String appId = req.getPartnerAppId();
+        if (StringUtils.isEmpty(appId)) {
+            appId = generateAppId();
+        }
+        applicationConfig.setAppId(appId);
         baseApplicationConfigDao.saveItem(applicationConfig);
         return new IdResponse(applicationConfig.getId());
     }
@@ -113,6 +117,7 @@ public class PartnerServiceImpl implements PartnerService {
             throw new BusinessException("应用信息未找到!");
         }
         BeanUtils.copyProperties(req, config);
+        config.setAppId(req.getPartnerAppId());
         baseApplicationConfigDao.updateByItemId(config);
     }
 

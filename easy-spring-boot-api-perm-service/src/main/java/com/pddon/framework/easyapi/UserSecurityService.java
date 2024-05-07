@@ -13,6 +13,8 @@ import java.util.Set;
  * @Addr: https://pddon.cn
  */
 public interface UserSecurityService {
+    boolean isSuperManager(String userId);
+
     void checkAndCreateSuperManager();
 
     /**
