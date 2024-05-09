@@ -75,7 +75,7 @@ public class RoleMntController {
 
     @GetMapping("get")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="查询角色详情", apiName = "role/get")
+    //@OperateLog(type="查询角色详情", apiName = "role/get")
     @RequiresPermissions("role:query")
     public RoleDetailDto roleDetail(@RequestParam("id")String id){
         return roleMntService.roleDetail(id);
@@ -98,7 +98,7 @@ public class RoleMntController {
 
     @PostMapping("updatePerm")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="更新角色", apiName = "role/updatePerm")
+    @OperateLog(type="更新权限", apiName = "role/updatePerm")
     @RequiresPermissions("perm:update")
     public void updatePerm(@RequestBody UpdatePermRequest req){
         roleMntService.updatePerm(req);
@@ -106,7 +106,7 @@ public class RoleMntController {
 
     @PostMapping("deletePerm")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="删除角色", apiName = "role/deletePerm")
+    @OperateLog(type="删除权限", apiName = "role/deletePerm")
     @RequiresPermissions("perm:delete")
     public void removePermByIds(@RequestBody IdsRequest req){
         roleMntService.removePermByIds(req.getIds());
