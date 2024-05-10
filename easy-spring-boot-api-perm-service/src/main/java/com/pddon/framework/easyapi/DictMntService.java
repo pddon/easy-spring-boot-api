@@ -30,4 +30,6 @@ public interface DictMntService extends DictService{
     void removeGroup(IdsRequest req);
 
     PaginationResponse<DictGroup> listGroup(DictGroupListRequest req);
+
+    boolean saveOrUpdate(String tenantId, String appId, String dictId, String content);
 }

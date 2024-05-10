@@ -121,4 +121,17 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
                 .setRecords(itemPage.getRecords());
         return page;
     }
+
+    @Override
+    public boolean saveOrUpdate(String tenantId, String appId, String dictId, String content){
+        DictItem dictItem = dictItemMntDao.getTenantDict(tenantId, appId, dictId);
+        if(dictItem == null){
+            dictItem = new DictItem();
+            dictItem.setDictId(dictId)
+                    .setAppId(appId)
+                    .setTenantId(tenantId);
+        }
+        dictItem.setContent(content);
+        return dictItemMntDao.saveOrUpdateItem(dictItem);
+    }
 }

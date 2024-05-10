@@ -100,4 +100,9 @@ public class DictItemMntDaoImpl extends DictItemDaoImpl implements DictItemMntDa
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DictItem::getCrtTime : DictItem::getChgTime);
         return this.page(page, wrapper);
     }
+
+    @Override
+    public boolean saveOrUpdateItem(DictItem dictItem) {
+        return this.saveOrUpdate(dictItem);
+    }
 }

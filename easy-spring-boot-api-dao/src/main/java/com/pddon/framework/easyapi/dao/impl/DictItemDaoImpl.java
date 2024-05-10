@@ -36,7 +36,9 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
     public DictItem getTenantDict(String tenantId, String appId, String dictId) {
         return this.lambdaQuery().eq(DictItem::getDictId, dictId)
                 .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
+                .isNull(StringUtils.isEmpty(tenantId), DictItem::getTenantId)
                 .eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId)
+                .isNull(StringUtils.isEmpty(appId), DictItem::getAppId)
                 .isNull(DictItem::getUserId)
                 .one();
     }

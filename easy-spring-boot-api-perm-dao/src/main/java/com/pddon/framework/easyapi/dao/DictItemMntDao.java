@@ -30,4 +30,6 @@ public interface DictItemMntDao extends DictItemDao {
     boolean removeByIds(List<String> ids);
 
     IPage<DictItem> pageQuery(DictListRequest req);
+
+    boolean saveOrUpdateItem(DictItem dictItem);
 }
