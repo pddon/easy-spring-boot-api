@@ -30,7 +30,6 @@ public class AddDictGroupRequest implements Serializable {
      * 分组自身内容
      * @author pddon.com
      */
-    @NotEmpty
     private String content;
     /**
      * 备注信息

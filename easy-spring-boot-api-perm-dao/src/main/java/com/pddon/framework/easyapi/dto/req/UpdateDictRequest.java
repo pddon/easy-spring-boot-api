@@ -32,4 +32,24 @@ public class UpdateDictRequest implements Serializable {
      * @author pddon.com
      */
     private String description;
+    /**
+     * 应用所属渠道ID(租户ID)
+     * @author pddon.com
+     */
+    private String tenantId;
+    /**
+     * 字典所属应用ID
+     * @author pddon.com
+     */
+    private String dictAppId;
+    /**
+     * 字典所属用户ID
+     * @author pddon.com
+     */
+    private String dictUserId;
+    /**
+     * 字典分组ID
+     * @author pddon.com
+     */
+    private String groupId;
 }

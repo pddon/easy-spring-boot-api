@@ -14,7 +14,7 @@ import com.pddon.framework.easyapi.dto.resp.IdResponse;
  * @Date: 2024-05-10 01:08
  * @Addr: https://pddon.cn
  */
-public interface DictMntService {
+public interface DictMntService extends DictService{
     IdResponse add(AddDictRequest req);
 
     void update(UpdateDictRequest req);

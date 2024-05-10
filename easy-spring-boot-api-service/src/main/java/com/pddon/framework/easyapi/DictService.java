@@ -1,17 +1,18 @@
-package com.pddon.framework.easyapi.dao;
+package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 
 import java.util.List;
 
 /**
- * @ClassName: DictItemDao
+ * @ClassName: DictService
  * @Description:
  * @Author: Allen
- * @Date: 2024-05-10 00:55
+ * @Date: 2024-05-10 20:33
  * @Addr: https://pddon.cn
  */
-public interface DictItemDao {
+public interface DictService {
     DictItem getDefaultByDictId(String dictId);
 
     DictItem getTenantDict(String tenantId, String appId, String dictId);
@@ -28,4 +29,5 @@ public interface DictItemDao {
 
     List<DictItem> getTenantDictsByUserId(String userId, String groupId);
 
+    List<DictGroup> getByParentDictGroupId(String parentId);
 }

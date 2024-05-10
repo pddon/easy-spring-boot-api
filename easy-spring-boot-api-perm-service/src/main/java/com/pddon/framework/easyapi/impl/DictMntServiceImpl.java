@@ -28,7 +28,7 @@ import java.util.Arrays;
  */
 @Service
 @Slf4j
-public class DictMntServiceImpl implements DictMntService {
+public class DictMntServiceImpl extends DictServiceImpl implements DictMntService {
 
     @Autowired
     private DictGroupMntDao dictGroupMntDao;
@@ -38,11 +38,13 @@ public class DictMntServiceImpl implements DictMntService {
 
     @Override
     public IdResponse add(AddDictRequest req) {
-        if(dictItemMntDao.exists(req.getTenantId(), req.getAppId(), req.getUserId(), req.getGroupId(), req.getDictId())){
+        if(dictItemMntDao.exists(req.getTenantId(), req.getDictAppId(), req.getDictUserId(), req.getGroupId(), req.getDictId())){
             throw new BusinessException("字典已存在！");
         }
         DictItem item = new DictItem();
         BeanUtils.copyProperties(req, item);
+        item.setAppId(req.getDictAppId());
+        item.setUserId(req.getDictUserId());
         dictItemMntDao.saveItem(item);
         return new IdResponse(item.getId());
     }
@@ -57,6 +59,8 @@ public class DictMntServiceImpl implements DictMntService {
         }
         DictItem item = dictItemMntDao.getByItemId(req.getId());
         BeanUtils.copyProperties(req, item);
+        item.setAppId(req.getDictAppId());
+        item.setUserId(req.getDictUserId());
         dictItemMntDao.updateByItemId(item);
     }
 

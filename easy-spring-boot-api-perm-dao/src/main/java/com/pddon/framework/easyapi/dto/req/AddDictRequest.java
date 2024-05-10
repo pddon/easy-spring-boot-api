@@ -25,12 +25,12 @@ public class AddDictRequest implements Serializable {
      * 字典所属应用ID
      * @author pddon.com
      */
-    private String appId;
+    private String dictAppId;
     /**
      * 字典所属用户ID
      * @author pddon.com
      */
-    private String userId;
+    private String dictUserId;
     /**
      * 字典分组ID
      * @author pddon.com

@@ -16,16 +16,17 @@ import lombok.experimental.Accessors;
 public class DictListRequest extends PaginationRequest {
 
     private String dictId;
+    private String tenantId;
     /**
      * 字典所属应用ID
      * @author pddon.com
      */
-    private String appId;
+    private String dictAppId;
     /**
      * 字典所属用户ID
      * @author pddon.com
      */
-    private String userId;
+    private String DictUserId;
     /**
      * 字典分组ID
      * @author pddon.com

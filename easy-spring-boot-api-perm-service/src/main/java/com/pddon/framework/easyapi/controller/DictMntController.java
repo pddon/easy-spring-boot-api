@@ -60,7 +60,7 @@ public class DictMntController {
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiresPermissions("dict:query")
-    public PaginationResponse<DictItem> listPartner(@RequestBody DictListRequest req){
+    public PaginationResponse<DictItem> listDict(@RequestBody DictListRequest req){
         return dictMntService.list(req);
     }
 

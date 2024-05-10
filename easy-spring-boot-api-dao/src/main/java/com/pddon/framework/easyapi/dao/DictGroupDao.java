@@ -1,5 +1,9 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.pddon.framework.easyapi.dao.entity.DictGroup;
+
+import java.util.List;
+
 /**
  * @ClassName: DictGroupDao
  * @Description:
@@ -8,4 +12,5 @@ package com.pddon.framework.easyapi.dao;
  * @Addr: https://pddon.cn
  */
 public interface DictGroupDao {
+    List<DictGroup> getByParentDictGroupId(String parentId);
 }

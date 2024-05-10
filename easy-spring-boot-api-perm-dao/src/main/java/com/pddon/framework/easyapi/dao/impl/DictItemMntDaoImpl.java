@@ -31,22 +31,14 @@ public class DictItemMntDaoImpl extends DictItemDaoImpl implements DictItemMntDa
     @Override
     public boolean exists(String tenantId, String appId, String userId, String groupId, String dictId) {
         return this.lambdaQuery().eq(DictItem::getDictId, dictId)
-                .and(query -> {
-                    return query.eq(StringUtils.isNotEmpty(groupId), DictItem::getGroupId, groupId).or()
-                            .isNull(DictItem::getGroupId);
-                })
-                .and(query -> {
-                    return query.eq(StringUtils.isNotEmpty(userId), DictItem::getUserId, userId).or()
-                            .isNull(DictItem::getUserId);
-                })
-                .and(query -> {
-                    return query.eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId).or()
-                            .isNull(DictItem::getAppId);
-                })
-                .and(query -> {
-                    return query.eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId).or()
-                            .isNull(DictItem::getTenantId);
-                })
+                .eq(StringUtils.isNotEmpty(groupId), DictItem::getGroupId, groupId)
+                .isNull(StringUtils.isEmpty(groupId), DictItem::getGroupId)
+                .eq(StringUtils.isNotEmpty(userId), DictItem::getUserId, userId)
+                .isNull(StringUtils.isEmpty(userId), DictItem::getUserId)
+                .eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId)
+                .isNull(StringUtils.isEmpty(appId), DictItem::getAppId)
+                .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
+                .isNull(StringUtils.isEmpty(tenantId), DictItem::getTenantId)
                 .count() > 0;
     }
 
@@ -94,8 +86,9 @@ public class DictItemMntDaoImpl extends DictItemDaoImpl implements DictItemMntDa
         Wrapper<DictItem> wrapper = new LambdaQueryWrapper<DictItem>()
                 .eq(StringUtils.isNotEmpty(req.getDictId()), DictItem::getDictId, req.getDictId())
                 .eq(StringUtils.isNotEmpty(req.getGroupId()), DictItem::getGroupId, req.getGroupId())
-                .eq(StringUtils.isNotEmpty(req.getAppId()), DictItem::getAppId, req.getAppId())
-                .eq(StringUtils.isNotEmpty(req.getUserId()), DictItem::getUserId, req.getUserId())
+                .eq(StringUtils.isNotEmpty(req.getDictAppId()), DictItem::getAppId, req.getDictAppId())
+                .eq(StringUtils.isNotEmpty(req.getTenantId()), DictItem::getTenantId, req.getTenantId())
+                .eq(StringUtils.isNotEmpty(req.getDictUserId()), DictItem::getUserId, req.getDictUserId())
                 .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
                     return query.like(DictItem::getDictId, req.getKeyword()).or()
                             .like(DictItem::getTenantId, req.getKeyword()).or()
