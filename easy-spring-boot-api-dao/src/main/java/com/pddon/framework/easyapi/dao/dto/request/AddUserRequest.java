@@ -20,6 +20,8 @@ import java.util.Set;
 @Data
 @Accessors(chain = true)
 public class AddUserRequest implements Serializable {
+
+    private String tenantId;
     /**
      * 用户真实姓名
      * @author pddon.com

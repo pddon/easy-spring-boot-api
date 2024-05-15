@@ -11,6 +11,7 @@ package com.pddon.framework.easyapi.interceptor.impl;
 import java.lang.reflect.Method;
 import java.util.List;
 
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
@@ -47,15 +48,17 @@ public class SessionInterceptor extends AbstractApiMethodInterceptor {
 			log.trace("开始校验接口会话信息！");
 		}
 		String sessionId = RequestContext.getContext().getSessionId();
-		Session session = sessionManager.get(sessionId);
-		if(RequestContext.getContext().getApiRestrictions().getSession()){
-			//检查会话信息
-			if(session == null){
-				throw new BusinessException(ErrorCodes.INVALID_SESSION_ID).setParam(systemParameterProperties.getSessionId(), sessionId);
+		if(StringUtils.isNotEmpty(sessionId)){
+			Session session = sessionManager.get(sessionId);
+			if(RequestContext.getContext().getApiRestrictions().getSession()){
+				//检查会话信息
+				if(session == null){
+					throw new BusinessException(ErrorCodes.INVALID_SESSION_ID).setParam(systemParameterProperties.getSessionId(), sessionId);
+				}
 			}
-		}
-		if(session != null){
-			RequestContext.getContext().setSession(session);
+			if(session != null){
+				RequestContext.getContext().setSession(session);
+			}
 		}
 	}
 

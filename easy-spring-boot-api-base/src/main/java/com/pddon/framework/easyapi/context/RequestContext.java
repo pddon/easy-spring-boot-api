@@ -102,14 +102,22 @@ public class RequestContext {
     public String getAttachment(String key) {
         return (String)this.attachments.get(key);
     }
- 
+
+    public Object getObjectAttachment(String key) {
+        return this.attachments.get(key);
+    }
+
     public RequestContext setAttachment(String key, String value) {
+        return this.setObjectAttachment(key, value);
+    }
+
+    public RequestContext setObjectAttachment(String key, Object value) {
         if(value == null) {
             this.attachments.remove(key);
         } else {
             String requestIdKey = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.REQUEST_ID);
             if(key.equalsIgnoreCase(requestIdKey)){
-                MDC.put("requestId",value);
+                MDC.put("requestId",value.toString());
             }
             this.attachments.put(key, value);
         } 

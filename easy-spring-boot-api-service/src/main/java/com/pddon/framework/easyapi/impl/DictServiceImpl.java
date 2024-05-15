@@ -37,8 +37,8 @@ public class DictServiceImpl implements DictService {
 
     @CacheMethodResult(prefix = "Dict")
     @Override
-    public DictItem getTenantDict(String tenantId, String appId, String dictId) {
-        return dictItemDao.getTenantDict(tenantId, appId, dictId);
+    public DictItem getTenantDict(String tenantId, String dictAppId, String dictId) {
+        return dictItemDao.getTenantDict(tenantId, dictAppId, dictId);
     }
 
     @CacheMethodResult(prefix = "Dict")
@@ -59,13 +59,13 @@ public class DictServiceImpl implements DictService {
     }
 
     @Override
-    public List<DictItem> getTenantDictsByGroupId(String tenantId, String appId, String groupId) {
-        return dictItemDao.getTenantDictsByGroupId(tenantId, appId, groupId);
+    public List<DictItem> getTenantDictsByGroupId(String tenantId, String dictAppId, String groupId) {
+        return dictItemDao.getTenantDictsByGroupId(tenantId, dictAppId, groupId);
     }
 
     @Override
-    public List<DictItem> getDefaultTenantDictsByGroupId(String appId, String groupId) {
-        return dictItemDao.getDefaultTenantDictsByGroupId(appId, groupId);
+    public List<DictItem> getDefaultTenantDictsByGroupId(String dictAppId, String groupId) {
+        return dictItemDao.getDefaultTenantDictsByGroupId(dictAppId, groupId);
     }
 
     @Override

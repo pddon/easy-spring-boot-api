@@ -31,6 +31,9 @@ import com.pddon.framework.easyapi.CacheManager;
 public class MethodCacheManager {
 
 	@Autowired
+	private CacheManager cacheManager;
+
+	@Autowired
 	private SystemParameterRenameProperties systemParameterRenameProperties;
 
 	public String getFieldValue(String keyId, String[] parameters, Object [] args, Method method){
@@ -112,17 +115,23 @@ public class MethodCacheManager {
 	}
 	
 	public Object getResult(String key, Class<?> classType, CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){
-		
+		if(cacheManager == null){
+			cacheManager = this.cacheManager;
+		}
 		return cacheManager.get(key, classType, expireSeconds, expireMode);
 	}
 	
 	public void cacheResult(String key ,Object result, CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){
-		
+		if(cacheManager == null){
+			cacheManager = this.cacheManager;
+		}
 		cacheManager.set(key, result, expireSeconds, expireSeconds, expireMode);
 	}
 	
 	public void remove(String key , CacheManager cacheManager, Long expireSeconds, CacheExpireMode expireMode){
-		
+		if(cacheManager == null){
+			cacheManager = this.cacheManager;
+		}
 		cacheManager.remove(key, expireSeconds, expireMode);
 	}
 	

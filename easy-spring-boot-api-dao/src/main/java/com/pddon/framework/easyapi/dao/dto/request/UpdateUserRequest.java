@@ -22,6 +22,8 @@ public class UpdateUserRequest implements Serializable {
     @NotNull
     private Long id;
 
+    private String tenantId;
+
     /**
      * 用户真实姓名
      * @author pddon.com

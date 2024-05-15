@@ -50,13 +50,15 @@ public class PersistSessionManager extends DefaultSessionManagerImpl {
                 .setClientIp(context.getClientIp())
                 .setCountryCode(context.getCountryCode())
                 .setCurrency(context.getCurrency())
-                .setLocale(context.getLocale())
+                .setLocale(user.getLocale())
                 .setTimeZone(context.getTimeZone())
-                .setUserId(context.getUserId())
+                .setUserId(user.getUserId())
                 .setVersionCode(context.getVersionCode())
         ;
         session.setUserId(user.getUserId().toString())
+                .setChannelId(user.getTenantId())
                 .setCountryCode(user.getCountryCode())
+                .setUsername(user.getUsername())
                 .setNewSession(false)
                 .setRecoverFromDB(true);
 

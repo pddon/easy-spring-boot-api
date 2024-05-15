@@ -20,6 +20,10 @@ import java.util.Set;
 public class UserInfoDto implements Serializable {
 
     private Long id;
+
+    private String tenantId;
+
+    private Boolean superManager;
     /**
      * 用户最近一次登录会话ID
      * @author pddon.com

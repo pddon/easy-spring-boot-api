@@ -2,6 +2,8 @@ package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.DictMntService;
+import com.pddon.framework.easyapi.cache.MethodCacheManager;
+import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.DictGroupMntDao;
@@ -15,6 +17,8 @@ import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -27,6 +31,7 @@ import java.util.Arrays;
  * @Addr: https://pddon.cn
  */
 @Service
+@Primary
 @Slf4j
 public class DictMntServiceImpl extends DictServiceImpl implements DictMntService {
 
@@ -35,6 +40,10 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
 
     @Autowired
     private DictItemMntDao dictItemMntDao;
+
+    @Autowired
+    @Lazy
+    private MethodCacheManager methodCacheManager;
 
     @Override
     public IdResponse add(AddDictRequest req) {
@@ -62,6 +71,15 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
         item.setAppId(req.getDictAppId());
         item.setUserId(req.getDictUserId());
         dictItemMntDao.updateByItemId(item);
+        String key = String.format("Dict:%s-%s-%s", item.getTenantId(), item.getAppId(), item.getDictId());
+        if(StringUtils.isEmpty(item.getTenantId()) && StringUtils.isEmpty(item.getTenantId())){
+            key = String.format("Dict:%s", item.getDictId());
+        }else if(StringUtils.isEmpty(item.getTenantId())){
+            key = String.format("Dict:%s-%s", item.getAppId(), item.getDictId());
+        }else if(StringUtils.isEmpty(item.getAppId())){
+            key = String.format("Dict:%s-%s", item.getTenantId(), item.getDictId());
+        }
+        methodCacheManager.remove(key, null, 120L, CacheExpireMode.EXPIRE_AFTER_REDA);
     }
 
     @Override
@@ -132,6 +150,18 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
                     .setTenantId(tenantId);
         }
         dictItem.setContent(content);
-        return dictItemMntDao.saveOrUpdateItem(dictItem);
+        boolean re = dictItemMntDao.saveOrUpdateItem(dictItem);
+        if(re){
+            String key = String.format("Dict:%s-%s-%s", tenantId, appId, dictId);
+            if(StringUtils.isEmpty(tenantId) && StringUtils.isEmpty(appId)){
+                key = String.format("Dict:%s", dictId);
+            }else if(StringUtils.isEmpty(tenantId)){
+                key = String.format("Dict:%s-%s", appId, dictId);
+            }else if(StringUtils.isEmpty(appId)){
+                key = String.format("Dict:%s-%s", tenantId, dictId);
+            }
+            methodCacheManager.remove(key, null, 120L, CacheExpireMode.EXPIRE_AFTER_REDA);
+        }
+        return re;
     }
 }

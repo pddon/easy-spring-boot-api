@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.annotation.CacheMethodResultEvict;
 import com.pddon.framework.easyapi.annotation.LockDistributed;
+import com.pddon.framework.easyapi.consts.CacheKeyMode;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
@@ -101,24 +102,24 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     }
 
     @Override
-    @CacheMethodResult(prefix = "User:Perms", id = "userId", needCacheField = "cacheable", expireSeconds = 3600)
-    public Set<String> getUserPermissions(String userId, boolean cacheable) {
-        if(StringUtils.isEmpty(userId)){
+    @CacheMethodResult(prefix = "User:Perms", id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, needCacheField = "cacheable", expireSeconds = 3600)
+    public Set<String> getUserPermissions(String currentUserId, boolean cacheable) {
+        if(StringUtils.isEmpty(currentUserId)){
             return new HashSet<>();
         }
-        if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId)){
+        if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(currentUserId)){
             RequestContext.getContext().setSuperManager(true);
             //超级管理员具有所有权限
             return getAllPermissions();
         }
         Set<String> perms = new HashSet<>();
         //获取用户权限
-        List<UserPerm> userPerms = userPermDao.getPermsByUserId(userId);
+        List<UserPerm> userPerms = userPermDao.getPermsByUserId(currentUserId);
         if(userPerms != null){
             perms.addAll(userPerms.stream().map(UserPerm::getPermId).collect(Collectors.toList()));
         }
         //获取用户角色
-        List<UserRole> roles = userRoleDao.getRolesByUserId(userId);
+        List<UserRole> roles = userRoleDao.getRolesByUserId(currentUserId);
         List<String> roleIds = roles.stream().map(UserRole::getRoleId).collect(Collectors.toList());
         //获取角色下所有权限
         List<RolePerm> rolePerms = rolePermDao.getByRoleIds(roleIds);
@@ -128,29 +129,31 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         return perms;
     }
 
+    @CacheMethodResultEvict(prefix = "User:Perms", id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, expireSeconds = 3600)
     @Override
-    public void login(String userId, String password, String loginType) {
+    public void login(String currentUserId, String password, String loginType) {
         // 获取当前用户
         Subject currentUser = SecurityUtils.getSubject();
         // 创建用户令牌，通常是用户名和密码
-        UserAuthenticationToken token = new UserAuthenticationToken(null, userId, EncryptUtils.encryptMD5Hex(password));
+        UserAuthenticationToken token = new UserAuthenticationToken(null, currentUserId, EncryptUtils.encryptMD5Hex(password));
         RequestContext.getContext().setShiroSessionEnable(true);
         try{
             currentUser.login(token);
         }catch (AuthenticationException e){
             throw e;
         }
-        if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId)){
+        if(SUPER_ADMIN_USER_ID.equalsIgnoreCase(currentUserId)){
             RequestContext.getContext().setSuperManager(true);
         }
         //获取用户信息
-        BaseUser user = baseUserDao.getByUserId(userId);
+        BaseUser user = baseUserDao.getByUserId(currentUserId);
         //创建会话信息
         Session session = sessionManager.getCurrentSession(true);
         session.setCountryCode(user.getCountryCode())
                 .setUserId(user.getUserId())
                 .setUsername(user.getUsername())
-                .setSuperManager(SUPER_ADMIN_USER_ID.equalsIgnoreCase(userId));
+                .setChannelId(user.getTenantId())
+                .setSuperManager(SUPER_ADMIN_USER_ID.equalsIgnoreCase(currentUserId));
         sessionManager.update(session);
         RequestContext.getContext().setSession(session);
         Date loginTime = new Date();

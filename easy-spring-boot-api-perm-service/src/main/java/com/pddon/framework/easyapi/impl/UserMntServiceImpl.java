@@ -9,6 +9,7 @@ import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
 import com.pddon.framework.easyapi.dao.UserPermDao;
 import com.pddon.framework.easyapi.dao.UserRoleDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserPassRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dao.entity.UserPerm;
@@ -67,6 +68,7 @@ public class UserMntServiceImpl implements UserMntService {
         //获取用户权限
         List<UserRole> userRoles = userRoleDao.getRolesByUserId(userId);
         userInfoDto.setRoleIds(userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet()));
+        userInfoDto.setSuperManager(userSecurityService.isSuperManager(userId));
         return userInfoDto;
     }
 
@@ -92,6 +94,15 @@ public class UserMntServiceImpl implements UserMntService {
         BeanUtils.copyProperties(req, user);
         String userId = UUIDGenerator.getUUID();
         user.setUserId(userId);
+        if(RequestContext.getContext().isSuperManager()){
+            String tenantId = req.getTenantId();
+            if(StringUtils.isEmpty(tenantId) && (RequestContext.getContext().getSession() != null)){
+                tenantId = RequestContext.getContext().getSession().getChannelId();
+            }
+            user.setTenantId(tenantId);
+        }else{
+            user.setTenantId(null);
+        }
         baseUserDao.saveUser(user);
         if(req.getRoleIds() != null && !req.getRoleIds().isEmpty()){
             List<UserRole> userRoles = req.getRoleIds().stream().map(roleId -> {
