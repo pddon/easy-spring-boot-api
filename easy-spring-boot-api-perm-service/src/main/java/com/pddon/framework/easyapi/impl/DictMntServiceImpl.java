@@ -8,6 +8,7 @@ import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.DictGroupMntDao;
 import com.pddon.framework.easyapi.dao.DictItemMntDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dto.req.*;
@@ -33,6 +34,7 @@ import java.util.Arrays;
 @Service
 @Primary
 @Slf4j
+@IgnoreTenant
 public class DictMntServiceImpl extends DictServiceImpl implements DictMntService {
 
     @Autowired

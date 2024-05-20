@@ -4,6 +4,9 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dto.req.RoleListRequest;
 
+import java.util.List;
+import java.util.Set;
+
 /**
  * @ClassName: RoleItemDao
  * @Description:
@@ -25,4 +28,6 @@ public interface RoleItemDao {
     RoleItem getByRoleId(String roleId);
 
     IPage<RoleItem> pageQuery(RoleListRequest req);
+
+    List<RoleItem> getByRoleIds(Set<String> roleIds);
 }

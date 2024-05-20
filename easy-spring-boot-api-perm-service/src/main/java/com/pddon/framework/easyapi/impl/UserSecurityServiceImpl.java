@@ -121,6 +121,9 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         //获取用户角色
         List<UserRole> roles = userRoleDao.getRolesByUserId(currentUserId);
         List<String> roleIds = roles.stream().map(UserRole::getRoleId).collect(Collectors.toList());
+        if(roleIds.isEmpty()){
+           return perms;
+        }
         //获取角色下所有权限
         List<RolePerm> rolePerms = rolePermDao.getByRoleIds(roleIds);
         if(rolePerms != null){

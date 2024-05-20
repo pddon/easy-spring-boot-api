@@ -6,6 +6,7 @@ import lombok.experimental.Accessors;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -124,6 +125,10 @@ public class UserInfoDto implements Serializable {
      * 拥有的角色
      */
     private Set<String> roleIds;
+    /**
+     * 拥有的角色名称
+     */
+    private List<String> roleNames;
     /**
      * 拥有的权限
      */

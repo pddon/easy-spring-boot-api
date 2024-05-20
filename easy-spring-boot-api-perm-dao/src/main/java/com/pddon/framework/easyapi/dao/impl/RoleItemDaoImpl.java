@@ -14,6 +14,8 @@ import org.springframework.stereotype.Repository;
 import org.springframework.util.StringUtils;
 
 import java.util.Arrays;
+import java.util.List;
+import java.util.Set;
 
 /**
  * @ClassName: RoleItemDaoImpl
@@ -54,6 +56,11 @@ public class RoleItemDaoImpl extends ServiceImpl<RoleItemMapper, RoleItem> imple
     @Override
     public RoleItem getByRoleId(String roleId) {
         return this.getOne(new LambdaQueryWrapper<RoleItem>().eq(RoleItem::getRoleId, roleId));
+    }
+
+    @Override
+    public List<RoleItem> getByRoleIds(Set<String> roleIds) {
+        return this.lambdaQuery().in(RoleItem::getRoleId, roleIds).list();
     }
 
     @Override

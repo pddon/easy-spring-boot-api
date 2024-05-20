@@ -7,11 +7,13 @@ import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
+import com.pddon.framework.easyapi.dao.RoleItemDao;
 import com.pddon.framework.easyapi.dao.UserPermDao;
 import com.pddon.framework.easyapi.dao.UserRoleDao;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserPassRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
+import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dao.entity.UserPerm;
 import com.pddon.framework.easyapi.dao.entity.UserRole;
 import com.pddon.framework.easyapi.dao.dto.request.UserListRequest;
@@ -29,6 +31,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -55,7 +58,11 @@ public class UserMntServiceImpl implements UserMntService {
     @Autowired
     private BaseUserDao baseUserDao;
 
+    @Autowired
+    private RoleItemDao roleItemDao;
+
     @Override
+    @IgnoreTenant
     public UserInfoDto getUserInfo(String userId) {
         UserInfoDto userInfoDto = new UserInfoDto();
         if(StringUtils.isEmpty(userId)){
@@ -68,6 +75,11 @@ public class UserMntServiceImpl implements UserMntService {
         //获取用户权限
         List<UserRole> userRoles = userRoleDao.getRolesByUserId(userId);
         userInfoDto.setRoleIds(userRoles.stream().map(UserRole::getRoleId).collect(Collectors.toSet()));
+        if(!userInfoDto.getRoleIds().isEmpty()){
+            List<RoleItem> roles = roleItemDao.getByRoleIds(userInfoDto.getRoleIds());
+            userInfoDto.setRoleNames(roles.stream().map(RoleItem::getRoleName).collect(Collectors.toList()));
+        }
+
         userInfoDto.setSuperManager(userSecurityService.isSuperManager(userId));
         return userInfoDto;
     }
@@ -103,6 +115,7 @@ public class UserMntServiceImpl implements UserMntService {
         }else{
             user.setTenantId(null);
         }
+        user.setRegTime(new Date());
         baseUserDao.saveUser(user);
         if(req.getRoleIds() != null && !req.getRoleIds().isEmpty()){
             List<UserRole> userRoles = req.getRoleIds().stream().map(roleId -> {
