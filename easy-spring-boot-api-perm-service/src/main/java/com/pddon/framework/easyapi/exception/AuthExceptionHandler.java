@@ -8,6 +8,7 @@ import com.pddon.framework.easyapi.exception.handler.CommonExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
@@ -46,6 +47,8 @@ public class AuthExceptionHandler implements CommonExceptionHandler {
         String locale = RequestContext.getContext().getLocale();
         if(e instanceof IncorrectCredentialsException){
             errorMsgCode = "账号或密码错误，请检查!";
+        } else if(e instanceof UnauthorizedException){
+            errorMsgCode = "您没有此功能的操作权限，请向管理员申请，分配权限后重新登录账号生效！";
         }
         errorMsg = languageTranslateManager.get(errorMsgCode, locale);
         ErrorCodes errorCode = ErrorCodes.getByMsgCode(errorMsgCode);
