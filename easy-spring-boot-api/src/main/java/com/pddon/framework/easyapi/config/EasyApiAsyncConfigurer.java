@@ -10,6 +10,8 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.task.TaskDecorator;
 import org.springframework.scheduling.annotation.AsyncConfigurer;
@@ -30,8 +32,9 @@ import java.util.concurrent.ThreadPoolExecutor;
  */
 @Configuration
 @AutoConfigureAfter(SpringBootApplication.class)
+@ConditionalOnMissingBean(AsyncConfigurer.class)
 @Slf4j
-public class EasyApiAsyncConfigurer  implements AsyncConfigurer {
+public class EasyApiAsyncConfigurer implements AsyncConfigurer {
 
     @Autowired
     private AsyncThreadPoolConfig asyncThreadPoolConfig;

@@ -13,6 +13,7 @@ import com.pddon.framework.easyapi.dao.PermItemDao;
 import com.pddon.framework.easyapi.dao.RoleItemDao;
 import com.pddon.framework.easyapi.dao.RolePermDao;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.entity.BaseUser;
 import com.pddon.framework.easyapi.dao.entity.PermItem;
 import com.pddon.framework.easyapi.dao.entity.RoleItem;
 import com.pddon.framework.easyapi.dao.entity.RolePerm;
@@ -23,6 +24,8 @@ import com.pddon.framework.easyapi.dto.resp.RoleDetailDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -190,6 +193,17 @@ public class RoleMntServiceImpl implements RoleMntService {
     public List<PermTreeDataDto> getUserPerms(String userId) {
         if(StringUtils.isEmpty(userId)){
             userId = RequestContext.getContext().getSession().getUserId();
+        }else{
+            BaseUser user = userSecurityService.queryByUserId(userId);
+            if(user == null){
+                throw new BusinessException("账号未找到，修改失败!");
+            }
+            if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+                //修改他人账号需要用户修改权限
+                // 获取当前Subject
+                Subject subject = SecurityUtils.getSubject();
+                subject.checkPermission("role:query");
+            }
         }
         List<String> permIds = new ArrayList<>(userSecurityService.getUserPermissions(userId, false));
         List<PermItem> perms = permItemDao.getByPermIds(permIds);

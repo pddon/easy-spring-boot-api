@@ -25,6 +25,8 @@ import com.pddon.framework.easyapi.utils.EncryptUtils;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import com.pddon.framework.easyapi.utils.UUIDGenerator;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.subject.Subject;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -70,6 +72,15 @@ public class UserMntServiceImpl implements UserMntService {
         }
         Set<String> perms = userSecurityService.getUserPermissions(userId, true);
         BaseUser user = userSecurityService.queryByUserId(userId);
+        if(user == null){
+            throw new BusinessException("账号未找到，修改失败!");
+        }
+        if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+            //修改他人账号需要用户修改权限
+            // 获取当前Subject
+            Subject subject = SecurityUtils.getSubject();
+            subject.checkPermission("user:query");
+        }
         BeanUtils.copyProperties(user, userInfoDto);
         userInfoDto.setPerms(perms);
         //获取用户权限
@@ -140,9 +151,16 @@ public class UserMntServiceImpl implements UserMntService {
     @Transactional
     @Override
     public void update(UpdateUserRequest req) {
+
         BaseUser user = baseUserDao.getByItemId(req.getId());
         if(user == null){
             throw new BusinessException("账号未找到，修改失败!");
+        }
+        if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+            //修改他人账号需要用户修改权限
+            // 获取当前Subject
+            Subject subject = SecurityUtils.getSubject();
+            subject.checkPermission("user:update");
         }
         BeanUtils.copyProperties(req, user);
         baseUserDao.updateUser(user);

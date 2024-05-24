@@ -44,7 +44,7 @@ public class LockDistributedManagerImpl implements LockDistributedManager {
 
         // 获取锁的超时时间，超过这个时间则放弃获取锁
         long end = System.currentTimeMillis() / 1000 + acquireTimeoutSeconds;
-        while (System.currentTimeMillis() / 1000 <= end || (acquireTimeoutSeconds <= 0)) {//自旋锁，等待锁释放
+        do {//自旋锁，等待锁释放
             if (Boolean.TRUE.equals(redisStringTemplate.opsForValue()
                     .setIfAbsent(lockKey, requestId, timeoutSeconds, TimeUnit.SECONDS))) {
                 log.info("获取锁key[{}],value[{}]成功!",lockKey,requestId);
@@ -59,7 +59,7 @@ public class LockDistributedManagerImpl implements LockDistributedManager {
             } catch (InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
-        }
+        } while (System.currentTimeMillis() / 1000 <= end || (acquireTimeoutSeconds <= 0));
         log.info("获取锁key[{}]失败!", lockKey);
         return null;
     }
