@@ -1,7 +1,9 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.pddon.framework.easyapi.LockDistributedManager;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.utils.RedisUtil;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
@@ -24,7 +26,6 @@ public class LockDistributedManagerImpl implements LockDistributedManager {
 
     private static Boolean connected = null;
 
-
     private Boolean isConnected() {
         if(connected != null){
             return connected;
@@ -35,12 +36,17 @@ public class LockDistributedManagerImpl implements LockDistributedManager {
 
     @Override
     public String lock(String lockName, long acquireTimeoutSeconds, long timeoutSeconds) {
+        String requestId = RequestContext.getContext().getAttachment(lockName);
+        if(StringUtils.isNotEmpty(requestId)){
+            //可重入分布式锁
+            return requestId;
+        }
         if(!this.isConnected()){
             return null;
         }
         // 锁名，即key值
         String lockKey = lockName;
-        String requestId = UUID.randomUUID().toString();
+        requestId = UUID.randomUUID().toString();
 
         // 获取锁的超时时间，超过这个时间则放弃获取锁
         long end = System.currentTimeMillis() / 1000 + acquireTimeoutSeconds;
@@ -49,6 +55,7 @@ public class LockDistributedManagerImpl implements LockDistributedManager {
                     .setIfAbsent(lockKey, requestId, timeoutSeconds, TimeUnit.SECONDS))) {
                 log.info("获取锁key[{}],value[{}]成功!",lockKey,requestId);
                 //获取锁成功
+                RequestContext.getContext().setAttachment(lockName, requestId);
                 return requestId;
             } else if (acquireTimeoutSeconds <= 0){
                 break;
