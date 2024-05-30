@@ -253,6 +253,8 @@ public class RoleMntServiceImpl implements RoleMntService {
         types.put("application", "应用信息");
         types.put("log", "系统日志");
         types.put("dict", "字典信息");
+        types.put("page", "html页面");
+        types.put("emailTemplate", "邮件模板");
         List<String[]> rootPermIds = types.keySet().stream().map(key -> new String[]{String.format("%s:*", key), key}).collect(Collectors.toList());
         List<PermItem> perms = new ArrayList<>();
         rootPermIds.forEach(items -> {

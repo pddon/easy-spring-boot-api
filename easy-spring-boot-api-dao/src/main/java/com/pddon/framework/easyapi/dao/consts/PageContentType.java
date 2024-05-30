@@ -9,5 +9,6 @@ package com.pddon.framework.easyapi.dao.consts;
  */
 public enum PageContentType {
     HTML,
-    MARKDOWN
+    MARKDOWN,
+    TEXT
 }

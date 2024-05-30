@@ -1,37 +1,33 @@
-package com.pddon.framework.easyapi.dao.entity;
+package com.pddon.framework.easyapi.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 /**
- * @ClassName: EmailTemplate
- * @Description: 邮件模板
+ * @ClassName: UpdateEmailTemplateRequest
+ * @Description:
  * @Author: Allen
- * @Date: 2024-05-29 11:43
+ * @Date: 2024-05-29 23:30
  * @Addr: https://pddon.cn
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain=true)
-@TableName("email_template")
-public class EmailTemplate extends BaseTenantEntity{
+@Data
+@Accessors(chain = true)
+public class UpdateEmailTemplateRequest implements Serializable {
+    @NotNull
+    private Long id;
     /**
-     * 记录ID
+     * 模板所属租户ID
      * @author pddon.com
      */
-    @TableId(type = IdType.AUTO)
-    private Long id;
+    private String tenantId;
     /**
      * 模板所属应用ID
      * @author pddon.com
      */
-    private String appId;
+    private String itemAppId;
     /**
      * 邮件应用场景，字典分组sceneId下的子分组列表，可以通过子字典分组新增业务应用场景
      * @author pddon.com
@@ -67,5 +63,4 @@ public class EmailTemplate extends BaseTenantEntity{
      * @author pddon.com
      */
     private String comments;
-
 }

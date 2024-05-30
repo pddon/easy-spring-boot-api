@@ -1,31 +1,25 @@
-package com.pddon.framework.easyapi.dao.entity;
+package com.pddon.framework.easyapi.dto.req;
 
-import com.baomidou.mybatisplus.annotation.IdType;
-import com.baomidou.mybatisplus.annotation.TableId;
-import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.ToString;
+import com.pddon.framework.easyapi.annotation.IgnoreSign;
+import com.pddon.framework.easyapi.dao.consts.HtmlPageStatus;
+import com.pddon.framework.easyapi.dao.consts.PageContentType;
+import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+
 /**
- * @ClassName: HtmlPage
- * @Description: html静态页面，支持部署到静态页面发布目录
+ * @ClassName: UpdateHtmlPageRequest
+ * @Description:
  * @Author: Allen
- * @Date: 2024-05-29 11:43
+ * @Date: 2024-05-29 23:56
  * @Addr: https://pddon.cn
  */
-@Getter
-@Setter
-@ToString
-@Accessors(chain=true)
-@TableName("html_page")
-public class HtmlPage extends BaseEntity{
-    /**
-     * 记录ID
-     * @author pddon.com
-     */
-    @TableId(type = IdType.AUTO)
+@Data
+@Accessors(chain = true)
+public class UpdateHtmlPageRequest implements Serializable {
+    @NotNull
     private Long id;
     /**
      * 页面所属业务场景，字典分组pageBusinessId下的子分组列表，可以通过子字典分组新增业务应用场景
@@ -61,26 +55,30 @@ public class HtmlPage extends BaseEntity{
      * 内容类型 取值：HTML html代码、MARKDOWN markdown格式文本
      * @author pddon.com
      */
-    private String contentType;
+    private PageContentType type;
     /**
      * 页面最终html内容
      * @author pddon.com
      */
+    @IgnoreSign
     private String content;
     /**
      * 页面编辑内容，用于存储非最终html的设计稿内容
      * @author pddon.com
      */
+    @IgnoreSign
     private String editableContent;
-    /**
-     * 页面状态 取值：EDIT 编辑中， COMPLETE 已完成， DEPLOYED 已部署， OFFLINE 已下线
-     * @author pddon.com
-     */
-    private String pageStatus;
     /**
      * 备注信息
      * @author pddon.com
      */
     private String comments;
-
+    /**
+     * 是否立即部署
+     */
+    private Boolean deployNow;
+    /**
+     * 是否已经编辑完成
+     */
+    private Boolean completed;
 }
