@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi.dto.req;
 
+import com.pddon.framework.easyapi.annotation.IgnoreSign;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
@@ -54,7 +55,15 @@ public class AddEmailTemplateRequest implements Serializable {
      * @author pddon.com
      */
     @NotEmpty
+    @IgnoreSign
     private String content;
+    /**
+     * 模板设计稿内容
+     * @author pddon.com
+     */
+    @NotEmpty
+    @IgnoreSign
+    private String editableContent;
     /**
      * 是否启用模板
      * @author pddon.com

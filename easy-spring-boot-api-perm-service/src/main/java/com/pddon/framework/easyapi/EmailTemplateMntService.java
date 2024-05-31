@@ -5,6 +5,7 @@ import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.entity.EmailTemplate;
 import com.pddon.framework.easyapi.dto.req.AddEmailTemplateRequest;
 import com.pddon.framework.easyapi.dto.req.EmailTemplateListRequest;
+import com.pddon.framework.easyapi.dto.req.SendEmailRequest;
 import com.pddon.framework.easyapi.dto.req.UpdateEmailTemplateRequest;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 
@@ -23,4 +24,6 @@ public interface EmailTemplateMntService {
     void remove(IdsRequest req);
 
     PaginationResponse<EmailTemplate> list(EmailTemplateListRequest req);
+
+    void sendEmail(SendEmailRequest req);
 }

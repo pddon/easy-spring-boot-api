@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.dto.req.DictListRequest;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 
 import java.util.List;
+import java.util.Set;
 
 /**
  * @ClassName: DictItemMntDao
@@ -32,4 +33,12 @@ public interface DictItemMntDao extends DictItemDao {
     IPage<DictItem> pageQuery(DictListRequest req);
 
     boolean saveOrUpdateItem(DictItem dictItem);
+
+    List<DictItem> getByGroupId(String groupId);
+
+    List<DictItem> getByTenantGroupId(String tenantId, String groupId);
+
+    List<DictItem> getByItemIds(Set<Long> keySet);
+
+    void saveOrUpdateByItemIds(List<DictItem> dictItems);
 }

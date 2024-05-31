@@ -1,8 +1,10 @@
 package com.pddon.framework.easyapi.dto.req;
 
+import com.pddon.framework.easyapi.annotation.IgnoreSign;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotEmpty;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
@@ -52,7 +54,14 @@ public class UpdateEmailTemplateRequest implements Serializable {
      * 模板内容
      * @author pddon.com
      */
+    @IgnoreSign
     private String content;
+    /**
+     * 模板设计稿内容
+     * @author pddon.com
+     */
+    @IgnoreSign
+    private String editableContent;
     /**
      * 是否启用模板
      * @author pddon.com

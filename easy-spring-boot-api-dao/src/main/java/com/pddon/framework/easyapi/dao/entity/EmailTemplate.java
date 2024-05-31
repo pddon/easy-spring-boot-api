@@ -33,12 +33,12 @@ public class EmailTemplate extends BaseTenantEntity{
      */
     private String appId;
     /**
-     * 邮件应用场景，字典分组sceneId下的子分组列表，可以通过子字典分组新增业务应用场景
+     * 邮件应用场景，字典分组emailSceneId下的子分组列表，可以通过子字典分组新增业务应用场景
      * @author pddon.com
      */
     private String sceneId;
     /**
-     * 邮件应用场景下特定的资源专属使用，通过新增sceneId的子分组下的字典，新增资源ID
+     * 邮件应用场景下特定的资源专属使用，通过新增emailSceneId的子分组下的字典，新增资源ID
      * @author pddon.com
      */
     private String resourceId;
@@ -57,6 +57,11 @@ public class EmailTemplate extends BaseTenantEntity{
      * @author pddon.com
      */
     private String content;
+    /**
+     * 模板设计稿内容
+     * @author pddon.com
+     */
+    private String editableContent;
     /**
      * 是否启用模板
      * @author pddon.com

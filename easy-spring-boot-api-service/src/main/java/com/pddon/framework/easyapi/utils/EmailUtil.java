@@ -72,7 +72,7 @@ public class EmailUtil {
         }
     }
 
-    public static boolean sendHtmlEmail(String toUserAccount, String title, String content){
+    public static boolean sendEmail(String toUserAccount, String title, String content, boolean isHtml){
         try {
             //创建一个MINE消息
             MimeMessage message = mailSender.createMimeMessage();
@@ -84,7 +84,7 @@ public class EmailUtil {
             //邮件主题
             minehelper.setSubject(languageTranslateManager.get(title, RequestContext.getContext().getLocale()));
             //邮件内容   true 表示带有附件或html
-            minehelper.setText(content, true);
+            minehelper.setText(content, isHtml);
             mailSender.send(message);
             log.info("HTML邮件发送成功!");
             return true;
@@ -93,5 +93,8 @@ public class EmailUtil {
             log.warn("HTML邮件失败");
             return false;
         }
+    }
+    public static boolean sendHtmlEmail(String toUserAccount, String title, String content){
+        return sendEmail(toUserAccount, title, content, true);
     }
 }

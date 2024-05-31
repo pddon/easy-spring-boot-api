@@ -26,7 +26,7 @@ public class DictListRequest extends PaginationRequest {
      * 字典所属用户ID
      * @author pddon.com
      */
-    private String DictUserId;
+    private String dictUserId;
     /**
      * 字典分组ID
      * @author pddon.com

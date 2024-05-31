@@ -27,6 +27,11 @@ public class EmailTemplateListRequest extends PaginationRequest {
      * @author pddon.com
      */
     private String itemAppId;
+    /**
+     * 是否启用模板
+     * @author pddon.com
+     */
+    private Boolean enabled;
 
     private String keyword;
 }

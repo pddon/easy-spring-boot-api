@@ -62,4 +62,12 @@ public class EmailTemplateController {
     public PaginationResponse<EmailTemplate> listDict(@RequestBody EmailTemplateListRequest req){
         return emailTemplateMntService.list(req);
     }
+
+    @PostMapping("sendEmail")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="发送邮件", apiName = "emailTemplate/sendEmail")
+    @RequiresPermissions("emailTemplate:query")
+    public void sendEmail(@RequestBody SendEmailRequest req){
+        emailTemplateMntService.sendEmail(req);
+    }
 }

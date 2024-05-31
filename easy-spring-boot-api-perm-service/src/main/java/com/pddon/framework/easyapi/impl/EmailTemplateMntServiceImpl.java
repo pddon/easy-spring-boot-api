@@ -1,17 +1,21 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pddon.framework.easyapi.EmailService;
 import com.pddon.framework.easyapi.EmailTemplateMntService;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.EmailTemplateMntDao;
+import com.pddon.framework.easyapi.dao.consts.PageContentType;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dao.entity.EmailTemplate;
 import com.pddon.framework.easyapi.dto.req.AddEmailTemplateRequest;
 import com.pddon.framework.easyapi.dto.req.EmailTemplateListRequest;
+import com.pddon.framework.easyapi.dto.req.SendEmailRequest;
 import com.pddon.framework.easyapi.dto.req.UpdateEmailTemplateRequest;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.EmailUtil;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +36,9 @@ public class EmailTemplateMntServiceImpl implements EmailTemplateMntService {
 
     @Autowired
     private EmailTemplateMntDao emailTemplateMntDao;
+
+    @Autowired
+    private EmailService emailService;
 
     @Override
     public IdResponse add(AddEmailTemplateRequest req) {
@@ -71,5 +78,10 @@ public class EmailTemplateMntServiceImpl implements EmailTemplateMntService {
                 .setPages(itemPage.getPages())
                 .setRecords(itemPage.getRecords());
         return page;
+    }
+
+    @Override
+    public void sendEmail(SendEmailRequest req) {
+        EmailUtil.sendEmail(req.getEmail(), req.getTitle(), req.getContent(), PageContentType.HTML.equals(req.getType()));
     }
 }

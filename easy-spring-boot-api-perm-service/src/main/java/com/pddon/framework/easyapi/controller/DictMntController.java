@@ -13,10 +13,9 @@ import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 /**
  * @ClassName: DictMntController
@@ -62,6 +61,28 @@ public class DictMntController {
     @RequiresPermissions("dict:query")
     public PaginationResponse<DictItem> listDict(@RequestBody DictListRequest req){
         return dictMntService.list(req);
+    }
+
+    @GetMapping("get")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @RequiresPermissions("dict:query")
+    public DictItem get(@RequestParam("dictId") String dictId){
+        return dictMntService.get(dictId);
+    }
+
+    @GetMapping("getByGroup")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @RequiresPermissions("dict:query")
+    public List<DictItem> getByGroup(@RequestParam(value = "tenantId", required = false) String tenantId, @RequestParam("groupId") String groupId){
+        return dictMntService.getByGroup(tenantId, groupId);
+    }
+
+    @PostMapping("updatesByGroup")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="批量修改分组下字典", apiName = "dict/updatesByGroup")
+    @RequiresPermissions("dict:update")
+    public void updatesByGroup(@RequestBody UpdatesByGroupRequest req){
+        dictMntService.updatesByGroup(req);
     }
 
     @PostMapping("addGroup")

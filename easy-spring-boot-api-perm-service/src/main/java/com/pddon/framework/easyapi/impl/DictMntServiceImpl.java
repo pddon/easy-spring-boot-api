@@ -1,9 +1,12 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.pddon.framework.easyapi.DictMntService;
 import com.pddon.framework.easyapi.cache.MethodCacheManager;
+import com.pddon.framework.easyapi.config.EmailConfig;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.DictGroupMntDao;
@@ -12,6 +15,7 @@ import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dto.req.*;
+import com.pddon.framework.easyapi.dto.req.dto.DictDto;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import com.pddon.framework.easyapi.utils.StringUtils;
@@ -23,6 +27,10 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: DictMntServiceImpl
@@ -46,6 +54,10 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
     @Autowired
     @Lazy
     private MethodCacheManager methodCacheManager;
+
+    @Autowired
+    @Lazy
+    private EmailConfig emailConfig;
 
     @Override
     public IdResponse add(AddDictRequest req) {
@@ -165,5 +177,61 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
             methodCacheManager.remove(key, null, 120L, CacheExpireMode.EXPIRE_AFTER_REDA);
         }
         return re;
+    }
+
+    @Override
+    public DictItem get(String dictId) {
+        DictItem dictItem = null;
+        if(RequestContext.getContext().getSession() != null){
+            //先查租户配置
+            dictItem = dictItemMntDao.getTenantDefaultDict(RequestContext.getContext().getSession().getChannelId(), dictId);
+        }
+        if(dictItem == null){
+            dictItem = dictItemMntDao.getDefaultByDictId(dictId);
+        }
+        if(dictItem == null){
+            throw new BusinessException("没有找到字典!");
+        }
+        return dictItem;
+    }
+
+    @Override
+    public List<DictItem> getByGroup(String tenantId, String groupId) {
+        return dictItemMntDao.getByTenantGroupId(tenantId, groupId);
+    }
+
+    @Override
+    public void updatesByGroup(UpdatesByGroupRequest req) {
+        Map<Long, DictDto> dtos = req.getItems().stream().filter(item -> item.getId() != null).collect(Collectors.toMap(DictDto::getId, item -> item, (item1, item2) -> item1));
+        List<DictItem> dictItems = null;
+        Map<Long, DictItem> items = new HashMap<>();
+        if(!dtos.isEmpty()){
+            dictItems = dictItemMntDao.getByItemIds(dtos.keySet());
+            items.putAll(dictItems.stream().collect(Collectors.toMap(DictItem::getId, item -> item)));
+        }
+        List<DictItem> updatedItems = req.getItems().stream().map(dto -> {
+            DictItem item = items.get(dto.getId());
+            if (item == null) {
+                item = new DictItem();
+            }
+            BeanUtils.copyProperties(dto, item);
+            if (req.getTenantId() != null) {
+                item.setTenantId(req.getTenantId());
+            }
+            if (req.getDictAppId() != null) {
+                item.setAppId(req.getDictAppId());
+            }
+            if (req.getUserId() != null) {
+                item.setUserId(req.getUserId());
+            }
+            if (req.getGroupId() != null) {
+                item.setGroupId(req.getGroupId());
+            }
+            return item;
+        }).collect(Collectors.toList());
+        dictItemMntDao.saveOrUpdateByItemIds(updatedItems);
+        if("emailServerConfigs".equalsIgnoreCase(req.getGroupId())){
+            emailConfig.initDbConfig();
+        }
     }
 }

@@ -66,6 +66,7 @@ public class EmailTemplateMntDaoImpl extends EmailTemplateDaoImpl implements Ema
                 .eq(StringUtils.isNotEmpty(req.getResourceId()), EmailTemplate::getResourceId, req.getResourceId())
                 .eq(StringUtils.isNotEmpty(req.getItemAppId()), EmailTemplate::getAppId, req.getItemAppId())
                 .eq(StringUtils.isNotEmpty(req.getTenantId()), EmailTemplate::getTenantId, req.getTenantId())
+                .eq(req.getEnabled() != null, EmailTemplate::getEnabled, req.getEnabled())
                 .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
                     return query.like(EmailTemplate::getSceneId, req.getKeyword()).or()
                             .like(EmailTemplate::getResourceId, req.getKeyword()).or()
