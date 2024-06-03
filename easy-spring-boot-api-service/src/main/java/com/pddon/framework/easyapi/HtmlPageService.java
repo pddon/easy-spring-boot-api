@@ -1,5 +1,7 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.dao.entity.HtmlPage;
+
 /**
  * @ClassName: HtmlPageService
  * @Description:
@@ -8,4 +10,5 @@ package com.pddon.framework.easyapi;
  * @Addr: https://pddon.cn
  */
 public interface HtmlPageService {
+    HtmlPage getByPagePath(String pagePath);
 }

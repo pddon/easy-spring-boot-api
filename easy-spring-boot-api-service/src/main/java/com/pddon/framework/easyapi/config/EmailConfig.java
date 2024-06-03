@@ -42,7 +42,7 @@ public class EmailConfig {
         if(items.isEmpty()){
             return;
         }
-        Map<String, String> map = items.stream().collect(Collectors.toMap(DictItem::getDictId, DictItem::getContent));
+        Map<String, String> map = items.stream().collect(Collectors.toMap(DictItem::getDictId, DictItem::getContent, (item1, item2) -> item1));
         JavaMailSenderImpl sender = (JavaMailSenderImpl) mailSender;
         if(map.containsKey("mail.host")){
             sender.setHost(map.get("mail.host"));

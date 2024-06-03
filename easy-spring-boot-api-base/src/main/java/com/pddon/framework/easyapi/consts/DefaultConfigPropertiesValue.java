@@ -28,6 +28,7 @@ public enum DefaultConfigPropertiesValue {
 	,EASYAPI_ENABLE_PERSIST_SESSION("easyapi.enablePersistSession",false, DefaultConfigValueMode.OPTION)
 	,SRPRING_MSG_USE_CODE_AS_DEFAULT_MESSAGE("spring.messages.useCodeAsDefaultMessage",false, DefaultConfigValueMode.FORCE_DEFAULT)
 	,SRPRING_MSG_FALLBACK_TO_SYSTEM_LOCALE("spring.messages.fallbackToSystemLocale",false, DefaultConfigValueMode.FORCE_DEFAULT)
+	//,SRPRING_MVC_PATH_MACTCH_STRATEGY("spring.mvc.pathmatch.matching-strategy","ant_path_matcher", DefaultConfigValueMode.FORCE_DEFAULT)
 	,JACKSON_DATA_FORMAT("spring.jackson.date-format","yyyy-MM-dd HH:mm:ss", DefaultConfigValueMode.OPTION)
 	,JACKSON_TIME_ZONE("spring.jackson.time-zone","GMT+0", DefaultConfigValueMode.OPTION)
 	,JACKSON_DEFAULT_PROPERTY_INCLUSION("spring.jackson.defaultPropertyInclusion","non_null", DefaultConfigValueMode.OPTION)

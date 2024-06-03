@@ -138,6 +138,7 @@ public class UserSecurityConfigurer {
         filterMap.put("/css/**", "anon");
         filterMap.put("/js/**", "anon");
         filterMap.put("/public/**", "anon");
+        filterMap.put("/res/**", "anon");
         //无权限访问业务资源
         Arrays.stream(securityConfigProperties.getAnnoAccessResourceUrls()).forEach(url -> {
             filterMap.put(url, "anon");

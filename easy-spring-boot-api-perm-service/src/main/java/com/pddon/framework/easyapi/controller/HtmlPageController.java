@@ -11,6 +11,7 @@ import com.pddon.framework.easyapi.dao.entity.HtmlPage;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import io.swagger.annotations.Api;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -25,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 @Api(tags = "html页面相关管理接口")
 @RestController
 @RequestMapping("page")
+@Slf4j
 public class HtmlPageController {
 
     @Autowired
@@ -75,5 +77,11 @@ public class HtmlPageController {
     @RequiresPermissions("page:update")
     public void deploy(@RequestParam(name = "id") Long id){
         htmlPageMntService.deployPage(id);
+    }
+
+    public static void main(String[] args) {
+        String url = "https://localhost:8080/admin/api/res/test/lll/aa.html";
+        String path = url.substring(url.indexOf("/res/") + 5);
+        log.info(path.substring(0, path.lastIndexOf(".")));
     }
 }

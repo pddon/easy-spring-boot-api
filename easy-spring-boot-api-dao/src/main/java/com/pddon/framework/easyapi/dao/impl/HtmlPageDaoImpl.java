@@ -19,4 +19,8 @@ import org.springframework.stereotype.Repository;
 @Slf4j
 public class HtmlPageDaoImpl extends ServiceImpl<HtmlPageMapper, HtmlPage> implements HtmlPageDao {
 
+    @Override
+    public HtmlPage getByPagePath(String pagePath) {
+        return this.lambdaQuery().eq(HtmlPage::getUrlPath, pagePath).one();
+    }
 }

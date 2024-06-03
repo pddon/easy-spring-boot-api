@@ -9,6 +9,7 @@ import com.pddon.framework.easyapi.dao.entity.HtmlPage;
 import com.pddon.framework.easyapi.dto.req.HtmlPageListRequest;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,6 +22,7 @@ import java.util.List;
  * @Addr: https://pddon.cn
  */
 @Service
+@Primary
 @Slf4j
 public class HtmlPageMntDaoImpl extends HtmlPageDaoImpl implements HtmlPageMntDao {
     @Override
