@@ -2,6 +2,8 @@ package com.pddon.framework.easyapi.dao;
 
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
 
+import java.util.List;
+
 /**
  * @ClassName: HtmlPageDao
  * @Description:
@@ -11,4 +13,8 @@ import com.pddon.framework.easyapi.dao.entity.HtmlPage;
  */
 public interface HtmlPageDao {
     HtmlPage getByPagePath(String pagePath);
+
+    List<HtmlPage> getListBySceneId(String sceneId, String resourceId);
+
+    List<HtmlPage> getListByKeyword(String sceneId, String keyword);
 }

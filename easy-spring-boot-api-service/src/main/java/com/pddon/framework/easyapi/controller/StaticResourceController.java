@@ -2,8 +2,11 @@ package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.HtmlPageService;
 import com.pddon.framework.easyapi.annotation.IgnoreSign;
+import com.pddon.framework.easyapi.annotation.RequiredSign;
+import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
+import com.pddon.framework.easyapi.dto.HtmlPageDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,14 +14,12 @@ import org.springframework.core.io.ByteArrayResource;
 import org.springframework.core.io.Resource;
 import org.springframework.http.*;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 /**
@@ -70,5 +71,21 @@ public class StaticResourceController {
                 .eTag(etag)
                 .contentType(MediaType.parseMediaType("text/html"))
                 .body(resource);
+    }
+
+    @GetMapping("getPagesByScene/{sceneId}")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @ResponseBody
+    public List<HtmlPageDto> getPagesByScene(@PathVariable(name = "sceneId") String sceneId,
+                                             @RequestParam(name = "resourceId", required = false) String resourceId){
+        return htmlPageService.getPagesByScene(sceneId, resourceId);
+    }
+
+    @GetMapping("searchPage")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @ResponseBody
+    public List<HtmlPageDto> searchPage(@RequestParam(name = "keyword", required = true) String keyword,
+                                        @RequestParam(name = "sceneId", required = false) String sceneId){
+        return htmlPageService.searchPage(sceneId, keyword);
     }
 }

@@ -79,9 +79,4 @@ public class HtmlPageController {
         htmlPageMntService.deployPage(id);
     }
 
-    public static void main(String[] args) {
-        String url = "https://localhost:8080/admin/api/res/test/lll/aa.html";
-        String path = url.substring(url.indexOf("/res/") + 5);
-        log.info(path.substring(0, path.lastIndexOf(".")));
-    }
 }
