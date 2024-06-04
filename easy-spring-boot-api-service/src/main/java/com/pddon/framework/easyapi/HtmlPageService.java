@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi;
 
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
+import com.pddon.framework.easyapi.dto.HtmlPageContentDto;
 import com.pddon.framework.easyapi.dto.HtmlPageDto;
 
 import java.util.List;
@@ -18,4 +19,6 @@ public interface HtmlPageService {
     List<HtmlPageDto> getPagesByScene(String sceneId, String resourceId);
 
     List<HtmlPageDto> searchPage(String sceneId, String keyword);
+
+    HtmlPageContentDto getPageByResId(String sceneId, String resourceId);
 }

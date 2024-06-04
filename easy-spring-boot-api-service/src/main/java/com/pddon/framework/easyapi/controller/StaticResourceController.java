@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
+import com.pddon.framework.easyapi.dto.HtmlPageContentDto;
 import com.pddon.framework.easyapi.dto.HtmlPageDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -73,16 +74,27 @@ public class StaticResourceController {
                 .body(resource);
     }
 
-    @GetMapping("getPagesByScene/{sceneId}")
+    @GetMapping("getPagesByScene")
     @RequiredSign(scope = SignScope.REQUEST)
+    @IgnoreTenant
     @ResponseBody
-    public List<HtmlPageDto> getPagesByScene(@PathVariable(name = "sceneId") String sceneId,
+    public List<HtmlPageDto> getPagesByScene(@RequestParam(name = "sceneId") String sceneId,
                                              @RequestParam(name = "resourceId", required = false) String resourceId){
         return htmlPageService.getPagesByScene(sceneId, resourceId);
     }
 
+    @GetMapping("getPageByResId")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @IgnoreTenant
+    @ResponseBody
+    public HtmlPageContentDto getPageByResId(@RequestParam(name = "sceneId") String sceneId,
+                                             @RequestParam(name = "resourceId", required = true) String resourceId){
+        return htmlPageService.getPageByResId(sceneId, resourceId);
+    }
+
     @GetMapping("searchPage")
     @RequiredSign(scope = SignScope.REQUEST)
+    @IgnoreTenant
     @ResponseBody
     public List<HtmlPageDto> searchPage(@RequestParam(name = "keyword", required = true) String keyword,
                                         @RequestParam(name = "sceneId", required = false) String sceneId){

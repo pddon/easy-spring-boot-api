@@ -30,7 +30,8 @@ public class HtmlPageDaoImpl extends ServiceImpl<HtmlPageMapper, HtmlPage> imple
     @Override
     public List<HtmlPage> getListBySceneId(String sceneId, String resourceId) {
         return this.lambdaQuery().eq(HtmlPage::getPageBusinessId, sceneId)
-                .eq(StringUtils.isNotEmpty(resourceId), HtmlPage::getResourceId, resourceId).list();
+                .eq(StringUtils.isNotEmpty(resourceId), HtmlPage::getResourceId, resourceId)
+                .orderByDesc(HtmlPage::getChgTime).list();
     }
 
     @Override

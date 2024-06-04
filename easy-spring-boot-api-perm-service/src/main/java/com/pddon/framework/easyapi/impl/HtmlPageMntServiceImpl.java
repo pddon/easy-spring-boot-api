@@ -42,6 +42,9 @@ public class HtmlPageMntServiceImpl implements HtmlPageMntService {
         BeanUtils.copyProperties(req, page);
         page.setContentType(req.getType().name())
                 .setPageStatus(req.getCompleted() == true ? HtmlPageStatus.COMPLETE.name() : HtmlPageStatus.EDIT.name());
+        if(req.getDeployNow() != null && (req.getDeployNow() == true)){
+            page.setPageStatus(HtmlPageStatus.DEPLOYED.name());
+        }
         htmlPageMntDao.saveItem(page);
         return new IdResponse(page.getId());
     }
@@ -58,6 +61,9 @@ public class HtmlPageMntServiceImpl implements HtmlPageMntService {
         }
         if(req.getCompleted() != null){
             page.setPageStatus(req.getCompleted() == true ? HtmlPageStatus.COMPLETE.name() : HtmlPageStatus.EDIT.name());
+        }
+        if(req.getDeployNow() != null && (req.getDeployNow() == true)){
+            page.setPageStatus(HtmlPageStatus.DEPLOYED.name());
         }
         htmlPageMntDao.updateByItemId(page);
     }

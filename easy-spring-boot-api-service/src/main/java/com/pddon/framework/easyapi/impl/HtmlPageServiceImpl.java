@@ -4,6 +4,7 @@ import com.pddon.framework.easyapi.HtmlPageService;
 import com.pddon.framework.easyapi.dao.HtmlPageDao;
 import com.pddon.framework.easyapi.dao.consts.HtmlPageStatus;
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
+import com.pddon.framework.easyapi.dto.HtmlPageContentDto;
 import com.pddon.framework.easyapi.dto.HtmlPageDto;
 import com.pddon.framework.easyapi.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
@@ -59,5 +60,16 @@ public class HtmlPageServiceImpl implements HtmlPageService {
             BeanUtils.copyProperties(page, dto);
             return dto;
         }).collect(Collectors.toList());
+    }
+
+    @Override
+    public HtmlPageContentDto getPageByResId(String sceneId, String resourceId) {
+        List<HtmlPage> pages = htmlPageDao.getListBySceneId(sceneId, resourceId);
+        if(pages.isEmpty()){
+            throw new BusinessException("未找到页面内容!");
+        }
+        HtmlPageContentDto dto = new HtmlPageContentDto();
+        BeanUtils.copyProperties(pages.get(0), dto);
+        return dto;
     }
 }
