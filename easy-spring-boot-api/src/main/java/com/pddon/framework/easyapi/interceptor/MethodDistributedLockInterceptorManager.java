@@ -20,6 +20,7 @@ import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -28,6 +29,7 @@ import org.springframework.core.annotation.AnnotationUtils;
 import org.springframework.stereotype.Component;
 
 import java.lang.reflect.Method;
+import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -70,6 +72,9 @@ public class MethodDistributedLockInterceptorManager implements MethodIntercepto
 				return invocation.proceed();
 			}
 			Class<?> targetClass = invocation.getThis().getClass();
+			try{
+				targetClass = AopProxyUtils.ultimateTargetClass(invocation.getThis());
+			}catch (Exception e){}
 			Object [] args=invocation.getArguments();
 			String[] parameters = parameterNameDiscoverer.getParameterNames(method);
 			String lockName = this.getLockName(lockDistributed, parameters, args, targetClass, method);

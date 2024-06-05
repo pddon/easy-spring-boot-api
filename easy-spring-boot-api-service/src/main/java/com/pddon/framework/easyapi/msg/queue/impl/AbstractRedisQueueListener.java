@@ -3,6 +3,7 @@ package com.pddon.framework.easyapi.msg.queue.impl;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pddon.framework.easyapi.msg.queue.Message;
+import com.pddon.framework.easyapi.msg.queue.MessageManager;
 import com.pddon.framework.easyapi.msg.queue.QueueListener;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
@@ -11,8 +12,6 @@ import org.springframework.data.redis.connection.MessageListener;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.data.redis.listener.PatternTopic;
 import org.springframework.data.redis.listener.RedisMessageListenerContainer;
-
-import javax.annotation.PostConstruct;
 
 /**
  * @ClassName: AbstractRedisQueueListener
@@ -24,21 +23,20 @@ import javax.annotation.PostConstruct;
 @Slf4j
 public abstract class AbstractRedisQueueListener implements QueueListener {
 
-    private static final RedisMessageListenerContainer container = new RedisMessageListenerContainer();
     @Autowired
-    protected RedisTemplate<String, String> redisTemplate;
+    private RedisMessageListenerContainer container;
+
     @Autowired
     protected ObjectMapper objectMapper;
 
     @Override
     public String queue() {
-        return "EASY_API_DEFAULT_QUEUE";
+        return MessageManager.EASY_API_DEFAULT_QUEUE;
     }
 
-    @PostConstruct
+    @Override
     public void init() {
         QueueListener listener = this;
-        container.setConnectionFactory(redisTemplate.getConnectionFactory());
         container.addMessageListener(new MessageListener() {
             @Override
             public void onMessage(org.springframework.data.redis.connection.Message message, byte[] bytes) {

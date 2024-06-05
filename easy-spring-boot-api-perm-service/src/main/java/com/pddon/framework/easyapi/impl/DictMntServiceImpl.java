@@ -18,6 +18,8 @@ import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.req.dto.DictDto;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.msg.queue.Message;
+import com.pddon.framework.easyapi.msg.queue.MessageManager;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
@@ -57,7 +59,7 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
 
     @Autowired
     @Lazy
-    private EmailConfig emailConfig;
+    private MessageManager messageManager;
 
     @Override
     public IdResponse add(AddDictRequest req) {
@@ -231,7 +233,7 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
         }).collect(Collectors.toList());
         dictItemMntDao.saveOrUpdateByItemIds(updatedItems);
         if("emailServerConfigs".equalsIgnoreCase(req.getGroupId())){
-            emailConfig.initDbConfig();
+            messageManager.sendDefaultMessage(Message.builder().type("emailConfigUpdated").build());
         }
     }
 }

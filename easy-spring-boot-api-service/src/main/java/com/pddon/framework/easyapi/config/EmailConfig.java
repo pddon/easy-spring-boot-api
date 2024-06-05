@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.config;
 
 import com.pddon.framework.easyapi.DictService;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,7 @@ public class EmailConfig {
     private DictService dictService;
 
     @PostConstruct
+    @IgnoreTenant
     public void initDbConfig(){
         if(!(mailSender instanceof JavaMailSenderImpl)){
             return;

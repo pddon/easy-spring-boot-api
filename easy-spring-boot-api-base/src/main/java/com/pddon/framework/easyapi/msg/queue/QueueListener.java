@@ -9,6 +9,12 @@ package com.pddon.framework.easyapi.msg.queue;
  */
 public interface QueueListener {
     /**
+     * 初始化
+     * @author: Allen
+     * @Date: 2024/6/6 0:50
+     */
+    void init();
+    /**
      * 需要监听的队列名
      * @return {@link String}
      * @author: Allen
