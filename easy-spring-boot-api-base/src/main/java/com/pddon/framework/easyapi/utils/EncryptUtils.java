@@ -153,8 +153,8 @@ public class EncryptUtils {
 	}
 
 	public static void main(String[] args) {
-		String key = "NKVNcuwwEF3sc22A";
-		String body = "1712736928277description请我喝杯饮料！orderId202404101615191350returnPageUrlhttp://localhost:8088/payment-demo/payResult.html?orderId=202404101615191350totalAmount1userNickname游客1712736928277";
+		String key = "HJKNGGHwEF3TG5TR";
+		String body = "公钥20240616";
 
 		System.out.println(EncryptUtils.encryptSHA1Hex(key, body));
 

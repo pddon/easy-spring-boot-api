@@ -1,5 +1,7 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.pddon.framework.easyapi.dao.entity.EmailTemplate;
+
 /**
  * @ClassName: EmailTemplateDao
  * @Description:
@@ -8,4 +10,5 @@ package com.pddon.framework.easyapi.dao;
  * @Addr: https://pddon.cn
  */
 public interface EmailTemplateDao {
+    EmailTemplate getByScene(String sceneId, String resourceId);
 }

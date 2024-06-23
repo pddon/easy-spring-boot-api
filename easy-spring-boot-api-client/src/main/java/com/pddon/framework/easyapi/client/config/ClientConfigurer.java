@@ -15,6 +15,7 @@ import com.pddon.framework.easyapi.encrypt.impl.AESDataEncryptHandler;
 import com.pddon.framework.easyapi.encrypt.impl.Sha1SignEncryptHandler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
@@ -31,6 +32,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClientConfigurer {
     @Bean
     @ConditionalOnMissingBean(ApiClient.class)
+    @ConditionalOnProperty(name={"easyapi.client.app.appId"}, matchIfMissing = false)
     public ApiClient apiClient(@Autowired ApplicationConfig applicationConfig){
         return ApiClient.newInstance(applicationConfig);
     }

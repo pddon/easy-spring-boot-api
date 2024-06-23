@@ -21,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -52,6 +53,9 @@ public class MethodDistributedLockInterceptorManager implements MethodIntercepto
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		if(AopUtils.isAopProxy(invocation.getThis())){
+			return invocation.proceed();
+		}
 		if(log.isTraceEnabled()){
 			log.trace("进入方法分布式锁处理器切面!");
 		}

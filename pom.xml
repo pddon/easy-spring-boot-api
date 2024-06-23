@@ -26,7 +26,7 @@
         <module>easy-spring-boot-api-service</module>
         <module>easy-spring-boot-api-perm-dao</module>
         <module>easy-spring-boot-api-perm-service</module>
-		<module>easy-spring-boot-api-demo</module>
+		<!--<module>easy-spring-boot-api-demo</module>-->
     </modules>
 
 	<!-- 定义公共变量 -->

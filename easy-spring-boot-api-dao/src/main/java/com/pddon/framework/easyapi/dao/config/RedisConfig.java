@@ -136,7 +136,7 @@ public class RedisConfig {
         om.registerModule(new JavaTimeModule());
         om.registerModule(new Jdk8Module());
         om.setVisibility(PropertyAccessor.ALL, JsonAutoDetect.Visibility.ANY);
-        om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
+        //om.enableDefaultTyping(ObjectMapper.DefaultTyping.NON_FINAL);
         om.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
         om.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
         om.configure(DeserializationFeature.FAIL_ON_INVALID_SUBTYPE, false);
@@ -147,6 +147,7 @@ public class RedisConfig {
         om.configure(MapperFeature.USE_GETTERS_AS_SETTERS, false);
         om.configure(MapperFeature.IGNORE_DUPLICATE_MODULE_REGISTRATIONS, true);
         om.setDefaultPropertyInclusion(JsonInclude.Include.NON_NULL);
+        om.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         om.setTimeZone(TimeZone.getTimeZone("GMT+0"));
         om.setDateFormat(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss"));
         jackson2JsonRedisSerializer.setObjectMapper(om);

@@ -31,9 +31,9 @@ public class ClientAESDataEncryptHandler implements ClientDataEncryptHandler {
 	 */
 	@Override
 	public String encrypt(String appId, String channelId, String content) throws Throwable {
-		SecretInfo secret = clientSecretManager.load(RequestContext.getContext().getChannelId(),
-				RequestContext.getContext().getAppId(), 
-				RequestContext.getContext().getSecretId());
+		SecretInfo secret = clientSecretManager.load(channelId,
+				appId,
+				null);
 		if(secret != null){
 			return EncryptUtils.encodeAES128(secret.getSecret(), content);
 		}
@@ -45,9 +45,9 @@ public class ClientAESDataEncryptHandler implements ClientDataEncryptHandler {
 	 */
 	@Override
 	public String decrypt(String appId, String channelId, String content) throws Throwable {
-		SecretInfo secret = clientSecretManager.load(RequestContext.getContext().getChannelId(),
-				RequestContext.getContext().getAppId(),
-				RequestContext.getContext().getSecretId());
+		SecretInfo secret = clientSecretManager.load(channelId,
+				appId,
+				null);
 		if(secret != null){
 			return EncryptUtils.decodeAES128(secret.getSecret(), content);
 		}		

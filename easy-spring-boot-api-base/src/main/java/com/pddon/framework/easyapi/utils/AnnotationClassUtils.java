@@ -4,11 +4,12 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.config.BeanDefinition;
 import org.springframework.context.annotation.ClassPathScanningCandidateComponentProvider;
 import org.springframework.core.type.filter.AnnotationTypeFilter;
+import org.springframework.util.ReflectionUtils;
 
 import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.lang.reflect.Field;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: AnnotationClassUtils
@@ -19,6 +20,33 @@ import java.util.Set;
  */
 @Slf4j
 public class AnnotationClassUtils {
+
+    public static Map<Class<?>, Annotation> findAnnotations(Class<?> clazz) {
+        List<Annotation> annotations = new ArrayList<>();
+        Annotation[] annos = clazz.getAnnotations();
+        if(annos != null){
+            annotations.addAll(Arrays.stream(annos).collect(Collectors.toList()));
+        }
+        return annotations.stream().collect(Collectors.toMap(annotation -> annotation.annotationType(), annotation -> annotation, (item1, item2) -> item2));
+    }
+
+    public static Map<Class<?>, Annotation> findFieldAnnotations(Class<?> clazz, String fieldName, boolean containsClazz) {
+        List<Annotation> annotations = new ArrayList<>();
+        if(containsClazz){
+            Annotation[] annos = clazz.getAnnotations();
+            if(annos != null){
+                annotations.addAll(Arrays.stream(annos).collect(Collectors.toList()));
+            }
+        }
+        Field field = ReflectionUtils.findField(clazz, fieldName);
+        if(field != null){
+            Annotation[] subAnnos = field.getAnnotations();
+            if(subAnnos != null){
+                annotations.addAll(Arrays.stream(subAnnos).collect(Collectors.toList()));
+            }
+        }
+        return annotations.stream().collect(Collectors.toMap(annotation -> annotation.annotationType(), annotation -> annotation, (item1, item2) -> item2));
+    }
 
     public static List<Class<?>> getAllClassByAnnotation(String packageName, Class<? extends Annotation> tClass){
         // 创建扫描器

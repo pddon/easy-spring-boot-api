@@ -24,6 +24,8 @@ import lombok.extern.slf4j.Slf4j;
 
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.aop.framework.AopProxyUtils;
+import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
@@ -42,7 +44,7 @@ import com.pddon.framework.easyapi.utils.MethodInvokeUtil;
 
 @Component
 @Slf4j
-public class ApiInvokeMethodInterceptorManager implements MethodInterceptor {
+public class  ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 
 	private static String DEFAULT_API_VERSION = "1.0";
 	private static String API_NAME = "%s::%s";
@@ -97,7 +99,7 @@ public class ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
-		if(!isApiPackageScopePresent()){
+		if(!isApiPackageScopePresent() || AopUtils.isAopProxy(invocation.getThis())){
 			return invocation.proceed();
 		}
 		
@@ -105,7 +107,7 @@ public class ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 			log.trace("进入API接口调用切面!");
 		}
 		
-		Class<?> targetClass = invocation.getThis().getClass();	
+		Class<?> targetClass = invocation.getThis().getClass();
 		RequestContext.getContext().setTargetClass(targetClass);
 		Object response = null;
 		Object [] args=invocation.getArguments();		

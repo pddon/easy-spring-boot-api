@@ -111,6 +111,18 @@ public class UserInfoDto implements Serializable {
     private Date regTime;
 
     /**
+     * 记录创建时间
+     * @author pddon.com
+     */
+    private Date crtTime;
+
+    /**
+     * 记录最近修改时间
+     * @author pddon.com
+     */
+    private Date chgTime;
+
+    /**
      * 用户最近一次登录时间
      * @author pddon.com
      */
