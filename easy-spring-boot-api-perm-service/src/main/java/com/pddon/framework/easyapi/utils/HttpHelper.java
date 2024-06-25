@@ -36,6 +36,9 @@ public class HttpHelper {
      * @return
      */
     public static String getBodyString(ServletRequest request) {
+        if(request.getContentType() != null && request.getContentType().contains("multipart")){
+            return "{}";
+        }
         StringBuilder sb = new StringBuilder();
         InputStream inputStream = null;
         BufferedReader reader = null;
@@ -71,6 +74,9 @@ public class HttpHelper {
     }
 
     public static String getJsonBodyStringParam(ServletRequest request, String paramName){
+        if(request.getContentType() != null && request.getContentType().contains("multipart")){
+            return null;
+        }
         String body = getBodyString(request);
         if(StringUtils.isEmpty(body)){
             return null;
@@ -88,6 +94,9 @@ public class HttpHelper {
     }
 
     public static String[] getParams(ServletRequest request, String... paramNames){
+        if(request.getContentType() != null && request.getContentType().contains("multipart")){
+            return new String[]{null, null};
+        }
         String[] values = new String[paramNames.length];
         HttpServletRequest servletRequest = WebUtils.toHttp(request);
         String method = ((HttpServletRequest) request).getMethod();

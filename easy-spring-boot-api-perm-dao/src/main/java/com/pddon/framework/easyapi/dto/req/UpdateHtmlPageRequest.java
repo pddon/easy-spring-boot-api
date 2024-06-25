@@ -47,6 +47,16 @@ public class UpdateHtmlPageRequest implements Serializable {
      */
     private String keywords;
     /**
+     * 封面图ID
+     * @author pddon.com
+     */
+    private String imgKey;
+    /**
+     * 封面图访问地址
+     * @author pddon.com
+     */
+    private String imgUrl;
+    /**
      * 描述
      * @author pddon.com
      */

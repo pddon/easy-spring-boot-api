@@ -40,6 +40,10 @@ public class RepeatedlyReadFilter implements Filter {
 	@Override
 	public void doFilter(ServletRequest request, ServletResponse response,
 			FilterChain chain) throws IOException, ServletException {
+		if(request.getContentType() != null && request.getContentType().contains("multipart")){
+			chain.doFilter(request, response);
+			return;
+		}
 		if(log.isTraceEnabled()){
 			log.trace("构建可重复读取的request.getInputStream流");
 		}		

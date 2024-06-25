@@ -103,6 +103,9 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
         		RequestContext.getContext().setAttachment(paramName, paramValue);
         	}        	
         });
+		if(request.getContentType() != null && request.getContentType().contains("multipart")){
+			return;
+		}
         //再通过请求体获取系统参数
         if(RequestMethod.POST.name().equals(method) || RequestMethod.PUT.name().equals(method)){
         	String body = null;

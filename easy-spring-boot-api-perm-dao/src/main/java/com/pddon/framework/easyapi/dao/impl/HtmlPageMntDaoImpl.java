@@ -64,7 +64,7 @@ public class HtmlPageMntDaoImpl extends HtmlPageDaoImpl implements HtmlPageMntDa
         Wrapper<HtmlPage> wrapper = new LambdaQueryWrapper<HtmlPage>()
                 .select(HtmlPage.class, tableFieldInfo -> {
                     if(tableFieldInfo.getColumn().equalsIgnoreCase("content")
-                            || tableFieldInfo.getColumn().equalsIgnoreCase("editableContent")){
+                            || tableFieldInfo.getColumn().equalsIgnoreCase("editable_content")){
                         return false;
                     }
                     return true;

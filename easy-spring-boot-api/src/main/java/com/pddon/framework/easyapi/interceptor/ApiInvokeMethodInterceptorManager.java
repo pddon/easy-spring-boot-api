@@ -110,7 +110,7 @@ public class  ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 		Class<?> targetClass = invocation.getThis().getClass();
 		RequestContext.getContext().setTargetClass(targetClass);
 		Object response = null;
-		Object [] args=invocation.getArguments();		
+		Object [] args = invocation.getArguments();
 		Method method = invocation.getMethod();
 		RequestContext.getContext().setMethod(method);
 		String[] paramNames = parameterNameDiscoverer.getParameterNames(method);
@@ -119,7 +119,7 @@ public class  ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 	    //参数注解，1维是参数，2维是注解
         Annotation[][] annotations = method.getParameterAnnotations();
         //获取参数
-		List<ApiRequestParameter> params = MethodInvokeUtil.parseParameters(paramNames, args, annotations, methodAnnos);
+		List<ApiRequestParameter> params = MethodInvokeUtil.parseParameters(paramNames, args, annotations, methodAnnos, easyApiConfig.getAllBasePackages());
 	    
 	    //获取接口信息
 	    HttpServletRequest request = (HttpServletRequest)RequestContext.getContext().getRequest();

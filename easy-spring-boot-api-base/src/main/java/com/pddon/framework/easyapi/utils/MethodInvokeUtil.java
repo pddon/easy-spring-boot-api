@@ -13,6 +13,7 @@ import java.lang.annotation.Annotation;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Set;
 
 import com.pddon.framework.easyapi.annotation.Decrypt;
 import com.pddon.framework.easyapi.annotation.IgnoreSign;
@@ -23,13 +24,13 @@ import com.pddon.framework.easyapi.dto.ApiRequestParameter;
 
 public class MethodInvokeUtil {
 	public static List<ApiRequestParameter> parseParameters(String[] params, Object [] args, 
-			Annotation[][] annotations, Annotation[] methodAnnos){
+			Annotation[][] annotations, Annotation[] methodAnnos, Set<String> pkgs){
 		List<ApiRequestParameter> parameters = new ArrayList<>();
 		//提取业务请求参数
 		ApiRequestParameter param = null;
 	    for(int i=0; i<args.length; i++){
 	    	if(args[i] != null && (BeanPropertyUtil.isBaseType(args[i]) 
-	    			|| (args[i] instanceof Serializable))){
+	    			|| ClassOriginCheckUtil.isBasePackagesChild(args[i].getClass(), pkgs))){
 	    		param = new ApiRequestParameter();
 	    		if(BeanPropertyUtil.isBaseType(args[i])){
 	    			String paramName = getBaseTypeParamName(annotations[i]);

@@ -28,6 +28,7 @@ import com.pddon.framework.easyapi.interceptor.ApiMethodInterceptor;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.multipart.MultipartFile;
 
 @Service
 @Slf4j
@@ -112,6 +113,11 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 			//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
 			StringBuffer buffer = new StringBuffer();
 			for(ApiRequestParameter param : arr){
+				if(param.getParam() != null && param.getParam() instanceof MultipartFile){
+					MultipartFile file = (MultipartFile) param.getParam();
+					buffer.append(file.getOriginalFilename()).append(",");
+					continue;
+				}
 				try {
 					buffer.append(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(param.getParam())).append(",");
 				} catch (JsonProcessingException e) {

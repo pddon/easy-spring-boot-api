@@ -3,6 +3,7 @@ package com.pddon.framework.easyapi.dao.interceptor;
 import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.entity.BaseEntity;
+import com.pddon.framework.easyapi.dao.entity.BaseHardEntity;
 import org.apache.ibatis.executor.Executor;
 import org.apache.ibatis.mapping.MappedStatement;
 import org.apache.ibatis.mapping.SqlCommandType;
@@ -39,8 +40,8 @@ public class UpdateCommentInterceptor extends SqlExplainInterceptor implements I
             return invocation.proceed();
         }
         String userId = RequestContext.getContext().getUserId();
-        if(param instanceof BaseEntity){
-            BaseEntity entity = (BaseEntity) param;
+        if(param instanceof BaseHardEntity){
+            BaseHardEntity entity = (BaseHardEntity) param;
             entity.setChgTime(new Date());
             if(!StringUtils.isEmpty(userId)){
                 entity.setChgUserId(userId);

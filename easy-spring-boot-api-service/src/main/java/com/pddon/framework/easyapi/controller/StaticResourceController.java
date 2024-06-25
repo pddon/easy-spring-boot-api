@@ -1,14 +1,15 @@
 package com.pddon.framework.easyapi.controller;
 
+import com.pddon.framework.easyapi.FileItemService;
 import com.pddon.framework.easyapi.HtmlPageService;
 import com.pddon.framework.easyapi.annotation.IgnoreSign;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.entity.FileItem;
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
 import com.pddon.framework.easyapi.dto.HtmlPageContentDto;
 import com.pddon.framework.easyapi.dto.HtmlPageDto;
-import com.pddon.framework.easyapi.exception.BusinessException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
@@ -37,6 +38,9 @@ public class StaticResourceController {
 
     @Autowired
     private HtmlPageService htmlPageService;
+
+    @Autowired
+    private FileItemService fileItemService;
 
     //@GetMapping("{pagePath:[a-zA-Z0-9_/]+}.html")
     @GetMapping("**/*.html")
@@ -71,6 +75,35 @@ public class StaticResourceController {
                 .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).cachePublic())
                 .eTag(etag)
                 .contentType(MediaType.parseMediaType("text/html"))
+                .body(resource);
+    }
+
+    @GetMapping("download/{fileType}/{fileKey}.{suffix}")
+    @IgnoreTenant
+    @IgnoreSign
+    public ResponseEntity<Resource> getFile(@PathVariable("fileType") String fileType,
+                                            @PathVariable("fileKey") String fileKey,
+                                            HttpServletRequest request,
+                                            HttpServletResponse response){
+        FileItem fileItem = fileItemService.getByTypeKey(fileType, fileKey);
+        String etag = fileItem.getChgTime() != null ? String.valueOf(fileItem.getChgTime().getTime()) : String.valueOf(fileItem.getCrtTime().getTime());
+        // 设置ETag到响应头
+        response.setHeader("ETag", etag);
+        String ifNoneMatch = request.getHeader("If-None-Match");
+        if (etag.equals(ifNoneMatch)) {
+            return ResponseEntity.status(HttpStatus.NOT_MODIFIED).build();
+        }
+        // 创建ByteArrayResource对象
+        ByteArrayResource resource = new ByteArrayResource(fileItem.getFileData());
+        HttpHeaders headers = new HttpHeaders();
+        //headers.add("Content-Disposition", String.format("attachment; filename=\"%s.html\"", htmlPage.getTitle()));
+        headers.add("ETag", etag);
+        //未命中缓存，直接返回页面
+        return ResponseEntity.ok()
+                .headers(headers)
+                .cacheControl(CacheControl.maxAge(7, TimeUnit.DAYS).cachePublic())
+                .eTag(etag)
+                .contentType(MediaType.parseMediaType(fileItem.getContentType()))
                 .body(resource);
     }
 
