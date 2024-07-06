@@ -2,6 +2,7 @@ package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.PartnerService;
+import com.pddon.framework.easyapi.annotation.LockDistributed;
 import com.pddon.framework.easyapi.consts.PartnerStatus;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
@@ -20,6 +21,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 
@@ -34,6 +36,8 @@ import java.util.Arrays;
 @IgnoreTenant
 @Slf4j
 public class PartnerServiceImpl implements PartnerService {
+
+    private static final String HOST_TENANT_ID = "EASY_API_HOST_TENANT";
 
     @Autowired
     private PartnerItemDao partnerItemDao;
@@ -55,6 +59,27 @@ public class PartnerServiceImpl implements PartnerService {
             return generateTenantId();
         }
         return appId;
+    }
+
+    @Override
+    @LockDistributed
+    @Transactional
+    public void checkAndCreateHostPartner(){
+        if(partnerItemDao.existsTenantId(HOST_TENANT_ID)){
+            return;
+        }
+        PartnerItem item = new PartnerItem();
+        item.setPartnerName("默认商户");
+        item.setPartnerType("HOST");
+        item.setSecret("1KAMHJ41ENMNMRQL");
+        item.setPartnerStatus(PartnerStatus.ACTIVE.name());
+        item.setTenantId(HOST_TENANT_ID);
+        item.setCompanyName("公司名（待修改）");
+        item.setEmail("联系邮箱(待修改)");
+        item.setUsername("联系人（待修改）");
+        item.setEnableApi(true);
+        item.setCountryName("中国");
+        partnerItemDao.saveItem(item);
     }
 
     @Override

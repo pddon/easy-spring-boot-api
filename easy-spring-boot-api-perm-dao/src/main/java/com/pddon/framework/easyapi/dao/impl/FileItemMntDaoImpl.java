@@ -45,8 +45,8 @@ public class FileItemMntDaoImpl extends ServiceImpl<FileItemMapper, FileItem> im
                 .gt(req.getStartTime() != null, FileItem::getCrtTime, req.getStartTime())
                 .lt(req.getEndTime() != null, FileItem::getCrtTime, req.getEndTime())
                 .and(!StringUtils.isEmpty(req.getKeyword()), query -> {
-                    return query.likeLeft(FileItem::getFilename, req.getKeyword()).or()
-                            .likeLeft(FileItem::getComments, req.getKeyword());
+                    return query.likeRight(FileItem::getFilename, req.getKeyword()).or()
+                            .likeRight(FileItem::getComments, req.getKeyword());
                 })
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? FileItem::getCrtTime : FileItem::getChgTime);
         return this.page(page, wrapper);

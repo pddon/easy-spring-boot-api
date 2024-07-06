@@ -82,6 +82,6 @@ public class EmailTemplateMntServiceImpl implements EmailTemplateMntService {
 
     @Override
     public void sendEmail(SendEmailRequest req) {
-        EmailUtil.sendEmail(req.getEmail(), req.getTitle(), req.getContent(), PageContentType.HTML.equals(req.getType()));
+        EmailUtil.sendHtmlEmail(req.getEmail(), req.getTitle(), req.getContent());
     }
 }

@@ -46,6 +46,7 @@ public class EntityManager {
     }
 
     public synchronized static void init(MybatisPlusProperties mybatisPlusProperties){
+
         List<Class<?>> list = AnnotationClassUtils.getAllClassByAnnotation(mybatisPlusProperties.getTypeAliasesPackage(), TableName.class);
         list.forEach(clazz -> {
             // 获取表信息
@@ -72,6 +73,10 @@ public class EntityManager {
     }
 
     public static boolean isIgnoreTable(String tableName){
+        Class<?> entityClass = getByTableName(tableName);
+        if(entityClass != null && (ReflectionUtils.findField(entityClass, TENANT_ID_FIELD_NAME) == null)){
+            return true;
+        }
         if(RequestContext.getContext().isSuperManager() || RequestContext.getContext().isIgnoreTenant()){
             return true;
         }

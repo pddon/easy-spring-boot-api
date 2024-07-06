@@ -55,4 +55,6 @@ public interface UserSecurityService {
     void logout();
 
     BaseUser queryByUserId(String userId);
+
+    void updateLastLoginTime(String userId);
 }

@@ -14,6 +14,7 @@ import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.dto.resp.PermTreeDataDto;
 import com.pddon.framework.easyapi.dto.resp.RoleDetailDto;
 import io.swagger.annotations.Api;
+import org.apache.shiro.authz.annotation.Logical;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -61,7 +62,7 @@ public class RoleMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
-    @RequiresPermissions("role:query")
+    @RequiredSession
     public PaginationResponse<RoleItem> listRole(@RequestBody RoleListRequest req){
         return roleMntService.listRole(req);
     }

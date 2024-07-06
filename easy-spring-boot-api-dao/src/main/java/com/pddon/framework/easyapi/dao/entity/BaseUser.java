@@ -34,6 +34,18 @@ public class BaseUser extends BaseTenantEntity{
      private String userId;
 
     /**
+     *
+     * @author pddon.com
+     */
+    private String logoImgKey;
+
+    /**
+     * 是否是管理员账号
+     * @author pddon.com
+     */
+    private Boolean mntAccount;
+
+    /**
      * 用户最近一次登录会话ID
      * @author pddon.com
      */

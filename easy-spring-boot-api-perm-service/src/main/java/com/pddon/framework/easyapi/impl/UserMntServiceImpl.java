@@ -127,6 +127,7 @@ public class UserMntServiceImpl implements UserMntService {
             user.setTenantId(null);
         }
         user.setRegTime(new Date());
+        user.setMntAccount(true);
         baseUserDao.saveUser(user);
         if(req.getRoleIds() != null && !req.getRoleIds().isEmpty()){
             List<UserRole> userRoles = req.getRoleIds().stream().map(roleId -> {
@@ -163,6 +164,9 @@ public class UserMntServiceImpl implements UserMntService {
             subject.checkPermission("user:update");
         }
         BeanUtils.copyProperties(req, user);
+        if(req.getUserCountryCode() != null){
+            user.setCountryCode(req.getUserCountryCode());
+        }
         baseUserDao.updateUser(user);
         String userId = user.getUserId();
         userRoleDao.removeByUserId(userId);

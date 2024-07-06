@@ -57,6 +57,12 @@ public class UpdatePartnerRequest implements Serializable {
     private String companyName;
 
     /**
+     * 公司Logo图标ID
+     * @author pddon.com
+     */
+    private String logoKey;
+
+    /**
      * 商户公司的logo图片地址
      * @author pddon.com
      */

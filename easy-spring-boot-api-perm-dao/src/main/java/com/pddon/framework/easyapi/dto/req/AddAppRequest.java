@@ -103,4 +103,16 @@ public class AddAppRequest implements Serializable {
      * @author pddon.com
      */
     private Long timeSection;
+
+    /**
+     * 应用logo图标地址
+     * @author pddon.com
+     */
+    private String logoUrl;
+
+    /**
+     * logo图标的ID
+     * @author pddon.com
+     */
+    private String logoKey;
 }

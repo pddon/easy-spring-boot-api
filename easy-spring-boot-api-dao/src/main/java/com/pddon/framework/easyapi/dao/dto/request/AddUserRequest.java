@@ -70,12 +70,6 @@ public class AddUserRequest implements Serializable {
     private String countryCode;
 
     /**
-     * 用户头像url地址
-     * @author pddon.com
-     */
-    private String avatar;
-
-    /**
      * 用户归属地国家名
      * @author pddon.com
      */
@@ -100,6 +94,19 @@ public class AddUserRequest implements Serializable {
      * @author pddon.com
      */
     private String intro;
+
+    /**
+     * 头像文件ID
+     * @author pddon.com
+     */
+    private String logoImgKey;
+
+    /**
+     * 用户头像url地址
+     * @author pddon.com
+     */
+    private String avatar;
+
     /**
      * 拥有的角色
      */

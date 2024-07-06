@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.DictMntService;
+import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
@@ -58,7 +59,7 @@ public class DictMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
-    @RequiresPermissions("dict:query")
+    @RequiredSession
     public PaginationResponse<DictItem> listDict(@RequestBody DictListRequest req){
         return dictMntService.list(req);
     }
@@ -111,7 +112,7 @@ public class DictMntController {
 
     @PostMapping("listGroup")
     @RequiredSign(scope = SignScope.REQUEST)
-    @RequiresPermissions("dict:query")
+    @RequiredSession
     public PaginationResponse<DictGroup> listGroup(@RequestBody DictGroupListRequest req){
         return dictMntService.listGroup(req);
     }

@@ -41,6 +41,12 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
     }
 
     @Override
+    public BaseUser getByEmail(String email) {
+        List<K> list = this.list(new LambdaQueryWrapper<K>().eq(BaseUser::getEmail, email).orderByDesc(BaseUser::getCrtTime));
+        return list.size() > 0 ? list.get(0) : null;
+    }
+
+    @Override
     public boolean updateUserSession(String sessionId, Date loginTime, String userId) {
         return this.update(new LambdaUpdateWrapper<K>().eq(BaseUser::getUserId, userId)
                 .set(BaseUser::getSessionId, sessionId)
@@ -108,5 +114,10 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
     @Override
     public boolean updateUserPass(Long id, String newPassword) {
         return this.update(new LambdaUpdateWrapper<K>().eq(BaseUser::getId, id).set(BaseUser::getPassword, newPassword));
+    }
+
+    @Override
+    public void updateLastLoginTime(String userId) {
+        this.lambdaUpdate().eq(BaseUser::getUserId, userId).set(BaseUser::getLastLoginTime, new Date()).update();
     }
 }

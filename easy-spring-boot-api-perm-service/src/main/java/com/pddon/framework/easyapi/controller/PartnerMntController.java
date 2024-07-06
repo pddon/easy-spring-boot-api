@@ -1,12 +1,12 @@
 package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.PartnerService;
+import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
-import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateItemFlagRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
@@ -70,7 +70,8 @@ public class PartnerMntController {
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
     //@OperateLog(type="商户列表", apiName = "partner/list")
-    @RequiresPermissions("partner:query")
+    //@RequiresPermissions("partner:query")
+    @RequiredSession
     public PaginationResponse<PartnerItem> listPartner(@RequestBody PartnerListRequest req){
         return partnerService.listPartner(req);
     }
@@ -109,7 +110,8 @@ public class PartnerMntController {
     @PostMapping("listApp")
     @RequiredSign(scope = SignScope.REQUEST)
     //@OperateLog(type="应用列表", apiName = "partner/listApp")
-    @RequiresPermissions("application:query")
+    //@RequiresPermissions("application:query")
+    @RequiredSession
     public PaginationResponse<BaseApplicationConfig> listApp(@RequestBody AppListRequest req){
         return partnerService.listApp(req);
     }

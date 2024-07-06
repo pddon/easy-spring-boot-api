@@ -44,6 +44,7 @@ import java.util.stream.Collectors;
 public class UserSecurityServiceImpl implements UserSecurityService {
 
     private static final String SUPER_ADMIN_USER_ID = "EASY_API_SUPER_ADMIN";
+    private static final String HOST_TENANT_ID = "EASY_API_HOST_TENANT";
 
     @Autowired
     private SessionManager sessionManager;
@@ -77,6 +78,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     @Override
     @LockDistributed
     @Transactional
+    @IgnoreTenant
     public void checkAndCreateSuperManager(){
         if(baseUserDao.existUserId(SUPER_ADMIN_USER_ID)){
             return;
@@ -86,7 +88,17 @@ public class UserSecurityServiceImpl implements UserSecurityService {
                 .setUsername("EasyApi超管")
                 .setAccountStatus(UserAccountStatus.ACTIVE.name())
                 .setPassword(EncryptUtils.encryptMD5Hex(EncryptUtils.encryptMD5Hex("88889999")))
-                .setTenantId("default")
+                .setMntAccount(true)
+                .setCountryCode("CN")
+                .setCountryName("中国")
+                .setIndustry("职业（待修改）")
+                .setEmail("邮箱号(待修改)")
+                .setPhone("手机号（待修改）")
+                .setJob("工作（待修改）")
+                .setNickname("昵称（待修改）")
+                .setSex(true)
+                .setIntro("个人简介（待修改）")
+                .setTenantId(HOST_TENANT_ID)
                 .setCrtUserId("system");
         baseUserDao.saveUser(user);
     }
@@ -181,6 +193,11 @@ public class UserSecurityServiceImpl implements UserSecurityService {
     @Override
     public BaseUser queryByUserId(String userId) {
         return baseUserDao.getByUserId(userId);
+    }
+
+    @Override
+    public void updateLastLoginTime(String userId) {
+        baseUserDao.updateLastLoginTime(userId);
     }
 
     @CacheMethodResultEvict(prefix = "User:Perms", id = "userId", expireSeconds = 3600)

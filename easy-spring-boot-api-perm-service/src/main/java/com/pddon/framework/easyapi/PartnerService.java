@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.annotation.LockDistributed;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateItemFlagRequest;
@@ -7,6 +8,7 @@ import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dao.entity.PartnerItem;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import org.springframework.transaction.annotation.Transactional;
 
 /**
  * @ClassName: PartnerService
@@ -16,6 +18,10 @@ import com.pddon.framework.easyapi.dto.resp.IdResponse;
  * @Addr: https://pddon.cn
  */
 public interface PartnerService {
+    @LockDistributed
+    @Transactional
+    void checkAndCreateHostPartner();
+
     IdResponse addPartner(AddPartnerRequest req);
 
     void updatePartner(UpdatePartnerRequest req);

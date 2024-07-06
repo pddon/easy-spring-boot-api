@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
@@ -84,7 +85,7 @@ public class StaticResourceController {
     public ResponseEntity<Resource> getFile(@PathVariable("fileType") String fileType,
                                             @PathVariable("fileKey") String fileKey,
                                             HttpServletRequest request,
-                                            HttpServletResponse response){
+                                            HttpServletResponse response) throws UnsupportedEncodingException {
         FileItem fileItem = fileItemService.getByTypeKey(fileType, fileKey);
         String etag = fileItem.getChgTime() != null ? String.valueOf(fileItem.getChgTime().getTime()) : String.valueOf(fileItem.getCrtTime().getTime());
         // 设置ETag到响应头
@@ -96,7 +97,9 @@ public class StaticResourceController {
         // 创建ByteArrayResource对象
         ByteArrayResource resource = new ByteArrayResource(fileItem.getFileData());
         HttpHeaders headers = new HttpHeaders();
-        //headers.add("Content-Disposition", String.format("attachment; filename=\"%s.html\"", htmlPage.getTitle()));
+        if(!fileItem.getContentType().contains("image")){
+            headers.add("Content-Disposition", String.format("attachment; filename=\"%s\"", URLEncoder.encode(fileItem.getFilename(), "UTF-8")));
+        }
         headers.add("ETag", etag);
         //未命中缓存，直接返回页面
         return ResponseEntity.ok()

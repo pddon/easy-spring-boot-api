@@ -66,13 +66,7 @@ public class UpdateUserRequest implements Serializable {
      * 用户归属地国家编码
      * @author pddon.com
      */
-    private String countryCode;
-
-    /**
-     * 用户头像url地址
-     * @author pddon.com
-     */
-    private String avatar;
+    private String userCountryCode;
 
     /**
      * 用户归属地国家名
@@ -97,6 +91,19 @@ public class UpdateUserRequest implements Serializable {
      * @author pddon.com
      */
     private String intro;
+
+    /**
+     *
+     * @author pddon.com
+     */
+    private String logoImgKey;
+
+    /**
+     * 用户头像url地址
+     * @author pddon.com
+     */
+    private String avatar;
+
     /**
      * 拥有的角色
      */

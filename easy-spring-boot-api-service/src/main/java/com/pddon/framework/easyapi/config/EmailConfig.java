@@ -47,23 +47,32 @@ public class EmailConfig {
         Map<String, String> map = items.stream().collect(Collectors.toMap(DictItem::getDictId, DictItem::getContent, (item1, item2) -> item1));
         JavaMailSenderImpl sender = (JavaMailSenderImpl) mailSender;
         if(map.containsKey("mail.host")){
-            sender.setHost(map.get("mail.host"));
+            String host = map.get("mail.host");
+            sender.setHost(host);
+            mailProperties.setHost(host);
             map.remove("mail.host");
         }
         if(map.containsKey("mail.port")){
-            sender.setPort(Integer.valueOf(map.get("mail.port")));
+            int port = Integer.valueOf(map.get("mail.port"));
+            sender.setPort(port);
+            mailProperties.setPort(port);
             map.remove("mail.port");
         }
         if(map.containsKey("mail.username")){
-            sender.setUsername(map.get("mail.username"));
+            String username = map.get("mail.username");
+            sender.setUsername(username);
+            mailProperties.setUsername(username);
             map.remove("mail.username");
         }
         if(map.containsKey("mail.password")){
-            sender.setPassword(map.get("mail.password"));
+            String password = map.get("mail.password");
+            sender.setPassword(password);
+            mailProperties.setPassword(password);
             map.remove("mail.password");
         }
         if(map.containsKey("mail.protocol")){
-            sender.setProtocol(map.get("mail.protocol"));
+            String protocol = map.get("mail.protocol");
+            sender.setProtocol(protocol);
             map.remove("mail.protocol");
         }
         Properties properties = new Properties();

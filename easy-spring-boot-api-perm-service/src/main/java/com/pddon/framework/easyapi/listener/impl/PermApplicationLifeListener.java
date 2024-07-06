@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi.listener.impl;
 
+import com.pddon.framework.easyapi.PartnerService;
 import com.pddon.framework.easyapi.RoleMntService;
 import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.listener.ApplicationLifeListener;
@@ -27,6 +28,9 @@ public class PermApplicationLifeListener implements ApplicationLifeListener {
     @Autowired
     private RoleMntService roleMntService;
 
+    @Autowired
+    private PartnerService partnerService;
+
     @Override
     public void contextInitialized(ApplicationContextInitializedEvent event) {
 
@@ -34,6 +38,7 @@ public class PermApplicationLifeListener implements ApplicationLifeListener {
 
     @Override
     public void started(ApplicationStartedEvent event) {
+        partnerService.checkAndCreateHostPartner();
         userSecurityService.checkAndCreateSuperManager();
         //检查并初始化权限
         roleMntService.checkAndInitPerms();
