@@ -36,7 +36,8 @@ public class DictMntController {
     @PostMapping("add")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="新增字典", apiName = "dict/add")
-    @RequiresPermissions("dict:add")
+    //@RequiresPermissions("dict:add")
+    @RequiredSession
     public IdResponse add(@RequestBody AddDictRequest req){
         return dictMntService.add(req);
     }
@@ -44,7 +45,8 @@ public class DictMntController {
     @PostMapping("update")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="修改字典", apiName = "dict/update")
-    @RequiresPermissions("dict:update")
+    //@RequiresPermissions("dict:update")
+    @RequiredSession
     public void update(@RequestBody UpdateDictRequest req){
         dictMntService.update(req);
     }
@@ -59,6 +61,7 @@ public class DictMntController {
 
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
+    //@RequiredSession
     @RequiredSession
     public PaginationResponse<DictItem> listDict(@RequestBody DictListRequest req){
         return dictMntService.list(req);
@@ -66,14 +69,16 @@ public class DictMntController {
 
     @GetMapping("get")
     @RequiredSign(scope = SignScope.REQUEST)
-    @RequiresPermissions("dict:query")
+    //@RequiresPermissions("dict:query")
+    @RequiredSession
     public DictItem get(@RequestParam("dictId") String dictId){
         return dictMntService.get(dictId);
     }
 
     @GetMapping("getByGroup")
     @RequiredSign(scope = SignScope.REQUEST)
-    @RequiresPermissions("dict:query")
+    //@RequiresPermissions("dict:query")
+    @RequiredSession
     public List<DictItem> getByGroup(@RequestParam(value = "tenantId", required = false) String tenantId, @RequestParam("groupId") String groupId){
         return dictMntService.getByGroup(tenantId, groupId);
     }
@@ -81,7 +86,8 @@ public class DictMntController {
     @PostMapping("updatesByGroup")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="批量修改分组下字典", apiName = "dict/updatesByGroup")
-    @RequiresPermissions("dict:update")
+    //@RequiresPermissions("dict:update")
+    @RequiredSession
     public void updatesByGroup(@RequestBody UpdatesByGroupRequest req){
         dictMntService.updatesByGroup(req);
     }
@@ -89,7 +95,8 @@ public class DictMntController {
     @PostMapping("addGroup")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="新增字典分组", apiName = "dict/addGroup")
-    @RequiresPermissions("dict:add")
+    //@RequiresPermissions("dict:add")
+    @RequiredSession
     public IdResponse addGroup(@RequestBody AddDictGroupRequest req){
         return dictMntService.addGroup(req);
     }
@@ -97,7 +104,8 @@ public class DictMntController {
     @PostMapping("updateGroup")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="修改字典分组", apiName = "dict/updateGroup")
-    @RequiresPermissions("dict:update")
+    //@RequiresPermissions("dict:update")
+    @RequiredSession
     public void updateGroup(@RequestBody UpdateDictGroupRequest req){
         dictMntService.updateGroup(req);
     }
