@@ -82,7 +82,12 @@ public class HtmlPageMntDaoImpl extends HtmlPageDaoImpl implements HtmlPageMntDa
                             .like(HtmlPage::getTitle, req.getKeyword()).or()
                             .like(HtmlPage::getComments, req.getKeyword());
                 })
-                .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? HtmlPage::getCrtTime : HtmlPage::getChgTime);
+                .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), HtmlPage::getOrderValue, "crtTime".equals(req.getOrderBy()) ? HtmlPage::getCrtTime : HtmlPage::getChgTime);
         return this.page(page, wrapper);
+    }
+
+    @Override
+    public void topPage(Long id) {
+        this.lambdaUpdate().eq(HtmlPage::getId, id).set(HtmlPage::getOrderValue, System.currentTimeMillis()).update();
     }
 }

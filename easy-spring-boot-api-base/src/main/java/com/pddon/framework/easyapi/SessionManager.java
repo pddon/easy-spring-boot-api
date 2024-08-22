@@ -16,6 +16,12 @@ public interface SessionManager {
 	 * @author danyuan
 	 */
 	Session getCurrentSession(boolean createNew);
+
+	/**
+	 * 获取当前会话信息
+	 * @author danyuan
+	 */
+	Session getCurrentSession(boolean createNew, boolean forceNew);
 	/**
 	 * 保存会话信息
 	 * @author danyuan

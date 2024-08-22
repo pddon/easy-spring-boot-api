@@ -1,5 +1,7 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 
 import java.util.List;
@@ -27,5 +29,7 @@ public interface DictItemDao {
     List<DictItem> getDefaultTenantDictsByGroupId(String appId, String groupId);
 
     List<DictItem> getTenantDictsByUserId(String userId, String groupId);
+
+    IPage<DictItem> pageQuery(DictListRequest req);
 
 }

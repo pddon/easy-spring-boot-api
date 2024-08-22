@@ -163,7 +163,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         //获取用户信息
         BaseUser user = baseUserDao.getByUserId(currentUserId);
         //创建会话信息
-        Session session = sessionManager.getCurrentSession(true);
+        Session session = sessionManager.getCurrentSession(true, true);
         session.setCountryCode(user.getCountryCode())
                 .setUserId(user.getUserId())
                 .setUsername(user.getUsername())

@@ -1,4 +1,4 @@
-package com.pddon.framework.easyapi.dto.req;
+package com.pddon.framework.easyapi.dao.dto.request;
 
 import com.pddon.framework.easyapi.controller.request.PaginationRequest;
 import lombok.Data;

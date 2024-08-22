@@ -25,4 +25,6 @@ public interface HtmlPageMntDao {
     boolean removeByIds(List<String> asList);
 
     IPage<HtmlPage> pageQuery(HtmlPageListRequest req);
+
+    void topPage(Long id);
 }

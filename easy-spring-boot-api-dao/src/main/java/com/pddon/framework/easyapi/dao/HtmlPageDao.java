@@ -1,5 +1,7 @@
 package com.pddon.framework.easyapi.dao;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.pddon.framework.easyapi.dao.dto.request.HtmlPageListRequest;
 import com.pddon.framework.easyapi.dao.entity.HtmlPage;
 
 import java.util.List;
@@ -17,4 +19,8 @@ public interface HtmlPageDao {
     List<HtmlPage> getListBySceneId(String sceneId, String resourceId);
 
     List<HtmlPage> getListByKeyword(String sceneId, String keyword);
+
+    IPage<HtmlPage> pageQuery(HtmlPageListRequest req);
+
+    HtmlPage getByItemId(Long id);
 }

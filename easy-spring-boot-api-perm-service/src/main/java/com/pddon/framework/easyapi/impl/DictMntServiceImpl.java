@@ -1,10 +1,8 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.baomidou.mybatisplus.core.toolkit.ReflectionKit;
 import com.pddon.framework.easyapi.DictMntService;
 import com.pddon.framework.easyapi.cache.MethodCacheManager;
-import com.pddon.framework.easyapi.config.EmailConfig;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
@@ -12,6 +10,8 @@ import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.DictGroupMntDao;
 import com.pddon.framework.easyapi.dao.DictItemMntDao;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dto.req.*;
@@ -104,18 +104,6 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
     }
 
     @Override
-    public PaginationResponse<DictItem> list(DictListRequest req) {
-        IPage<DictItem> itemPage = dictItemMntDao.pageQuery(req);
-        PaginationResponse<DictItem> page = new PaginationResponse<>();
-        page.setSize(itemPage.getSize())
-                .setCurrent(itemPage.getCurrent())
-                .setTotal(itemPage.getTotal())
-                .setPages(itemPage.getPages())
-                .setRecords(itemPage.getRecords());
-        return page;
-    }
-
-    @Override
     public IdResponse addGroup(AddDictGroupRequest req) {
         if(dictGroupMntDao.exists(req.getGroupId())){
             throw new BusinessException("字典分组已存在！");
@@ -142,18 +130,6 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
     @Override
     public void removeGroup(IdsRequest req) {
         dictGroupMntDao.removeByIds(Arrays.asList(req.getIds()));
-    }
-
-    @Override
-    public PaginationResponse<DictGroup> listGroup(DictGroupListRequest req) {
-        IPage<DictGroup> itemPage = dictGroupMntDao.pageQuery(req);
-        PaginationResponse<DictGroup> page = new PaginationResponse<>();
-        page.setSize(itemPage.getSize())
-                .setCurrent(itemPage.getCurrent())
-                .setTotal(itemPage.getTotal())
-                .setPages(itemPage.getPages())
-                .setRecords(itemPage.getRecords());
-        return page;
     }
 
     @Override

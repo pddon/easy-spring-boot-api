@@ -1,10 +1,8 @@
 package com.pddon.framework.easyapi.dao;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
-import com.pddon.framework.easyapi.dao.DictGroupDao;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
-import com.pddon.framework.easyapi.dto.req.DictGroupListRequest;
-import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
 
 import java.util.List;
 
@@ -30,5 +28,5 @@ public interface DictGroupMntDao extends DictGroupDao {
 
     boolean removeByIds(List<String> asList);
 
-    IPage<DictGroup> pageQuery(DictGroupListRequest req);
+
 }

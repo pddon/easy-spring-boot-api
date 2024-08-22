@@ -6,9 +6,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.pddon.framework.easyapi.dao.DictGroupMntDao;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
-import com.pddon.framework.easyapi.dao.entity.DictItem;
-import com.pddon.framework.easyapi.dto.req.DictGroupListRequest;
-import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.annotation.Primary;
@@ -62,26 +60,4 @@ public class DictGroupMntDaoImpl extends DictGroupDaoImpl implements DictGroupMn
         return this.remove(new LambdaQueryWrapper<DictGroup>().in(DictGroup::getId, ids));
     }
 
-    @Override
-    public IPage<DictGroup> pageQuery(DictGroupListRequest req) {
-        Page<DictGroup> page = new Page<>(req.getCurrent(), req.getSize());
-        if(StringUtils.isEmpty(req.getOrderBy())){
-            //默认按创建时间排序
-            req.setOrderBy("crtTime");
-        }
-        if(req.getIsAsc() == null){
-            //默认降序排列
-            req.setIsAsc(false);
-        }
-        Wrapper<DictGroup> wrapper = new LambdaQueryWrapper<DictGroup>()
-                .eq(StringUtils.isNotEmpty(req.getGroupId()), DictGroup::getGroupId, req.getGroupId())
-                .eq(StringUtils.isNotEmpty(req.getParentGroupId()), DictGroup::getParentGroupId, req.getParentGroupId())
-                .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
-                    return query.like(DictGroup::getGroupId, req.getKeyword()).or()
-                            .like(DictGroup::getParentGroupId, req.getKeyword()).or()
-                            .like(DictGroup::getDescription, req.getKeyword());
-                })
-                .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DictGroup::getCrtTime : DictGroup::getChgTime);
-        return this.page(page, wrapper);
-    }
 }

@@ -196,7 +196,7 @@ public class RoleMntServiceImpl implements RoleMntService {
         }else{
             BaseUser user = userSecurityService.queryByUserId(userId);
             if(user == null){
-                throw new BusinessException("账号未找到，修改失败!");
+                throw new BusinessException("账号未找到!");
             }
             if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
                 //修改他人账号需要用户修改权限

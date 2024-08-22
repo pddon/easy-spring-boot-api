@@ -34,7 +34,7 @@ public class MethodInvokeUtil {
 	    		param = new ApiRequestParameter();
 	    		if(BeanPropertyUtil.isBaseType(args[i])){
 	    			String paramName = getBaseTypeParamName(annotations[i]);
-	    			if(StringUtils.isEmpty(paramName)){
+	    			if(StringUtils.isEmpty(paramName) && (params != null && params.length > i)){
 	    				param.setParamName(params[i]);
 	    			}else{
 	    				param.setParamName(paramName);

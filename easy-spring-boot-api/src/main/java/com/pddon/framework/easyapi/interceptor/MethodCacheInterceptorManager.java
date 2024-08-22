@@ -11,6 +11,7 @@ package com.pddon.framework.easyapi.interceptor;
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
 
+import com.pddon.framework.easyapi.properties.EasyApiConfig;
 import lombok.extern.slf4j.Slf4j;
 
 import org.aopalliance.intercept.MethodInterceptor;
@@ -41,6 +42,10 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 	@Autowired
 	@Lazy
 	private MethodCacheManager methodCacheManager;
+
+	@Autowired
+	@Lazy
+	private EasyApiConfig easyApiConfig;
 	
 	private ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
 	
@@ -52,6 +57,9 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		if(easyApiConfig.getDisableMethodCache() == true){
+			return invocation.proceed();
+		}
 		if(AopUtils.isAopProxy(invocation.getThis())){
 			return invocation.proceed();
 		}

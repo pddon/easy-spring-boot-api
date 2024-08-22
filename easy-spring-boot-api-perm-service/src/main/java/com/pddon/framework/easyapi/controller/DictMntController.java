@@ -7,6 +7,8 @@ import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dto.req.*;

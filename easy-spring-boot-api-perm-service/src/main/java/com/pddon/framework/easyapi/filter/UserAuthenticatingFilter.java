@@ -63,8 +63,6 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
         if(user == null){
             throw new BusinessException(ErrorCodes.ACCOUNT_NOT_FOUND);
         }
-        //更新最近登录时间
-        userSecurityService.updateLastLoginTime(user.getUserId());
         UserAuthenticationToken token = new UserAuthenticationToken(sessionId, user.getUserId(), user.getPassword());
         return token;
     }

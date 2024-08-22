@@ -27,4 +27,6 @@ public interface HtmlPageMntService {
     HtmlPage getPageContent(Long id);
 
     void deployPage(Long id);
+
+    void topPage(Long id);
 }

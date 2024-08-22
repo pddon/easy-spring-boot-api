@@ -1,8 +1,13 @@
 package com.pddon.framework.easyapi.dao.impl;
 
+import com.baomidou.mybatisplus.core.conditions.Wrapper;
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
+import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.pddon.framework.easyapi.dao.DictGroupDao;
 import com.pddon.framework.easyapi.dao.DictItemDao;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.dao.mapper.DictGroupMapper;
@@ -72,7 +77,7 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
     @Override
     public List<DictItem> getTenantDictsByGroupId(String tenantId, String appId, String groupId) {
         return this.lambdaQuery().eq(DictItem::getGroupId, groupId)
-                .eq(DictItem::getAppId, appId)
+                .eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId)
                 .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
                 .isNull(DictItem::getUserId)
                 .list();
@@ -91,5 +96,34 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
         return this.lambdaQuery().eq(DictItem::getGroupId, groupId)
                 .eq(DictItem::getUserId, userId)
                 .list();
+    }
+
+    @Override
+    public IPage<DictItem> pageQuery(DictListRequest req) {
+        Page<DictItem> page = new Page<>(req.getCurrent(), req.getSize());
+        if(StringUtils.isEmpty(req.getOrderBy())){
+            //默认按创建时间排序
+            req.setOrderBy("crtTime");
+        }
+        if(req.getIsAsc() == null){
+            //默认降序排列
+            req.setIsAsc(false);
+        }
+        Wrapper<DictItem> wrapper = new LambdaQueryWrapper<DictItem>()
+                .eq(StringUtils.isNotEmpty(req.getDictId()), DictItem::getDictId, req.getDictId())
+                .eq(StringUtils.isNotEmpty(req.getGroupId()), DictItem::getGroupId, req.getGroupId())
+                .eq(StringUtils.isNotEmpty(req.getDictAppId()), DictItem::getAppId, req.getDictAppId())
+                .eq(StringUtils.isNotEmpty(req.getTenantId()), DictItem::getTenantId, req.getTenantId())
+                .eq(StringUtils.isNotEmpty(req.getDictUserId()), DictItem::getUserId, req.getDictUserId())
+                .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
+                    return query.like(DictItem::getDictId, req.getKeyword()).or()
+                            .like(DictItem::getTenantId, req.getKeyword()).or()
+                            .like(DictItem::getUserId, req.getKeyword()).or()
+                            .like(DictItem::getAppId, req.getKeyword()).or()
+                            .like(DictItem::getGroupId, req.getKeyword()).or()
+                            .like(DictItem::getDescription, req.getKeyword());
+                })
+                .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DictItem::getCrtTime : DictItem::getChgTime);
+        return this.page(page, wrapper);
     }
 }

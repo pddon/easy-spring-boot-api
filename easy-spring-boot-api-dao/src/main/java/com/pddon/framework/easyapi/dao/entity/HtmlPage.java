@@ -92,5 +92,10 @@ public class HtmlPage extends BaseEntity{
      * @author pddon.com
      */
     private String comments;
+    /**
+     * 排序值，值越大排名越靠前
+     * @author pddon.com
+     */
+    private Long orderValue;
 
 }

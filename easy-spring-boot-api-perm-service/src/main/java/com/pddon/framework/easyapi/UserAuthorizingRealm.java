@@ -77,6 +77,15 @@ public class UserAuthorizingRealm extends AuthorizingRealm {
             throw new LockedAccountException(ErrorCodes.ACCOUNT_LOCKED.getMsgCode());
         }
 
-        return new SimpleAuthenticationInfo(user.getUserId(), EncryptUtils.encryptMD5Hex(user.getPassword()), getName());
+        SimpleAuthenticationInfo result = null;
+
+        try{
+            result = new SimpleAuthenticationInfo(user.getUserId(), EncryptUtils.encryptMD5Hex(user.getPassword()), getName());
+            //更新最近登录时间
+            userSecurityService.updateLastLoginTime(user.getUserId());
+        }catch (Exception e){
+            throw e;
+        }
+        return result;
     }
 }

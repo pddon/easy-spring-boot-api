@@ -1,9 +1,13 @@
 package com.pddon.framework.easyapi.impl;
 
+import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.DictService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
+import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.DictGroupDao;
 import com.pddon.framework.easyapi.dao.DictItemDao;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import lombok.extern.slf4j.Slf4j;
@@ -76,5 +80,39 @@ public class DictServiceImpl implements DictService {
     @Override
     public List<DictGroup> getByParentDictGroupId(String parentId) {
         return dictGroupDao.getByParentDictGroupId(parentId);
+    }
+
+    @Override
+    public boolean existsGroupId(String groupId) {
+        return dictGroupDao.existsGroupId(groupId);
+    }
+
+    @Override
+    public DictGroup getByGroupId(String groupId) {
+        return dictGroupDao.getByGroupId(groupId);
+    }
+
+    @Override
+    public PaginationResponse<DictItem> list(DictListRequest req) {
+        IPage<DictItem> itemPage = dictItemDao.pageQuery(req);
+        PaginationResponse<DictItem> page = new PaginationResponse<>();
+        page.setSize(itemPage.getSize())
+                .setCurrent(itemPage.getCurrent())
+                .setTotal(itemPage.getTotal())
+                .setPages(itemPage.getPages())
+                .setRecords(itemPage.getRecords());
+        return page;
+    }
+
+    @Override
+    public PaginationResponse<DictGroup> listGroup(DictGroupListRequest req) {
+        IPage<DictGroup> itemPage = dictGroupDao.pageQuery(req);
+        PaginationResponse<DictGroup> page = new PaginationResponse<>();
+        page.setSize(itemPage.getSize())
+                .setCurrent(itemPage.getCurrent())
+                .setTotal(itemPage.getTotal())
+                .setPages(itemPage.getPages())
+                .setRecords(itemPage.getRecords());
+        return page;
     }
 }

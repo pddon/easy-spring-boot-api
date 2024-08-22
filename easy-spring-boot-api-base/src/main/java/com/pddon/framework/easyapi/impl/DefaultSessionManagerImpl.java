@@ -28,19 +28,26 @@ public class DefaultSessionManagerImpl implements SessionManager {
 	protected CacheManager cacheManager;
 	
 	protected long expireSeconds = 15;
-	
+
 	/**
 	 * @author danyuan
 	 */
 	@Override
 	public Session getCurrentSession(boolean createNew) {
+		return getCurrentSession(createNew, false);
+	}
+	/**
+	 * @author danyuan
+	 */
+	@Override
+	public Session getCurrentSession(boolean createNew, boolean forceNew) {
 		Session session = RequestContext.getContext().getSession();
 		String sessionId = RequestContext.getContext().getSessionId();
 		
-		if(!StringUtils.isEmpty(sessionId)){
+		if(!StringUtils.isEmpty(sessionId) && !forceNew){
 			session = this.get(sessionId);
 		}
-		if(session == null && createNew){
+		if((session == null && createNew) || forceNew){
 			//创建会话
 			sessionId = UUIDGenerator.getUUID();
 			session = new Session();

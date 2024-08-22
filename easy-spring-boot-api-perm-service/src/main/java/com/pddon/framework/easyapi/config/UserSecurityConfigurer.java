@@ -139,7 +139,11 @@ public class UserSecurityConfigurer {
         filterMap.put("/js/**", "anon");
         filterMap.put("/public/**", "anon");
         filterMap.put("/res/**", "anon");
-        //无权限访问业务资源
+        filterMap.put("/**/*.html", "anon");
+        filterMap.put("/*.html", "anon");
+        filterMap.put("/admin/login.html", "anon");
+        filterMap.put("/admin/index.html", "anon");
+        //支持匿名访问的业务资源
         Arrays.stream(securityConfigProperties.getAnnoAccessResourceUrls()).forEach(url -> {
             filterMap.put(url, "anon");
         });

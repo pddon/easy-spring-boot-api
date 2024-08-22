@@ -15,7 +15,7 @@ import java.util.Date;
  */
 @Data
 @Accessors(chain = true)
-public class HtmlPageDto implements Serializable {
+public class HtmlPageDetailDto implements Serializable {
     private Long id;
     /**
      * 页面所属业务场景，字典分组pageBusinessId下的子分组列表，可以通过子字典分组新增业务应用场景
@@ -58,4 +58,9 @@ public class HtmlPageDto implements Serializable {
      * @author pddon.com
      */
     private Date crtTime;
+    /**
+     * 页面最终html内容
+     * @author pddon.com
+     */
+    private String content;
 }

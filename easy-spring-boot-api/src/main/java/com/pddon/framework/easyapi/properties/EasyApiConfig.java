@@ -73,6 +73,10 @@ public class EasyApiConfig implements Serializable {
 	 * 是否在控制台打印所有配置信息
 	 */
 	private Boolean printAllProperties;
+	/**
+	 * 禁用方法缓存
+	 */
+	private Boolean disableMethodCache;
 	public EasyApiConfig(){
 		this.enable = true;
 		this.enableSwagger = true;
@@ -85,6 +89,7 @@ public class EasyApiConfig implements Serializable {
 		this.forceAutoAddResponseWrapper = true;
 		this.basePackages = "";
 		this.printAllProperties = false;
+		this.disableMethodCache = false;
 	}
 	
 	public Set<String> getAllBasePackages(){

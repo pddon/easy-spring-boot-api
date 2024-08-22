@@ -59,13 +59,13 @@ public class HtmlPageController {
     @PostMapping("list")
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiresPermissions("page:query")
-    public PaginationResponse<HtmlPage> listDict(@RequestBody HtmlPageListRequest req){
+    public PaginationResponse<HtmlPage> list(@RequestBody HtmlPageListRequest req){
         return htmlPageMntService.list(req);
     }
 
     @GetMapping("get")
     @RequiredSign(scope = SignScope.REQUEST)
-    @OperateLog(type="获取html页面内容", apiName = "page/get")
+    //@OperateLog(type="获取html页面内容", apiName = "page/get")
     @RequiresPermissions("page:query")
     public HtmlPage get(@RequestParam(name = "id") Long id){
         return htmlPageMntService.getPageContent(id);
@@ -77,6 +77,14 @@ public class HtmlPageController {
     @RequiresPermissions("page:update")
     public void deploy(@RequestParam(name = "id") Long id){
         htmlPageMntService.deployPage(id);
+    }
+
+    @PostMapping("top")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="置顶html页面", apiName = "page/top")
+    @RequiresPermissions("page:update")
+    public void top(@RequestParam(name = "id") Long id){
+        htmlPageMntService.topPage(id);
     }
 
 }

@@ -1,5 +1,8 @@
 package com.pddon.framework.easyapi;
 
+import com.pddon.framework.easyapi.controller.response.PaginationResponse;
+import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 
@@ -30,4 +33,12 @@ public interface DictService {
     List<DictItem> getTenantDictsByUserId(String userId, String groupId);
 
     List<DictGroup> getByParentDictGroupId(String parentId);
+
+    boolean existsGroupId(String groupId);
+
+    DictGroup getByGroupId(String groupId);
+
+    PaginationResponse<DictItem> list(DictListRequest req);
+
+    PaginationResponse<DictGroup> listGroup(DictGroupListRequest req);
 }

@@ -34,7 +34,6 @@ public class AddHtmlPageRequest implements Serializable {
      * 页面访问路径，相对于服务器静态资源部署的根路径地址
      * @author pddon.com
      */
-    @NotEmpty
     private String urlPath;
     /**
      * 页面标题

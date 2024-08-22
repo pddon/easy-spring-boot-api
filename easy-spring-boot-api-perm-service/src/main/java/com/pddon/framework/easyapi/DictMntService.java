@@ -23,15 +23,11 @@ public interface DictMntService extends DictService{
 
     void remove(IdsRequest req);
 
-    PaginationResponse<DictItem> list(DictListRequest req);
-
     IdResponse addGroup(AddDictGroupRequest req);
 
     void updateGroup(UpdateDictGroupRequest req);
 
     void removeGroup(IdsRequest req);
-
-    PaginationResponse<DictGroup> listGroup(DictGroupListRequest req);
 
     boolean saveOrUpdate(String tenantId, String appId, String dictId, String content);
 

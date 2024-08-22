@@ -2,8 +2,7 @@ package com.pddon.framework.easyapi.dao;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
-import com.pddon.framework.easyapi.dto.req.DictListRequest;
-import com.pddon.framework.easyapi.dto.resp.IdResponse;
+import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 
 import java.util.List;
 import java.util.Set;
@@ -29,8 +28,6 @@ public interface DictItemMntDao extends DictItemDao {
     boolean updateByItemId(DictItem item);
 
     boolean removeByIds(List<String> ids);
-
-    IPage<DictItem> pageQuery(DictListRequest req);
 
     boolean saveOrUpdateItem(DictItem dictItem);
 

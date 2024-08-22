@@ -73,7 +73,7 @@ public class UserMntServiceImpl implements UserMntService {
         Set<String> perms = userSecurityService.getUserPermissions(userId, true);
         BaseUser user = userSecurityService.queryByUserId(userId);
         if(user == null){
-            throw new BusinessException("账号未找到，修改失败!");
+            throw new BusinessException("账号未找到!");
         }
         if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
             //修改他人账号需要用户修改权限
@@ -200,7 +200,7 @@ public class UserMntServiceImpl implements UserMntService {
     public void updatePass(UpdateUserPassRequest req) {
         BaseUser user = baseUserDao.getBySessionId(RequestContext.getContext().getSessionId());
         if(user == null){
-            throw new BusinessException("账号未找到，修改失败!");
+            throw new BusinessException("账号未找到，修改密码失败!");
         }
         if(!EncryptUtils.encryptMD5Hex(req.getPassword()).equalsIgnoreCase(user.getPassword())){
             throw new BusinessException("原密码错误，修改失败！");
@@ -215,7 +215,7 @@ public class UserMntServiceImpl implements UserMntService {
     public void resetPass(Long id) {
         BaseUser user = baseUserDao.getByItemId(id);
         if(user == null){
-            throw new BusinessException("账号未找到，修改失败!");
+            throw new BusinessException("账号未找到，重置密码失败!");
         }
         baseUserDao.updateUserPass(id, EncryptUtils.encryptMD5Hex(EncryptUtils.encryptMD5Hex("88888888")));
     }
