@@ -40,7 +40,9 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
     @Override
     public DictItem getTenantDict(String tenantId, String appId, String dictId) {
         return this.lambdaQuery().eq(DictItem::getDictId, dictId)
-                .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
+                .and(StringUtils.isNotEmpty(tenantId), query -> {
+                    return query.eq(DictItem::getTenantId, tenantId).or().isNull(DictItem::getTenantId);
+                })
                 .isNull(StringUtils.isEmpty(tenantId), DictItem::getTenantId)
                 .eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId)
                 .isNull(StringUtils.isEmpty(appId), DictItem::getAppId)
@@ -51,7 +53,9 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
     @Override
     public DictItem getTenantDefaultDict(String tenantId, String dictId) {
         return this.lambdaQuery().eq(DictItem::getDictId, dictId)
-                .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
+                .and(StringUtils.isNotEmpty(tenantId), query -> {
+                    return query.eq(DictItem::getTenantId, tenantId).or().isNull(DictItem::getTenantId);
+                })
                 .isNull(DictItem::getAppId)
                 .isNull(DictItem::getUserId)
                 .one();
@@ -78,7 +82,9 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
     public List<DictItem> getTenantDictsByGroupId(String tenantId, String appId, String groupId) {
         return this.lambdaQuery().eq(DictItem::getGroupId, groupId)
                 .eq(StringUtils.isNotEmpty(appId), DictItem::getAppId, appId)
-                .eq(StringUtils.isNotEmpty(tenantId), DictItem::getTenantId, tenantId)
+                .and(StringUtils.isNotEmpty(tenantId), query -> {
+                    return query.eq(DictItem::getTenantId, tenantId).or().isNull(DictItem::getTenantId);
+                })
                 .isNull(DictItem::getUserId)
                 .list();
     }
@@ -113,7 +119,9 @@ public class DictItemDaoImpl extends ServiceImpl<DictItemMapper, DictItem> imple
                 .eq(StringUtils.isNotEmpty(req.getDictId()), DictItem::getDictId, req.getDictId())
                 .eq(StringUtils.isNotEmpty(req.getGroupId()), DictItem::getGroupId, req.getGroupId())
                 .eq(StringUtils.isNotEmpty(req.getDictAppId()), DictItem::getAppId, req.getDictAppId())
-                .eq(StringUtils.isNotEmpty(req.getTenantId()), DictItem::getTenantId, req.getTenantId())
+                .and(StringUtils.isNotEmpty(req.getTenantId()), query -> {
+                    return query.eq(DictItem::getTenantId, req.getTenantId()).or().isNull(DictItem::getTenantId);
+                })
                 .eq(StringUtils.isNotEmpty(req.getDictUserId()), DictItem::getUserId, req.getDictUserId())
                 .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
                     return query.like(DictItem::getDictId, req.getKeyword()).or()

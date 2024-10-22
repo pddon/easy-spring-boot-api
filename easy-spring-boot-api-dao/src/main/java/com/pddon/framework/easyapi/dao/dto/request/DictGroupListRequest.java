@@ -4,6 +4,8 @@ import com.pddon.framework.easyapi.controller.request.PaginationRequest;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @ClassName: DictGroupListRequest
  * @Description:
@@ -15,6 +17,7 @@ import lombok.experimental.Accessors;
 @Accessors(chain = true)
 public class DictGroupListRequest extends PaginationRequest {
 
+    private String tenantId;
     private String groupId;
     /**
      * 父分组Id

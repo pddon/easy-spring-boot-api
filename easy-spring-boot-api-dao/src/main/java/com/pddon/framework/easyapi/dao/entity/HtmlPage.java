@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 @TableName("html_page")
-public class HtmlPage extends BaseEntity{
+public class HtmlPage extends BaseTenantEntity{
     /**
      * 记录ID
      * @author pddon.com

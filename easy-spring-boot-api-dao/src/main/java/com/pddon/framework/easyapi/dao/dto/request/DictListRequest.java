@@ -4,6 +4,8 @@ import com.pddon.framework.easyapi.controller.request.PaginationRequest;
 import lombok.Data;
 import lombok.experimental.Accessors;
 
+import javax.validation.constraints.NotEmpty;
+
 /**
  * @ClassName: DictListRequest
  * @Description:

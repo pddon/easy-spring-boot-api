@@ -5,6 +5,7 @@ import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.dto.request.DictGroupListRequest;
@@ -124,6 +125,9 @@ public class DictMntController {
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
     public PaginationResponse<DictGroup> listGroup(@RequestBody DictGroupListRequest req){
+        if(!RequestContext.getContext().getSession().isSuperManager()){
+            req.setTenantId(RequestContext.getContext().getSession().getChannelId());
+        }
         return dictMntService.listGroup(req);
     }
 }

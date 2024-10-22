@@ -73,6 +73,7 @@ public class HtmlPageMntDaoImpl extends HtmlPageDaoImpl implements HtmlPageMntDa
                 .eq(StringUtils.isNotEmpty(req.getResourceId()), HtmlPage::getResourceId, req.getResourceId())
                 .eq(StringUtils.isNotEmpty(req.getUrlPath()), HtmlPage::getUrlPath, req.getUrlPath())
                 .eq(StringUtils.isNotEmpty(req.getPageStatus()), HtmlPage::getPageStatus, req.getPageStatus())
+                .eq(StringUtils.isNotEmpty(req.getTenantId()), HtmlPage::getTenantId, req.getTenantId())
                 .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
                     return query.like(HtmlPage::getPageBusinessId, req.getKeyword()).or()
                             .like(HtmlPage::getResourceId, req.getKeyword()).or()

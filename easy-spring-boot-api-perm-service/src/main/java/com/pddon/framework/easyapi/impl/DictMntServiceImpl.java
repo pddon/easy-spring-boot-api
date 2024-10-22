@@ -44,7 +44,6 @@ import java.util.stream.Collectors;
 @Service
 @Primary
 @Slf4j
-@IgnoreTenant
 public class DictMntServiceImpl extends DictServiceImpl implements DictMntService {
 
     @Autowired

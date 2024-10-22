@@ -2,10 +2,12 @@ package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.DictService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
+import com.pddon.framework.easyapi.annotation.RequiredParam;
 import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.consts.CacheExpireMode;
 import com.pddon.framework.easyapi.consts.SignScope;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.response.ItemResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
@@ -14,6 +16,7 @@ import com.pddon.framework.easyapi.dao.dto.request.DictListRequest;
 import com.pddon.framework.easyapi.dao.entity.DictGroup;
 import com.pddon.framework.easyapi.dao.entity.DictItem;
 import com.pddon.framework.easyapi.properties.EasyApiConfig;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.web.bind.annotation.*;
@@ -29,7 +32,6 @@ import java.util.List;
  */
 @RestController
 @RequestMapping("public/res")
-@IgnoreTenant
 public class PublicResController {
 
     @Autowired
@@ -49,8 +51,12 @@ public class PublicResController {
 
     @PostMapping("listDict")
     @RequiredSign(scope = SignScope.REQUEST)
+    @IgnoreTenant
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public PaginationResponse<DictItem> listDict(@RequestBody DictListRequest req){
+        if(StringUtils.isEmpty(req.getTenantId())){
+            req.setTenantId(RequestContext.getContext().getChannelId());
+        }
         return dictService.list(req);
     }
 
@@ -58,13 +64,20 @@ public class PublicResController {
     @RequiredSign(scope = SignScope.REQUEST)
     @CacheMethodResult(expireSeconds = 180)
     public List<DictItem> getByGroup(@RequestParam(value = "tenantId", required = false) String tenantId, @RequestParam(value = "dictAppId", required = false) String dictAppId, @RequestParam("groupId") String groupId){
+        if(StringUtils.isEmpty(tenantId)){
+            tenantId = RequestContext.getContext().getChannelId();
+        }
         return dictService.getTenantDictsByGroupId(tenantId, dictAppId, groupId);
     }
 
     @PostMapping("listGroup")
     @RequiredSign(scope = SignScope.REQUEST)
+    @IgnoreTenant
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public PaginationResponse<DictGroup> listGroup(@RequestBody DictGroupListRequest req){
+        if(StringUtils.isEmpty(req.getTenantId())){
+            req.setTenantId(RequestContext.getContext().getChannelId());
+        }
         return dictService.listGroup(req);
     }
 }

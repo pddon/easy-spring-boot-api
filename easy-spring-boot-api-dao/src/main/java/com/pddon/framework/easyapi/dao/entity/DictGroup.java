@@ -17,7 +17,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 @TableName("dict_group")
-public class DictGroup extends BaseEntity{
+public class DictGroup extends BaseTenantEntity{
     /**
      * 记录ID
      * @author pddon.com

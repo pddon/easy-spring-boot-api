@@ -54,6 +54,9 @@ public class DictGroupDaoImpl extends ServiceImpl<DictGroupMapper, DictGroup> im
         Wrapper<DictGroup> wrapper = new LambdaQueryWrapper<DictGroup>()
                 .eq(StringUtils.isNotEmpty(req.getGroupId()), DictGroup::getGroupId, req.getGroupId())
                 .eq(StringUtils.isNotEmpty(req.getParentGroupId()), DictGroup::getParentGroupId, req.getParentGroupId())
+                .and(StringUtils.isNotEmpty(req.getTenantId()), query -> {
+                    return query.eq(DictGroup::getTenantId, req.getTenantId()).or().isNull(DictGroup::getTenantId);
+                })
                 .and(StringUtils.isNotEmpty(req.getKeyword()), query -> {
                     return query.like(DictGroup::getGroupId, req.getKeyword()).or()
                             .like(DictGroup::getParentGroupId, req.getKeyword()).or()

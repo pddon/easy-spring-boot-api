@@ -50,7 +50,6 @@ public class StaticResourceController {
 
     //@GetMapping("{pagePath:[a-zA-Z0-9_/]+}.html")
     @GetMapping("**/*.html")
-    @IgnoreTenant
     @IgnoreSign
     //@CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public ResponseEntity<Resource> htmlPage(HttpServletRequest request, HttpServletResponse response){
@@ -86,8 +85,8 @@ public class StaticResourceController {
     }
 
     @GetMapping("download/{fileType}/{fileKey}.{suffix}")
-    @IgnoreTenant
     @IgnoreSign
+    @IgnoreTenant
     //@CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public ResponseEntity<Resource> getFile(@PathVariable("fileType") String fileType,
                                             @PathVariable("fileKey") String fileKey,
@@ -119,7 +118,6 @@ public class StaticResourceController {
 
     @GetMapping("getPagesByScene")
     @RequiredSign(scope = SignScope.REQUEST)
-    @IgnoreTenant
     @ResponseBody
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public List<HtmlPageDto> getPagesByScene(@RequestParam(name = "sceneId") String sceneId,
@@ -129,7 +127,6 @@ public class StaticResourceController {
 
     @PostMapping("getPagesByScenePage")
     @RequiredSign(scope = SignScope.REQUEST)
-    @IgnoreTenant
     @ResponseBody
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public PaginationResponse<HtmlPageDto> getPagesByScenePage(@RequestBody HtmlPageListRequest req){
@@ -138,7 +135,6 @@ public class StaticResourceController {
 
     @GetMapping("getPageByResId")
     @RequiredSign(scope = SignScope.REQUEST)
-    @IgnoreTenant
     @ResponseBody
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public HtmlPageContentDto getPageByResId(@RequestParam(name = "sceneId") String sceneId,
@@ -148,7 +144,6 @@ public class StaticResourceController {
 
     @GetMapping("searchPage")
     @RequiredSign(scope = SignScope.REQUEST)
-    @IgnoreTenant
     @ResponseBody
     public List<HtmlPageDto> searchPage(@RequestParam(name = "keyword", required = true) String keyword,
                                         @RequestParam(name = "sceneId", required = false) String sceneId){
@@ -156,7 +151,6 @@ public class StaticResourceController {
     }
     @GetMapping("getPageById")
     @RequiredSign(scope = SignScope.REQUEST)
-    @IgnoreTenant
     @ResponseBody
     @CacheMethodResult(expireSeconds = 180, expireMode = CacheExpireMode.EXPIRE_AFTER_WRITE)
     public HtmlPageDetailDto getPageById(@RequestParam(name = "id", required = true) Long id){

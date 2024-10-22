@@ -18,6 +18,8 @@ import javax.validation.constraints.NotEmpty;
 @Accessors(chain = true)
 public class HtmlPageListRequest extends PaginationRequest {
 
+    private String tenantId;
+
     /**
      * 页面所属业务场景，字典分组pageBusinessId下的子分组列表，可以通过子字典分组新增业务应用场景
      * @author pddon.com

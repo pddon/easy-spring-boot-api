@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 @TableName("file_item")
-public class FileItem extends BaseHardEntity{
+public class FileItem extends BaseHardTenantEntity{
     /**
      * 记录ID
      * @author pddon.com

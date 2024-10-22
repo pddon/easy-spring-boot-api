@@ -10,7 +10,7 @@ import com.pddon.framework.easyapi.dao.entity.FileItem;
  * @Addr: https://pddon.cn
  */
 public interface FileItemService {
-    FileItem saveFileData(String filename, String contentType, byte[] data);
+    FileItem saveFileData(String tenantId, String filename, String contentType, byte[] data);
 
     FileItem getByTypeKey(String fileType, String fileKey);
 

@@ -2,6 +2,7 @@ package com.pddon.framework.easyapi.controller;
 
 import com.pddon.framework.easyapi.FileItemService;
 import com.pddon.framework.easyapi.annotation.IgnoreSign;
+import com.pddon.framework.easyapi.annotation.RequiredParam;
 import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
@@ -38,11 +39,10 @@ public class FileController {
     private FileItemService fileItemService;
 
     @PostMapping("upload")
-    @IgnoreTenant
     @IgnoreSign
     @RequiredSession
     @ResponseBody
-    public FileUploadResult upload(@RequestPart("file") MultipartFile file) throws IOException {
+    public FileUploadResult upload(@RequestParam(value = "tenantId", required = false) String tenantId, @RequestPart("file") MultipartFile file) throws IOException {
         if (file.isEmpty()) {
             throw new BusinessException("文件为空，请选择一个文件上传!");
         }
@@ -55,7 +55,7 @@ public class FileController {
         byte[] data = file.getBytes();
         String contentType = file.getContentType();
 
-        FileItem item = fileItemService.saveFileData(filename, contentType, data);
+        FileItem item = fileItemService.saveFileData(tenantId, filename, contentType, data);
         FileUploadResult result = new FileUploadResult();
         result.setFileKey(item.getFileKey())
                 .setFilename(item.getFilename())
@@ -64,7 +64,6 @@ public class FileController {
     }
 
     @PostMapping("delete")
-    @IgnoreTenant
     @RequiredSign
     @RequiredSession
     @ResponseBody
