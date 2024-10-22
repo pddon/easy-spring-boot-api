@@ -115,7 +115,7 @@
 		<repository>
 			<id>Sonatype</id>
 			<name>Sonatype Repository</name>
-			<url>http://repository.sonatype.org/content/groups/public</url>
+			<url>https://repository.sonatype.org/content/groups/public</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
@@ -127,7 +127,7 @@
 		<repository>
 			<id>Central</id>
 			<name>Central Repository</name>
-			<url>http://repo1.maven.org/maven2</url>
+			<url>https://repo1.maven.org/maven2</url>
 			<layout>default</layout>
 			<releases>
 				<enabled>true</enabled>
