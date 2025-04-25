@@ -9,6 +9,7 @@
 package com.pddon.framework.easyapi.context;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -29,6 +30,8 @@ import lombok.experimental.Accessors;
 @Data
 @Accessors(chain=true)
 public class RequestContext {
+
+    private final static String DATA_PERMISSION = "DATA_PERMISSION";
 	 // *) 定义了ThreadLocal对象
     private static final ThreadLocal<RequestContext> LOCAL = new ThreadLocal<RequestContext>() {
         protected RequestContext initialValue() {
@@ -69,6 +72,10 @@ public class RequestContext {
      * 是否忽略多租户条件
      */
     private boolean ignoreTenant = false;
+    /**
+     * 是否忽略数据权限
+     */
+    private boolean ignoreDataPerm = false;
     /**
      * 是否已启用shiro会话
      */
@@ -235,5 +242,16 @@ public class RequestContext {
     	return responseSystemParams.get(key);
     }
 
+    public Map<String, Object> getDataPermissions(){
+        Object data = this.getObjectAttachment(DATA_PERMISSION);
+        if(data != null && data instanceof Map){
+            return (Map<String, Object>)data;
+        }
+        return Collections.emptyMap();
+    }
+
+    public void setDataPermissions(Map<String, Object> perms){
+        this.setObjectAttachment(DATA_PERMISSION, perms);
+    }
 	
 }
