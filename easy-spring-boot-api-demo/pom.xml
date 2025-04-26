@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.pddon.framework</groupId>
         <artifactId>easy-spring-boot-api-parent</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
     </parent>
 
     <artifactId>easy-spring-boot-api-demo</artifactId>
-    <version>2.0.6</version>
+    <version>2.0.7</version>
     <name>easy-spring-boot-api-demo</name>
     <url>https://pddon.cn</url>
     <description>easy-spring-boot-api是一款服务器API开发神器，基于springboot，可以做到零配置零代码即可集成所有api开发需要基础能力。，集成该项目后，不用自己再去处理api安全、加签、验签、加解密、数据脱敏、异常处理、国际化、接口文档、错误码、缓存、分布式锁、应用、渠道管理等等功能。 还提供了java和typescript版本的项目，极大简化了web或者其他客户端应用接入api服务的流程。</description>

@@ -6,6 +6,14 @@ import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.annotation.RequireDataPermission;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import lombok.extern.slf4j.Slf4j;
+import net.sf.jsqlparser.expression.Expression;
+import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
+import net.sf.jsqlparser.parser.CCJSqlParser;
+import net.sf.jsqlparser.parser.CCJSqlParserUtil;
+import net.sf.jsqlparser.statement.Statement;
+import net.sf.jsqlparser.statement.select.PlainSelect;
+import net.sf.jsqlparser.statement.select.Select;
+import net.sf.jsqlparser.statement.select.SelectBody;
 import org.apache.ibatis.executor.statement.StatementHandler;
 import org.apache.ibatis.mapping.BoundSql;
 import org.apache.ibatis.mapping.MappedStatement;
@@ -44,63 +52,86 @@ public class DataPermissionInterceptor extends SqlExplainInterceptor implements 
         BoundSql boundSql = (BoundSql) metaObject.getValue("delegate.boundSql");
         StringBuilder filterSql = new StringBuilder(boundSql.getSql());
 
-        RequireDataPermission requireDataPermission = invocation.getMethod().getAnnotation(RequireDataPermission.class);
         if (RequestContext.getContext().isSuperManager()
                 || RequestContext.getContext().isIgnoreDataPerm()
-                || requireDataPermission == null
-                || !requireDataPermission.value()
+                || !RequestContext.getContext().getDataPermissionsEnable()
                 ) {
             return invocation.proceed();
         } else {
             //拼接数据权限校验sql
-            // TODO:
-            Map<String, Object> dataPerms = RequestContext.getContext().getDataPermissions();
-            String[] tableFields = requireDataPermission.tableFields();
-            String[] tableFieldAlias = requireDataPermission.tableFieldAlias();
-            for(int i=0; i < tableFields.length; i++){
-                if(dataPerms.containsKey(tableFields[i])){
-                    if(filterSql.indexOf(" where ") < 0){
-                        filterSql.append("where 1=1 ");
+            Statement statement = CCJSqlParserUtil.parse(filterSql.toString());
+            if (statement instanceof Select) {
+                Select selectStatement = (Select) statement;
+                SelectBody selectBody = selectStatement.getSelectBody();
+                if (selectBody instanceof PlainSelect) {
+                    PlainSelect plainSelect = (PlainSelect) selectBody;
+                    Expression oldWhere = plainSelect.getWhere();
+                    String permSQL = composeDataPermSQL();
+                    Expression permExpression = CCJSqlParserUtil.parseCondExpression(permSQL);
+
+                    Expression where = permExpression;
+                    if(oldWhere != null){
+                        where = new AndExpression(oldWhere, permExpression);
                     }
-                    Object permValue = dataPerms.get(tableFields[i]);
-                    if(permValue == null){
-                        //该用户没有此数据权限，直接让条件不成立，返回空查询结果
-                        filterSql.append(" and 1=2 ");
-                        continue;
-                    }
-                    if(BeanPropertyUtil.isBaseType(permValue)){
-                        if(permValue instanceof String){
-                            filterSql.append(" and " + tableFieldAlias[i] + "='" + permValue + "' ");
-                        }else{
-                            filterSql.append(" and " + tableFieldAlias[i] + "=" + permValue + " ");
-                        }
-                    }else if (permValue.getClass().isArray()){
-                        Object[] values = (Object[])permValue;
-                        if(values.length == 0){
-                            //该用户没有此数据权限，直接让条件不成立，返回空查询结果
-                            filterSql.append(" and 1=2 ");
-                            continue;
-                        }
-                        filterSql.append(" and " + tableFieldAlias[i] + " in (");
-                        for(int j=0; j < values.length; j++){
-                            if(j > 0){
-                                filterSql.append(",");
-                            }
-                            if(values[j] instanceof String){
-                                filterSql.append("'" + values[j] + "'");
-                            }else{
-                                filterSql.append(values[j]);
-                            }
-                        }
-                        filterSql.append(") ");
-                    }
+                    // 修改 WHERE 条件
+                    plainSelect.setWhere(where);
+                    metaObject.setValue("delegate.boundSql.sql", plainSelect.toString());
                 }
             }
-            metaObject.setValue("delegate.boundSql.sql", filterSql.toString());
+            
+
             return invocation.proceed();
         }
     }
 
+    public String composeDataPermSQL() {
+        StringBuffer filterSql = new StringBuffer();
+        Map<String, Object> dataPerms = RequestContext.getContext().getDataPermissions();
+        String[] tableFields = RequestContext.getContext().getDataPermissionsInfo().get("tableFields");
+        String[] tableFieldAlias = RequestContext.getContext().getDataPermissionsInfo().get("tableFieldAlias");
+        for(int i=0; i < tableFields.length; i++){
+            if(dataPerms.containsKey(tableFields[i])){
+
+                Object permValue = dataPerms.get(tableFields[i]);
+                if(permValue == null){
+                    //该用户没有此数据权限，直接让条件不成立，返回空查询结果
+                    filterSql.append(" AND 1=2 ");
+                    continue;
+                }
+                if(BeanPropertyUtil.isBaseType(permValue)){
+                    if(permValue instanceof String){
+                        filterSql.append(" AND " + tableFieldAlias[i] + "='" + permValue + "' ");
+                    }else{
+                        filterSql.append(" AND " + tableFieldAlias[i] + "=" + permValue + " ");
+                    }
+                }else if (permValue.getClass().isArray()){
+                    Object[] values = (Object[])permValue;
+                    if(values.length == 0){
+                        //该用户没有此数据权限，直接让条件不成立，返回空查询结果
+                        filterSql.append(" AND 1=2 ");
+                        continue;
+                    }
+                    filterSql.append(" AND " + tableFieldAlias[i] + " in (");
+                    for(int j=0; j < values.length; j++){
+                        if(j > 0){
+                            filterSql.append(",");
+                        }
+                        if(values[j] instanceof String){
+                            filterSql.append("'" + values[j] + "'");
+                        }else{
+                            filterSql.append(values[j]);
+                        }
+                    }
+                    filterSql.append(") ");
+                }
+            }
+        }
+        if(filterSql.indexOf(" AND") == 0){
+            return filterSql.substring(4);
+        }
+        return filterSql.toString();
+    }
+    
     /**
      * 生成拦截对象的代理
      *

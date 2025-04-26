@@ -18,6 +18,7 @@ import com.baomidou.mybatisplus.extension.plugins.PaginationInterceptor;
 import com.baomidou.mybatisplus.extension.plugins.tenant.TenantHandler;
 import com.baomidou.mybatisplus.extension.plugins.tenant.TenantSqlParser;
 import com.pddon.framework.easyapi.context.RequestContext;
+import com.pddon.framework.easyapi.dao.interceptor.DataPermissionInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.InsertCommentInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.RenameCacheKeyInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.UpdateCommentInterceptor;
@@ -69,6 +70,12 @@ public class MybatisPlusConfig {
 		paginationInterceptor.setSqlParserList(sqlParserList);
         return paginationInterceptor;
     }
+
+	@Bean
+	public DataPermissionInterceptor dataPermissionInterceptor() {
+		log.info("Init DataPermissionInterceptor Plugin ...");
+		return new DataPermissionInterceptor();
+	}
     /**
      * 乐观锁插件
      * @return

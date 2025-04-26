@@ -6,11 +6,11 @@
     <parent>
         <groupId>com.pddon.framework</groupId>
         <artifactId>easy-spring-boot-api-parent</artifactId>
-        <version>2.0.6</version>
+        <version>2.0.7</version>
     </parent>
 
     <artifactId>easy-spring-boot-api-client</artifactId>
-    <version>2.0.6</version>
+    <version>2.0.7</version>
     <name>easy-spring-boot-api-client</name>
     <description>easy-spring-boot-api-client是easy-spring-boot-api开源api框架的java客户端，可以极大简化您的客户端API调用流程。</description>
     <url>https://pddon.cn</url>

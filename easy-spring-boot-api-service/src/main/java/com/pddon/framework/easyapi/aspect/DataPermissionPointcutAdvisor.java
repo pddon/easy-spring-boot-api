@@ -1,6 +1,6 @@
-/**  
- * Title OperateLogPointcutAdvisor.java
- * Description  
+/**
+ * Title DataPermissionPointcutAdvisor.java
+ * Description
  * @author danyuan
  * @date Dec 17, 2020
  * @version 1.0.0
@@ -8,7 +8,7 @@
  */
 package com.pddon.framework.easyapi.aspect;
 
-import com.pddon.framework.easyapi.annotations.OperateLog;
+import com.pddon.framework.easyapi.dao.annotation.RequireDataPermission;
 import org.springframework.aop.support.StaticMethodMatcherPointcutAdvisor;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,12 +20,12 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 @Component
-public class OperateLogPointcutAdvisor extends
+public class DataPermissionPointcutAdvisor extends
 StaticMethodMatcherPointcutAdvisor implements InitializingBean {
 	
 	@Autowired
 	@Lazy
-	private DataPermissionInterceptorManager operateLogInterceptorManager;
+	private DataPermissionInterceptorManager dataPermissionInterceptorManager;
 	
 	/** 
 	 *serialVersionUID
@@ -41,11 +41,11 @@ StaticMethodMatcherPointcutAdvisor implements InitializingBean {
 	@Override
 	public boolean matches(Method method, Class<?> targetClass) {
 
-		Annotation a = AnnotationUtils.findAnnotation(method, OperateLog.class);
+		Annotation a = AnnotationUtils.findAnnotation(method, RequireDataPermission.class);
 		if (a != null) {
 			return true;
 		}
-		if(null != AnnotationUtils.findAnnotation(targetClass, OperateLog.class)){
+		if(null != AnnotationUtils.findAnnotation(targetClass, RequireDataPermission.class)){
 			return true;
 		}
 		return false;
@@ -57,8 +57,8 @@ StaticMethodMatcherPointcutAdvisor implements InitializingBean {
 	 */
 	@Override
 	public void afterPropertiesSet() throws Exception {
-		this.setAdvice(operateLogInterceptorManager);
-		this.setOrder(LOWEST_PRECEDENCE);
+		this.setAdvice(dataPermissionInterceptorManager);
+		this.setOrder(HIGHEST_PRECEDENCE);
 	}
 
 }

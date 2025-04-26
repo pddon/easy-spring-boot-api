@@ -32,6 +32,11 @@ import lombok.experimental.Accessors;
 public class RequestContext {
 
     private final static String DATA_PERMISSION = "DATA_PERMISSION";
+
+    private final static String DATA_PERMISSION_ENABLE = "DATA_PERMISSION_ENABLE";
+
+    private final static String DATA_PERMISSION_INFO = "DATA_PERMISSION_INFO";
+
 	 // *) 定义了ThreadLocal对象
     private static final ThreadLocal<RequestContext> LOCAL = new ThreadLocal<RequestContext>() {
         protected RequestContext initialValue() {
@@ -252,6 +257,33 @@ public class RequestContext {
 
     public void setDataPermissions(Map<String, Object> perms){
         this.setObjectAttachment(DATA_PERMISSION, perms);
+    }
+
+    public Map<String, String[]> getDataPermissionsInfo(){
+        Object data = this.getObjectAttachment(DATA_PERMISSION_INFO);
+        if(data != null && data instanceof Map){
+            return (Map<String, String[]>)data;
+        }
+        return Collections.emptyMap();
+    }
+
+    public void setDataPermissionsInfo(String[] tableFields, String[] tableFieldAlias){
+        Map<String, String[]> info = new HashMap<>();
+        info.put("tableFieldAlias", tableFieldAlias);
+        info.put("tableFields", tableFields);
+        this.setObjectAttachment(DATA_PERMISSION_INFO, info);
+    }
+
+    public Boolean getDataPermissionsEnable(){
+        Object data = this.getObjectAttachment(DATA_PERMISSION_ENABLE);
+        if(data != null && data instanceof Boolean){
+            return (Boolean)data;
+        }
+        return false;
+    }
+
+    public void setDataPermissionsEnable(Boolean enable){
+        this.setObjectAttachment(DATA_PERMISSION_ENABLE, enable);
     }
 	
 }

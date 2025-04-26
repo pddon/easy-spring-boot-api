@@ -1,0 +1,55 @@
+/**  
+* Title DataPermissionInterceptorManager.java
+* Description  
+* @author Allen
+* @date Dec 17, 2023
+* @version 1.0.0
+* site: pddon.cn
+*/ 
+package com.pddon.framework.easyapi.aspect;
+
+import com.pddon.framework.easyapi.context.RequestContext;
+import com.pddon.framework.easyapi.dao.annotation.RequireDataPermission;
+import lombok.extern.slf4j.Slf4j;
+import org.aopalliance.intercept.MethodInterceptor;
+import org.aopalliance.intercept.MethodInvocation;
+import org.springframework.core.annotation.AnnotationUtils;
+import org.springframework.stereotype.Component;
+
+import java.lang.reflect.Method;
+import java.util.Date;
+
+
+@Component
+@Slf4j
+public class DataPermissionInterceptorManager implements MethodInterceptor {
+	
+	/**
+	 * @param invocation
+	 * @return
+	 * @throws Throwable
+	 * @author danyuan
+	 */
+	@Override
+	public Object invoke(MethodInvocation invocation) throws Throwable {
+		if(log.isTraceEnabled()){
+			log.trace("进入数据权限拦截处理器切面!");
+		}
+		Object response = null;
+		Class<?> targetClass = invocation.getThis().getClass();
+		Method method = invocation.getMethod();
+		RequireDataPermission requireDataPermission = AnnotationUtils.findAnnotation(targetClass, RequireDataPermission.class);
+		if(requireDataPermission == null){
+			requireDataPermission = AnnotationUtils.findAnnotation(method, RequireDataPermission.class);
+		}
+		if(requireDataPermission != null){
+			RequestContext.getContext().setDataPermissionsEnable(true);
+			RequestContext.getContext().setDataPermissionsInfo(requireDataPermission.tableFields(), requireDataPermission.tableFieldAlias());
+			//获取当前用户拥有的所有数据权限信息并设置到当前环境上下文
+			// TODO:
+
+		}
+		return invocation.proceed();
+	}
+
+}
