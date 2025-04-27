@@ -120,4 +120,9 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
     public void updateLastLoginTime(String userId) {
         this.lambdaUpdate().eq(BaseUser::getUserId, userId).set(BaseUser::getLastLoginTime, new Date()).update();
     }
+
+    @Override
+    public boolean updateDepartmentId(Long departmentId, List<String> userIds) {
+        return this.lambdaUpdate().set(BaseUser::getDepId, departmentId).in(BaseUser::getUserId, userIds).update();
+    }
 }

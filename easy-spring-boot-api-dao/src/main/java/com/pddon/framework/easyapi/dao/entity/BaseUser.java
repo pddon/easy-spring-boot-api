@@ -34,6 +34,12 @@ public class BaseUser extends BaseTenantEntity{
      private String userId;
 
     /**
+     * 用户所属部门ID
+     * @author pddon.com
+     */
+    private Long depId;
+
+    /**
      *
      * @author pddon.com
      */

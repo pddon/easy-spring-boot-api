@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.dao.dto.request.UserListRequest;
 import com.pddon.framework.easyapi.dao.entity.BaseUser;
 
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 import java.util.List;
 
@@ -40,4 +41,6 @@ public interface BaseUserDao<K extends BaseUser> {
     BaseUser getByEmail(String email);
 
     void updateLastLoginTime(String userId);
+
+    boolean updateDepartmentId(@NotNull Long departmentId, @NotNull List<String> userIds);
 }
