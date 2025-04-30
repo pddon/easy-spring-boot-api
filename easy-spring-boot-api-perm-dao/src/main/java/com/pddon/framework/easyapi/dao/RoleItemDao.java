@@ -17,6 +17,8 @@ import java.util.Set;
 public interface RoleItemDao {
     boolean exists(String roleId);
 
+    boolean exists(List<String> roleIds);
+
     boolean saveRole(RoleItem role);
 
     RoleItem getByItemId(Long id);

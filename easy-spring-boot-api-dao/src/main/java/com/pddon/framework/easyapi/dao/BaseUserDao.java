@@ -24,6 +24,8 @@ public interface BaseUserDao<K extends BaseUser> {
 
     boolean existUserId(String userId);
 
+    boolean exists(@NotNull List<String> userIds);
+
     boolean saveUser(BaseUser user);
 
     IPage<K> pageQuery(UserListRequest req);

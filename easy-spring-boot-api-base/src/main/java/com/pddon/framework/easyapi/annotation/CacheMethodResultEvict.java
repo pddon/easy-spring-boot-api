@@ -44,7 +44,7 @@ public @interface CacheMethodResultEvict {
 	 * 自动生成的key前缀的格式： 类名:方法名
 	 * @author danyuan
 	 */
-	String prefix() default "";
+	String[] prefix() default {};
 	/**
 	 * 缓存失效时长
 	 * @author danyuan

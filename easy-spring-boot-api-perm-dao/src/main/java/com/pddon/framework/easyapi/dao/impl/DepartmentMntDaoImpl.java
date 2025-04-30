@@ -62,7 +62,7 @@ public class DepartmentMntDaoImpl extends ServiceImpl<DepartmentMapper, Departme
             req.setOrderBy("crtTime");
         }
         if(req.getIsAsc() == null){
-            //默认降序排列
+            //默认升序排列
             req.setIsAsc(true);
         }
         Wrapper<Department> wrapper = new LambdaQueryWrapper<Department>()

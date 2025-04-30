@@ -99,6 +99,10 @@ public class DataPermissionInterceptor extends SqlExplainInterceptor implements 
                     continue;
                 }
                 if(BeanPropertyUtil.isBaseType(permValue)){
+                    if(permValue.equals("*")){
+                        //拥有该类型所有数据权限，直接不添加该筛选条件
+                        continue;
+                    }
                     if(permValue instanceof String){
                         filterSql.append(" AND " + tableFieldAlias[i] + "='" + permValue + "' ");
                     }else{
@@ -109,6 +113,9 @@ public class DataPermissionInterceptor extends SqlExplainInterceptor implements 
                     if(values.length == 0){
                         //该用户没有此数据权限，直接让条件不成立，返回空查询结果
                         filterSql.append(" AND 1=2 ");
+                        continue;
+                    }else if(values.length == 1 && values[0].equals("*")){
+                        //拥有该类型所有数据权限，直接不添加该筛选条件
                         continue;
                     }
                     filterSql.append(" AND " + tableFieldAlias[i] + " in (");

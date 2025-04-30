@@ -11,6 +11,7 @@ package com.pddon.framework.easyapi.context;
 import java.lang.reflect.Method;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
@@ -255,7 +256,7 @@ public class RequestContext {
         return Collections.emptyMap();
     }
 
-    public void setDataPermissions(Map<String, Object> perms){
+    public void setDataPermissions(Map<String, Object[]> perms){
         this.setObjectAttachment(DATA_PERMISSION, perms);
     }
 

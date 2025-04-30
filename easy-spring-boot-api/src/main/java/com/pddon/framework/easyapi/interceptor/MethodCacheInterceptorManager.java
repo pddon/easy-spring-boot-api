@@ -10,6 +10,7 @@ package com.pddon.framework.easyapi.interceptor;
 
 import java.lang.reflect.Method;
 import java.lang.reflect.Proxy;
+import java.util.Arrays;
 
 import com.pddon.framework.easyapi.properties.EasyApiConfig;
 import lombok.extern.slf4j.Slf4j;
@@ -66,10 +67,11 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 		if(log.isTraceEnabled()){
 			log.trace("进入方法缓存处理器切面!");
 		}
-		Class<?> targetClass = invocation.getThis().getClass();
+		Class<?> tClass = invocation.getThis().getClass();
 		try{
-			targetClass = AopProxyUtils.ultimateTargetClass(invocation.getThis());
+			tClass = AopProxyUtils.ultimateTargetClass(invocation.getThis());
 		}catch (Exception e){}
+		final Class<?> targetClass = tClass;
 		Object response = null;
 		Object [] args=invocation.getArguments();		
 		Method method = invocation.getMethod();
@@ -121,18 +123,23 @@ public class MethodCacheInterceptorManager implements MethodInterceptor {
 		}else if(cacheMethodResultEvict != null){
 			//先执行业务流程
 			response = invocation.proceed();
-			//执行成功后删除前一次的缓存结果
-			cacheManager = SpringBeanUtil.getBean(cacheMethodResultEvict.cacheManager());
-			if(cacheManager == null){
-				throw new BusinessException(ErrorCodes.NOT_FOUND_CONFIG).setParam(cacheMethodResultEvict.cacheManager().toString());
-			}
-			//获取缓存key
-			String cacheKey = methodCacheManager.getCacheKey(cacheMethodResultEvict.prefix(), cacheMethodResultEvict.keyMode(), cacheMethodResultEvict.id(), parameters, args, targetClass, method);
-			if(StringUtils.isNotEmpty(cacheKey)){
-				if(log.isTraceEnabled()){
-					log.trace("检查并清理缓存[{}]", cacheKey);
-				}
-				methodCacheManager.remove(cacheKey, cacheManager, cacheMethodResultEvict.expireSeconds(), cacheMethodResultEvict.expireMode());
+
+			if(cacheMethodResultEvict.prefix().length > 0){
+				Arrays.stream(cacheMethodResultEvict.prefix()).forEach(prefix -> {
+					//执行成功后删除前一次的缓存结果
+					CacheManager cm = SpringBeanUtil.getBean(cacheMethodResultEvict.cacheManager());
+					if(cm == null){
+						throw new BusinessException(ErrorCodes.NOT_FOUND_CONFIG).setParam(cacheMethodResultEvict.cacheManager().toString());
+					}
+					//获取缓存key
+					String cacheKey = methodCacheManager.getCacheKey(prefix, cacheMethodResultEvict.keyMode(), cacheMethodResultEvict.id(), parameters, args, targetClass, method);
+					if(StringUtils.isNotEmpty(cacheKey)){
+						if(log.isTraceEnabled()){
+							log.trace("检查并清理缓存[{}]", cacheKey);
+						}
+						methodCacheManager.remove(cacheKey, cm, cacheMethodResultEvict.expireSeconds(), cacheMethodResultEvict.expireMode());
+					}
+				});
 			}
 		}else{
 			log.warn("未找到缓存相关注解，请检查配置！");

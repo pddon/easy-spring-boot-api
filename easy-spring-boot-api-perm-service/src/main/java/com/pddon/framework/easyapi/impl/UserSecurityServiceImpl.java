@@ -144,7 +144,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         return perms;
     }
 
-    @CacheMethodResultEvict(prefix = "User:Perms", id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, expireSeconds = 3600)
+    @CacheMethodResultEvict(prefix = {"User:Perms", "User:DataPerms"}, id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, expireSeconds = 3600)
     @Override
     public void login(String currentUserId, String password, String loginType) {
         // 获取当前用户

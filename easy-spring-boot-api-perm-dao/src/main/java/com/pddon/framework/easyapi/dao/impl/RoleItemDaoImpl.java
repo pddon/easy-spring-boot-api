@@ -34,6 +34,11 @@ public class RoleItemDaoImpl extends ServiceImpl<RoleItemMapper, RoleItem> imple
     }
 
     @Override
+    public boolean exists(List<String> roleIds) {
+        return this.count(new LambdaQueryWrapper<RoleItem>().in(RoleItem::getRoleId, roleIds)) == roleIds.size();
+    }
+
+    @Override
     public boolean saveRole(RoleItem role) {
         return this.save(role);
     }

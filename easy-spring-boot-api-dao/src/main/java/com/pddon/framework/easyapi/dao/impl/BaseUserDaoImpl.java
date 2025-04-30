@@ -60,6 +60,11 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
     }
 
     @Override
+    public boolean exists(List<String> userIds) {
+        return this.count(new LambdaQueryWrapper<K>().in(BaseUser::getUserId, userIds)) == userIds.size();
+    }
+
+    @Override
     public boolean saveUser(BaseUser user) {
         K entity = newEntityInstance();
         BeanUtils.copyProperties(user, entity);
