@@ -72,10 +72,11 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
     }
 
     @Override
-    public IPage<K> pageQuery(UserListRequest req) {
+    public IPage<K> pageQuery(UserListRequest req, List<Long> depIds) {
         Page<K> page = new Page<>(req.getCurrent(), req.getSize());
         Wrapper<K> wrapper = new LambdaQueryWrapper<K>()
                 .eq(req.getTenantId() != null, BaseUser::getTenantId, req.getTenantId())
+                .in(!depIds.isEmpty(), BaseUser::getDepId, depIds)
                 .eq(req.getAccountStatus() != null, BaseUser::getAccountStatus, req.getAccountStatus())
                 .gt(req.getStartTime() != null, BaseUser::getCrtTime, req.getStartTime())
                 .lt(req.getEndTime() != null, BaseUser::getCrtTime, req.getEndTime())

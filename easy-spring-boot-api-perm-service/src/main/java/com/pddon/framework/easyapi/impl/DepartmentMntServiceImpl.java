@@ -2,7 +2,9 @@ package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.DepartmentMntService;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseUserDao;
 import com.pddon.framework.easyapi.dao.DepartmentMntDao;
@@ -15,11 +17,13 @@ import com.pddon.framework.easyapi.dto.req.DepartmentListRequest;
 import com.pddon.framework.easyapi.dto.req.UpdateDepartmentRequest;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Arrays;
 import java.util.List;
@@ -43,14 +47,21 @@ public class DepartmentMntServiceImpl implements DepartmentMntService {
     private BaseUserDao baseUserDao;
 
 
+    //@Transactional
     @Override
     public IdResponse add(AddDepartmentRequest req) {
         Department department = new Department();
         BeanUtils.copyProperties(req, department);
+        department.setOrderValue(System.currentTimeMillis());
+        department.setTenantId(RequestContext.getContext().getSession().getChannelId());
         departmentMntDao.saveItem(department);
+        /*if(StringUtils.isNotEmpty(department.getLeaderId())){
+            baseUserDao.updateDepartmentId(department.getId(), Arrays.asList(department.getLeaderId()));
+        }*/
         return new IdResponse(department.getId());
     }
 
+    //@Transactional
     @Override
     public void update(UpdateDepartmentRequest req) {
         Department department = departmentMntDao.getByItemId(req.getId());
@@ -59,6 +70,9 @@ public class DepartmentMntServiceImpl implements DepartmentMntService {
         }
         BeanUtils.copyProperties(req, department);
         departmentMntDao.updateByItemId(department);
+        /*if(StringUtils.isNotEmpty(department.getLeaderId())){
+            baseUserDao.updateDepartmentId(department.getId(), Arrays.asList(department.getLeaderId()));
+        }*/
     }
 
     @Override
@@ -79,7 +93,18 @@ public class DepartmentMntServiceImpl implements DepartmentMntService {
     }
 
     @Override
+    public void top(Integer id) {
+        departmentMntDao.top(id);
+    }
+
+    @Override
     public void addMember(AddDepartmentMemberRequest req) {
         baseUserDao.updateDepartmentId(req.getDepartmentId(), req.getUserIds());
+    }
+
+    @Override
+    public ListResponse<Department> listItems(String tenantId, Long parentId) {
+        List<Department> items = departmentMntDao.listItems(tenantId, parentId);
+        return new ListResponse<>(items);
     }
 }

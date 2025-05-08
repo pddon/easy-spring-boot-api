@@ -16,6 +16,7 @@ import java.io.Serializable;
 @Data
 @Accessors(chain = true)
 public class AddDepartmentRequest implements Serializable {
+
     /**
      * 组织机构下部门的名字
      * @author pddon.com

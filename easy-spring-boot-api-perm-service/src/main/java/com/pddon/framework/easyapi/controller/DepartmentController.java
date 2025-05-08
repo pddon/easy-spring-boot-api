@@ -5,7 +5,9 @@ import com.pddon.framework.easyapi.annotation.RequiredSession;
 import com.pddon.framework.easyapi.annotation.RequiredSign;
 import com.pddon.framework.easyapi.annotations.OperateLog;
 import com.pddon.framework.easyapi.consts.SignScope;
+import com.pddon.framework.easyapi.controller.request.IdRequest;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.entity.Department;
 import com.pddon.framework.easyapi.dto.req.AddDepartmentMemberRequest;
@@ -16,10 +18,7 @@ import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import io.swagger.annotations.Api;
 import org.apache.shiro.authz.annotation.RequiresPermissions;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 /**
  * @ClassName: DepartmentController
@@ -54,6 +53,14 @@ public class DepartmentController {
         departmentMntService.update(req);
     }
 
+    @PostMapping("top")
+    @RequiredSign(scope = SignScope.REQUEST)
+    @OperateLog(type="置顶部门", apiName = "department/top")
+    @RequiresPermissions("department:update")
+    public void top(@RequestBody IdRequest req){
+        departmentMntService.top(req.getId());
+    }
+
     @PostMapping("addMember")
     @RequiredSign(scope = SignScope.REQUEST)
     @OperateLog(type="添加部门成员", apiName = "department/addMember")
@@ -77,6 +84,14 @@ public class DepartmentController {
     @RequiredSession
     public PaginationResponse<Department> listDepartment(@RequestBody DepartmentListRequest req){
         return departmentMntService.list(req);
+    }
+
+    @GetMapping("listItems")
+    @RequiredSign(scope = SignScope.REQUEST)
+    //@RequiredSession
+    @RequiredSession
+    public ListResponse<Department> listItems(@RequestParam(value = "tenantId", required = false) String tenantId, @RequestParam(value = "parentId", required = false) Long parentId){
+        return departmentMntService.listItems(tenantId, parentId);
     }
 
 }

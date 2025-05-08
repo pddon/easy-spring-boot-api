@@ -24,6 +24,10 @@ public class UserListRequest extends PaginationRequest {
     private String tenantId;
     private String accountStatus;
     private UserKeyType type;
+    /**
+     * 部门ID
+     */
+    private Long depId;
     private String keyword;
     private Date startTime;
 

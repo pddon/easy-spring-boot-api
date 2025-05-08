@@ -70,6 +70,12 @@ public class Department extends BaseTenantEntity {
     private String typeName;
 
     /**
+     * 排序值
+     * @author pddon.com
+     */
+    private Long orderValue;
+
+    /**
      * 其他描述信息
      * @author pddon.com
      */

@@ -6,16 +6,10 @@ import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
-import com.pddon.framework.easyapi.dao.BaseUserDao;
-import com.pddon.framework.easyapi.dao.RoleItemDao;
-import com.pddon.framework.easyapi.dao.UserPermDao;
-import com.pddon.framework.easyapi.dao.UserRoleDao;
+import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserPassRequest;
-import com.pddon.framework.easyapi.dao.entity.BaseUser;
-import com.pddon.framework.easyapi.dao.entity.RoleItem;
-import com.pddon.framework.easyapi.dao.entity.UserPerm;
-import com.pddon.framework.easyapi.dao.entity.UserRole;
+import com.pddon.framework.easyapi.dao.entity.*;
 import com.pddon.framework.easyapi.dao.dto.request.UserListRequest;
 import com.pddon.framework.easyapi.dao.dto.request.AddUserRequest;
 import com.pddon.framework.easyapi.dao.dto.request.UpdateUserRequest;
@@ -32,10 +26,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -62,6 +53,9 @@ public class UserMntServiceImpl implements UserMntService {
 
     @Autowired
     private RoleItemDao roleItemDao;
+
+    @Autowired
+    private DepartmentMntDao departmentMntDao;
 
     @Override
     @IgnoreTenant
@@ -95,9 +89,26 @@ public class UserMntServiceImpl implements UserMntService {
         return userInfoDto;
     }
 
+    private List<Long> getAllSubDepartmentIds(Long depId){
+        if(depId == null){
+            return Collections.emptyList();
+        }
+        List<Department> departments = departmentMntDao.listItems(null, depId);
+        if(departments.isEmpty()){
+            return Arrays.asList(depId);
+        }
+        List<Long> depIds = new ArrayList<>();
+        depIds.add(depId);
+        departments.forEach(department -> {
+            depIds.addAll(getAllSubDepartmentIds(department.getId()));
+        });
+        return depIds;
+    }
     @Override
     public PaginationResponse<BaseUser> list(UserListRequest req) {
-        IPage<BaseUser> itemPage = baseUserDao.pageQuery(req);
+        //查询所有子部门
+        List<Long> depIds = getAllSubDepartmentIds(req.getDepId());
+        IPage<BaseUser> itemPage = baseUserDao.pageQuery(req, depIds);
         PaginationResponse<BaseUser> page = new PaginationResponse<>();
         page.setSize(itemPage.getSize())
                 .setCurrent(itemPage.getCurrent())

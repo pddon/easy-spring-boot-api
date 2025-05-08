@@ -23,4 +23,8 @@ public interface DepartmentMntDao {
     boolean removeByIds(List<String> ids);
 
     IPage<Department> pageQuery(DepartmentListRequest req);
+
+    List<Department> listItems(String tenantId, Long parentId);
+
+    boolean top(Integer id);
 }

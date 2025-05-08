@@ -1,6 +1,7 @@
 package com.pddon.framework.easyapi;
 
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.entity.Department;
 import com.pddon.framework.easyapi.dto.req.AddDepartmentMemberRequest;
@@ -26,4 +27,8 @@ public interface DepartmentMntService {
     PaginationResponse<Department> list(DepartmentListRequest req);
 
     void addMember(AddDepartmentMemberRequest req);
+
+    ListResponse<Department> listItems(String tenantId, Long parentId);
+
+    void top(Integer id);
 }

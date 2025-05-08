@@ -80,4 +80,18 @@ public class DepartmentMntDaoImpl extends ServiceImpl<DepartmentMapper, Departme
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? Department::getCrtTime : Department::getChgTime);
         return this.page(page, wrapper);
     }
+
+    @Override
+    public List<Department> listItems(String tenantId, Long parentId) {
+        return this.lambdaQuery().isNull(parentId == null, Department::getParentId)
+                .eq(parentId != null, Department::getParentId, parentId)
+                .eq(StringUtils.isNotEmpty(tenantId), Department::getTenantId, tenantId)
+                .orderByDesc(Department::getOrderValue).orderByAsc(Department::getCrtTime)
+                .list();
+    }
+
+    @Override
+    public boolean top(Integer id) {
+        return this.lambdaUpdate().set(Department::getOrderValue, System.currentTimeMillis()).eq(Department::getId, id).update();
+    }
 }
