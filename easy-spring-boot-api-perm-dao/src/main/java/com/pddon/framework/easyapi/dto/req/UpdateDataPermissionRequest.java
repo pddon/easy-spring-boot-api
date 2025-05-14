@@ -32,10 +32,40 @@ public class UpdateDataPermissionRequest implements Serializable {
     private String permName;
 
     /**
+     * 取值： FIELD字段查询； TABLE_FIELD 表字段查询
+     * @author pddon.com
+     */
+    private String queryType;
+
+    /**
+     * 查询表名
+     * @author pddon.com
+     */
+    private String queryTable;
+
+    /**
+     * 查询字段
+     * @author pddon.com
+     */
+    private String queryField;
+
+    /**
+     *
+     * @author pddon.com
+     */
+    private String realField;
+
+    /**
+     * 需要转换到该权限进行限制
+     * @author pddon.com
+     */
+    private String realPermId;
+
+    /**
      * 是否禁用该权限
      * @author pddon.com
      */
-    private Boolean disable;
+    private Boolean disabled;
 
     /**
      *

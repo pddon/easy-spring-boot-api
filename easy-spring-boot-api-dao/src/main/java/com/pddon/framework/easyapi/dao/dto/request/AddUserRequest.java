@@ -22,6 +22,12 @@ import java.util.Set;
 public class AddUserRequest implements Serializable {
 
     private String tenantId;
+
+    /**
+     * 用户所属部门ID
+     * @author pddon.com
+     */
+    private Long depId;
     /**
      * 用户真实姓名
      * @author pddon.com

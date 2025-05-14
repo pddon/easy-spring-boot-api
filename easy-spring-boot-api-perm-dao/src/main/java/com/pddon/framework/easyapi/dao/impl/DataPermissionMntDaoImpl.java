@@ -69,8 +69,9 @@ public class DataPermissionMntDaoImpl extends ServiceImpl<DataPermissionMapper, 
                             .like(DataPermission::getPermName, req.getKeyword()).or()
                             .like(DataPermission::getComment, req.getKeyword());
                 })
+                .eq(StringUtils.isNotEmpty(req.getQueryType()), DataPermission::getQueryType, req.getQueryType())
                 .eq(StringUtils.isNotEmpty(req.getTenantId()), DataPermission::getTenantId, req.getTenantId())
-                .eq(req.getDisable() != null, DataPermission::getDisable, req.getDisable())
+                .eq(req.getDisabled() != null, DataPermission::getDisabled, req.getDisabled())
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DataPermission::getCrtTime : DataPermission::getChgTime);
         return this.page(page, wrapper);
     }
@@ -78,5 +79,18 @@ public class DataPermissionMntDaoImpl extends ServiceImpl<DataPermissionMapper, 
     @Override
     public boolean exists(String permId) {
         return this.lambdaQuery().eq(DataPermission::getPermId, permId).count() > 0;
+    }
+
+    @Override
+    public List<DataPermission> getByPermIds(List<String> permIds, String queryType) {
+        return this.lambdaQuery().in(DataPermission::getPermId, permIds)
+                .eq(queryType != null, DataPermission::getQueryType, queryType)
+                .list();
+    }
+
+    @Override
+    public DataPermission getByPermId(String permId) {
+        return this.lambdaQuery().eq(DataPermission::getPermId, permId)
+                .one();
     }
 }

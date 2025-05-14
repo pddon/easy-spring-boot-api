@@ -33,7 +33,7 @@ public class InsertCommentInterceptor extends SqlExplainInterceptor implements I
         if(param == null){
             return invocation.proceed();
         }
-        String userId = RequestContext.getContext().getUserId();
+        String userId = RequestContext.getContext().getSession() != null ? RequestContext.getContext().getSession().getUserId() : RequestContext.getContext().getUserId();
         if(param instanceof BaseHardEntity){
             BaseHardEntity entity = (BaseHardEntity) param;
             entity.setCrtTime(new Date());

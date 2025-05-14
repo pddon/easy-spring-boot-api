@@ -20,6 +20,7 @@ import org.springframework.util.ReflectionUtils;
 
 import javax.annotation.PostConstruct;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @ClassName: EntityManager
@@ -89,5 +90,17 @@ public class EntityManager {
             init(mybatisPlusProperties);
         }
         return ignoreTenantTableSet.contains(tableName);
+    }
+
+    public static List<TableInfo> getAllTableInfos(){
+        MybatisPlusProperties mybatisPlusProperties = SpringBeanUtil.getBean(MybatisPlusProperties.class);
+        if(mybatisPlusProperties == null){
+            return Collections.emptyList();
+        }
+        List<Class<?>> list = AnnotationClassUtils.getAllClassByAnnotation(mybatisPlusProperties.getTypeAliasesPackage(), TableName.class);
+        return list.stream().map(clazz -> {
+            // 获取表信息
+            return TableInfoHelper.getTableInfo(clazz);
+        }).collect(Collectors.toList()).stream().filter(item -> item != null).collect(Collectors.toList());
     }
 }

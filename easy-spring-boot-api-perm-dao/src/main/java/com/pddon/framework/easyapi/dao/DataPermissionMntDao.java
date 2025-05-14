@@ -25,4 +25,8 @@ public interface DataPermissionMntDao {
     IPage<DataPermission> pageQuery(DataPermissionListRequest req);
 
     boolean exists(String permId);
+
+    List<DataPermission> getByPermIds(List<String> permIds, String queryType);
+
+    DataPermission getByPermId(String permId);
 }

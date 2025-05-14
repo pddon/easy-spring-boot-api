@@ -3,10 +3,12 @@ package com.pddon.framework.easyapi;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.consts.CacheKeyMode;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.dto.DataPermDto;
 import com.pddon.framework.easyapi.dao.entity.DataPermission;
 import com.pddon.framework.easyapi.dao.entity.DataPermissionResource;
+import com.pddon.framework.easyapi.dto.TableInfoDto;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 
@@ -43,4 +45,8 @@ public interface DataPermissionMntService {
 
     @CacheMethodResult(prefix = "User:DataPerms", id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, needCacheField = "cacheable", expireSeconds = 3600)
     List<DataPermDto> getDataPermsByUserId(String currentUserId, boolean cacheable);
+
+    ListResponse<TableInfoDto> listTables();
+
+    ListResponse<String> getOwnerDataPerms(String permId, String ownerId, Boolean roleOwner);
 }

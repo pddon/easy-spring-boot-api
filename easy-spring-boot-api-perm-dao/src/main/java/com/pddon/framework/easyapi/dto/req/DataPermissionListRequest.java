@@ -19,5 +19,11 @@ public class DataPermissionListRequest extends PaginationRequest {
 
     private String keyword;
 
-    private Boolean disable;
+    /**
+     * 取值： FIELD字段查询； TABLE_FIELD 表字段查询
+     * @author pddon.com
+     */
+    private String queryType;
+
+    private Boolean disabled;
 }

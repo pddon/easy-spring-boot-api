@@ -17,4 +17,6 @@ public interface RoleDataPermissionMntDao {
     List<RoleDataPermission> getByRoleIds(List<String> roleIds);
 
     boolean saveItems(List<RoleDataPermission> perms);
+
+    List<RoleDataPermission> getByPermId(String roleId, String permId);
 }

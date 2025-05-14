@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import java.util.Date;
+import java.util.List;
 
 /**
  * @ClassName: UserListRequest
@@ -28,6 +29,7 @@ public class UserListRequest extends PaginationRequest {
      * 部门ID
      */
     private Long depId;
+    private List<String> userIds;
     private String keyword;
     private Date startTime;
 

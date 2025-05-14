@@ -48,4 +48,10 @@ public class UserDataPermissionMntDaoImpl extends ServiceImpl<UserDataPermission
     public boolean saveItems(List<UserDataPermission> perms) {
         return this.saveBatch(perms);
     }
+
+    @Override
+    public List<UserDataPermission> getByPermId(String userId, String permId) {
+        return this.lambdaQuery().eq(UserDataPermission::getUserId, userId)
+                .eq(UserDataPermission::getPermId, permId).list();
+    }
 }

@@ -1,14 +1,20 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.baomidou.mybatisplus.core.metadata.IPage;
+import com.baomidou.mybatisplus.core.metadata.TableInfo;
 import com.pddon.framework.easyapi.DataPermissionMntService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.consts.CacheKeyMode;
+import com.pddon.framework.easyapi.consts.DataPermissionQueryType;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
+import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.dto.DataPermDto;
 import com.pddon.framework.easyapi.dao.entity.*;
+import com.pddon.framework.easyapi.dao.tenant.EntityManager;
+import com.pddon.framework.easyapi.dto.DataPermItemDto;
+import com.pddon.framework.easyapi.dto.TableInfoDto;
 import com.pddon.framework.easyapi.dto.req.*;
 import com.pddon.framework.easyapi.dto.resp.IdResponse;
 import com.pddon.framework.easyapi.exception.BusinessException;
@@ -17,6 +23,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Primary;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -55,6 +62,9 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
 
     @Autowired
     private UserRoleDao userRoleDao;
+
+    @Autowired
+    private JdbcTemplate jdbcTemplate;
 
     @Override
     public IdResponse add(AddDataPermissionRequest req) {
@@ -216,40 +226,81 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
             return new ArrayList<>();
         }
         List<DataPermDto> perms = new ArrayList<>();
+        List<DataPermItemDto> permItems = new ArrayList<>();
         //获取用户的所有数据权限
         List<UserDataPermission> userDataPermissions = userDataPermissionMntDao.getByUserId(currentUserId);
         if(userDataPermissions != null && !userDataPermissions.isEmpty()){
-            List<DataPermissionResource> resources = dataPermissionResourceMntDao.getByPermIds(userDataPermissions.stream().map(UserDataPermission::getPermId).collect(Collectors.toList()));
-            Map<String, List<DataPermissionResource>> map = resources.stream()
-                    .collect(Collectors.groupingBy(DataPermissionResource::getPermId));
-            Map<String, List<String>> dataPerms = userDataPermissions.stream()
-                    .collect(Collectors.groupingBy(UserDataPermission::getPermId, Collectors.mapping(UserDataPermission::getPermValue, Collectors.toList())));
-            dataPerms.forEach((key, values) -> {
-                List<DataPermissionResource> tableFields = map.get(key);
-                perms.addAll(tableFields.stream().map(item -> {
-                    //每张表都需要添加权限值
-                    DataPermDto dto = new DataPermDto();
-                    dto.setPermId(item.getPermId());
-                    dto.setResType(item.getResType());
-                    dto.setResName(item.getResName());
-                    dto.setResField(item.getResField());
-                    dto.setValues(values);
-                    return dto;
-                }).collect(Collectors.toList()));
-            });
+            permItems.addAll(userDataPermissions.stream().map(item -> {
+                DataPermItemDto dto = new DataPermItemDto();
+                BeanUtils.copyProperties(item, dto);
+                return dto;
+            }).collect(Collectors.toList()));
         }
         //获取用户拥有的角色
         List<String> roleIds = userRoleDao.getRolesByUserId(currentUserId).stream().map(UserRole::getRoleId).collect(Collectors.toList());
         //获取角色下的所有数据权限
         List<RoleDataPermission> roleDataPermissions = roleDataPermissionMntDao.getByRoleIds(roleIds);
         if(roleDataPermissions != null && !roleDataPermissions.isEmpty()){
-            List<DataPermissionResource> resources = dataPermissionResourceMntDao.getByPermIds(roleDataPermissions.stream().map(RoleDataPermission::getPermId).collect(Collectors.toList()));
+            permItems.addAll(roleDataPermissions.stream().map(item -> {
+                DataPermItemDto dto = new DataPermItemDto();
+                BeanUtils.copyProperties(item, dto);
+                return dto;
+            }).collect(Collectors.toList()));
+        }
+        Map<String, List<String>> convertDataPerms = new HashMap<>();
+        if(!permItems.isEmpty()){
+            List<String> permIds = permItems.stream().map(DataPermItemDto::getPermId).collect(Collectors.toList());
+            //查找需要转换的数据权限
+            List<DataPermission> dataPermissions = dataPermissionMntDao.getByPermIds(permIds, DataPermissionQueryType.TABLE_FIELD.name());
+            if(!dataPermissions.isEmpty()){
+                //处理需要转换的数据权限
+                Map<String, List<DataPermission>> convertPermMap = dataPermissions.stream().collect(Collectors.groupingBy(DataPermission::getPermId));
+                Map<String, List<String>> convertPerms = permItems.stream().filter(item -> convertPermMap.containsKey(item.getPermId()))
+                        .collect(Collectors.groupingBy(DataPermItemDto::getPermId,
+                                Collectors.mapping(DataPermItemDto::getPermValue, Collectors.toList())));
+                //查询并转换
+                convertPerms.forEach((permId, values) -> {
+                    DataPermission dataPermission = convertPermMap.get(permId).get(0);
+                    DataPermission realPermission = dataPermissionMntDao.getByPermId(dataPermission.getRealPermId());
+                    String idArrStr = values.stream().map(value -> String.format("'%s'", value)).collect(Collectors.joining(","));
+                    List<Map<String, Object>> targetIds = jdbcTemplate.queryForList(
+                            String.format("select %s from %s where %s in (%s)",
+                                    realPermission.getQueryField(), realPermission.getQueryTable(), dataPermission.getRealField(), idArrStr));
+                    List<String> targetValues = targetIds.stream().flatMap(map -> map.values().stream().map(obj -> (String) obj)).collect(Collectors.toList());
+                    convertDataPerms.put(permId, targetValues);
+                });
+                //移除转换的数据权限值集合
+                List<DataPermItemDto> realPermItems = permItems.stream()
+                        .filter(item -> !convertPermMap.containsKey(item.getPermId()))
+                        .collect(Collectors.toList());
+                permItems.clear();
+                permItems.addAll(realPermItems);
+            }
+
+            List<DataPermission> fieldDataPermissions = dataPermissionMntDao.getByPermIds(permIds, DataPermissionQueryType.FIELD.name());
+            Map<String, DataPermission> fieldDataPermMap = new HashMap<>();
+            if(!fieldDataPermissions.isEmpty()){
+                Map<String, List<DataPermission>> map = fieldDataPermissions.stream().collect(Collectors.groupingBy(DataPermission::getPermId));
+                map.forEach((key, list) -> {
+                    fieldDataPermMap.put(key, list.get(0));
+                });
+            }
+            List<DataPermissionResource> resources = dataPermissionResourceMntDao.getByPermIds(permIds);
             Map<String, List<DataPermissionResource>> map = resources.stream()
                     .collect(Collectors.groupingBy(DataPermissionResource::getPermId));
-            Map<String, List<String>> dataPerms = roleDataPermissions.stream()
-                    .collect(Collectors.groupingBy(RoleDataPermission::getPermId, Collectors.mapping(RoleDataPermission::getPermValue, Collectors.toList())));
+            Map<String, List<String>> dataPerms = permItems.stream()
+                    .collect(Collectors.groupingBy(DataPermItemDto::getPermId, Collectors.mapping(DataPermItemDto::getPermValue, Collectors.toList())));
             dataPerms.forEach((key, values) -> {
                 List<DataPermissionResource> tableFields = map.get(key);
+
+                if(fieldDataPermMap.containsKey(key) && fieldDataPermMap.get(key).getDisabled()){
+                    //禁用该数据权限，所有字段均允许查询
+                    values.clear();
+                    values.add("*");
+                } else if(convertDataPerms.containsKey(key)){
+                    //查找并合并值
+                    values.addAll(convertDataPerms.get(key));
+                }
                 perms.addAll(tableFields.stream().map(item -> {
                     //每张表都需要添加权限值
                     DataPermDto dto = new DataPermDto();
@@ -257,11 +308,56 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
                     dto.setResType(item.getResType());
                     dto.setResName(item.getResName());
                     dto.setResField(item.getResField());
-                    dto.setValues(values);
+                    if(item.getDisabled()){
+                        //禁用该数据权限资源，所有字段均允许查询
+                        dto.setValues(Arrays.asList("*"));
+                    }else{
+                        dto.setValues(values);
+                    }
                     return dto;
                 }).collect(Collectors.toList()));
             });
         }
         return perms;
+    }
+
+    @Override
+    public ListResponse<TableInfoDto> listTables() {
+        //查找所有的table
+        List<TableInfo> list = EntityManager.getAllTableInfos();
+        List<TableInfoDto> tables = list.stream().map(item -> {
+            TableInfoDto dto = new TableInfoDto();
+            dto.setTableName(item.getTableName());
+            if(item.getFieldList() == null){
+                log.warn("table: {} fileds is empty.", item.getTableName());
+                dto.setFields(Collections.emptyList());
+                return dto;
+            }
+            dto.setFields(item.getFieldList().stream().map(field -> {
+                return field.getColumn();
+            }).collect(Collectors.toList()));
+            dto.getFields().add(item.getKeyColumn());
+            return dto;
+        }).collect(Collectors.toList());
+        return new ListResponse<>(tables);
+    }
+
+    @Override
+    public ListResponse<String> getOwnerDataPerms(String permId, String ownerId, Boolean roleOwner) {
+        List<String> ids = Collections.emptyList();
+        if(roleOwner){
+            List<RoleDataPermission> perms = roleDataPermissionMntDao.getByPermId(ownerId, permId);
+            if(perms.isEmpty()){
+                return new ListResponse<>(ids);
+            }
+            ids = perms.stream().map(RoleDataPermission::getPermValue).collect(Collectors.toList());
+        }else{
+            List<UserDataPermission> perms = userDataPermissionMntDao.getByPermId(ownerId, permId);
+            if(perms.isEmpty()){
+                return new ListResponse<>(ids);
+            }
+            ids = perms.stream().map(UserDataPermission::getPermValue).collect(Collectors.toList());
+        }
+        return new ListResponse<>(ids);
     }
 }

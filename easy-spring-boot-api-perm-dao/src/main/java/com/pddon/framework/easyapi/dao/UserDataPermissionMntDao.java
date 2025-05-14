@@ -19,4 +19,6 @@ public interface UserDataPermissionMntDao {
     boolean saveItems(List<UserDataPermission> perms);
 
     List<UserDataPermission> getByUserId(String userId);
+
+    List<UserDataPermission> getByPermId(String userId, String permId);
 }

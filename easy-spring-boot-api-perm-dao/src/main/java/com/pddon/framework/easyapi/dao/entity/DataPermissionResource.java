@@ -56,7 +56,7 @@ public class DataPermissionResource extends BaseTenantEntity {
      * 是否禁用该资源数据权限控制
      * @author pddon.com
      */
-    private Boolean disable;
+    private Boolean disabled;
 
     /**
      *

@@ -44,4 +44,11 @@ public class RoleDataPermissionMntDaoImpl extends ServiceImpl<RoleDataPermission
     public boolean saveItems(List<RoleDataPermission> perms) {
         return this.saveBatch(perms);
     }
+
+    @Override
+    public List<RoleDataPermission> getByPermId(String roleId, String permId) {
+        return this.lambdaQuery().eq(RoleDataPermission::getRoleId, roleId)
+                .eq(RoleDataPermission::getPermId, permId)
+                .list();
+    }
 }

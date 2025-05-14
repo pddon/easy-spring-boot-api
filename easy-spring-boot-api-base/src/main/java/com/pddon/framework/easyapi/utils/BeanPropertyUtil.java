@@ -58,7 +58,7 @@ public class BeanPropertyUtil {
 		if(object == null){
 			return resultMap;
 		}
-		if(!isBaseType(object) && !(object instanceof Map) && !(object instanceof Collections) && !(object instanceof Iterator)){//非基础数据类型需要防止重复引用的问题
+		if(!isBaseType(object) && !(object instanceof Map) && !(object instanceof Collections) && !(object instanceof Iterator) && !(object instanceof Collection<?>)){//非基础数据类型需要防止重复引用的问题
 			if(hashCodeSet.contains(String.valueOf(object.hashCode()))){
 				return resultMap;
 			}
