@@ -6,11 +6,13 @@ import com.pddon.framework.easyapi.DataPermissionMntService;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.consts.CacheKeyMode;
 import com.pddon.framework.easyapi.consts.DataPermissionQueryType;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.ListResponse;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.*;
 import com.pddon.framework.easyapi.dao.dto.DataPermDto;
+import com.pddon.framework.easyapi.dto.DataPermDtoList;
 import com.pddon.framework.easyapi.dao.entity.*;
 import com.pddon.framework.easyapi.dao.tenant.EntityManager;
 import com.pddon.framework.easyapi.dto.DataPermItemDto;
@@ -106,6 +108,9 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
         if(!dataPermissionMntDao.exists(req.getPermId())){
             throw new BusinessException("参数非法，数据权限未找到!");
         }
+        if(dataPermissionResourceMntDao.exists(req.getResType(), req.getResName(), req.getResField(), req.getPermId())){
+            throw new BusinessException("该数据权限资源已经添加过了!");
+        }
         DataPermissionResource resource = new DataPermissionResource();
         BeanUtils.copyProperties(req, resource);
         dataPermissionResourceMntDao.saveItem(resource);
@@ -120,6 +125,9 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
         }
         if(StringUtils.isNotEmpty(req.getPermId()) &&  !dataPermissionMntDao.exists(req.getPermId())){
             throw new BusinessException("参数非法，数据权限未找到!");
+        }
+        if(dataPermissionResourceMntDao.existsExcludeSelf(req.getResType(), req.getResName(), req.getResField(), req.getPermId(), req.getId())){
+            throw new BusinessException("该数据权限资源已存在，不允许重复!!");
         }
         BeanUtils.copyProperties(req, resource);
         dataPermissionResourceMntDao.updateByItemId(resource);
@@ -221,9 +229,9 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
 
     @CacheMethodResult(prefix = "User:DataPerms", id = "currentUserId", keyMode = CacheKeyMode.CUSTOM_ID, needCacheField = "cacheable", expireSeconds = 3600)
     @Override
-    public List<DataPermDto> getDataPermsByUserId(String currentUserId, boolean cacheable) {
+    public DataPermDtoList getDataPermsByUserId(String currentUserId, boolean cacheable) {
         if(StringUtils.isEmpty(currentUserId)){
-            return new ArrayList<>();
+            return new DataPermDtoList(new ArrayList<>());
         }
         List<DataPermDto> perms = new ArrayList<>();
         List<DataPermItemDto> permItems = new ArrayList<>();
@@ -238,16 +246,20 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
         }
         //获取用户拥有的角色
         List<String> roleIds = userRoleDao.getRolesByUserId(currentUserId).stream().map(UserRole::getRoleId).collect(Collectors.toList());
-        //获取角色下的所有数据权限
-        List<RoleDataPermission> roleDataPermissions = roleDataPermissionMntDao.getByRoleIds(roleIds);
-        if(roleDataPermissions != null && !roleDataPermissions.isEmpty()){
-            permItems.addAll(roleDataPermissions.stream().map(item -> {
-                DataPermItemDto dto = new DataPermItemDto();
-                BeanUtils.copyProperties(item, dto);
-                return dto;
-            }).collect(Collectors.toList()));
+        if(!roleIds.isEmpty()){
+            //获取角色下的所有数据权限
+            List<RoleDataPermission> roleDataPermissions = roleDataPermissionMntDao.getByRoleIds(roleIds);
+            if(roleDataPermissions != null && !roleDataPermissions.isEmpty()){
+                permItems.addAll(roleDataPermissions.stream().map(item -> {
+                    DataPermItemDto dto = new DataPermItemDto();
+                    BeanUtils.copyProperties(item, dto);
+                    return dto;
+                }).collect(Collectors.toList()));
+            }
         }
+
         Map<String, List<String>> convertDataPerms = new HashMap<>();
+        permItems.add(new DataPermItemDto("UserScope", RequestContext.getContext().getSession().getUserId()));
         if(!permItems.isEmpty()){
             List<String> permIds = permItems.stream().map(DataPermItemDto::getPermId).collect(Collectors.toList());
             //查找需要转换的数据权限
@@ -267,7 +279,11 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
                             String.format("select %s from %s where %s in (%s)",
                                     realPermission.getQueryField(), realPermission.getQueryTable(), dataPermission.getRealField(), idArrStr));
                     List<String> targetValues = targetIds.stream().flatMap(map -> map.values().stream().map(obj -> (String) obj)).collect(Collectors.toList());
-                    convertDataPerms.put(permId, targetValues);
+                    if(convertDataPerms.containsKey(permId)){
+                        convertDataPerms.get(permId).addAll(targetValues);
+                    }else{
+                        convertDataPerms.put(permId, targetValues);
+                    }
                 });
                 //移除转换的数据权限值集合
                 List<DataPermItemDto> realPermItems = permItems.stream()
@@ -297,9 +313,11 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
                     //禁用该数据权限，所有字段均允许查询
                     values.clear();
                     values.add("*");
-                } else if(convertDataPerms.containsKey(key)){
-                    //查找并合并值
-                    values.addAll(convertDataPerms.get(key));
+                } else {
+                    if(convertDataPerms.containsKey(key)){
+                        //查找并合并值
+                        values.addAll(convertDataPerms.get(key));
+                    }
                 }
                 perms.addAll(tableFields.stream().map(item -> {
                     //每张表都需要添加权限值
@@ -318,7 +336,7 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
                 }).collect(Collectors.toList()));
             });
         }
-        return perms;
+        return new DataPermDtoList(perms);
     }
 
     @Override

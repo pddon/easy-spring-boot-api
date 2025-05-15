@@ -21,5 +21,7 @@ public class PermTreeDataDto implements Serializable {
 
     private String value;
 
+    private boolean disabled;
+
     private List<PermTreeDataDto> children;
 }

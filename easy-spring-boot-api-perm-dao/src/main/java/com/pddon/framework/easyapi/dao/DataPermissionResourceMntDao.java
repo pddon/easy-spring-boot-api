@@ -25,4 +25,8 @@ public interface DataPermissionResourceMntDao {
     IPage<DataPermissionResource> pageQuery(DataPermissionResourceListRequest req);
 
     List<DataPermissionResource> getByPermIds(List<String> permIds);
+
+    boolean exists(String resType, String resName, String resField, String permId);
+
+    boolean existsExcludeSelf(String resType, String resName, String resField, String permId, Long id);
 }

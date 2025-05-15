@@ -26,6 +26,8 @@ public interface UserSecurityService {
      */
     BaseUser queryBySessionId(String sessionId);
 
+    Set<String> getAllPermissions();
+
     /**
      * 通过用户ID查询用户权限信息
      * @param userId

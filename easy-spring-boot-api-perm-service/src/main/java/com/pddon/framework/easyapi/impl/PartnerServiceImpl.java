@@ -4,6 +4,7 @@ import com.baomidou.mybatisplus.core.metadata.IPage;
 import com.pddon.framework.easyapi.PartnerService;
 import com.pddon.framework.easyapi.annotation.LockDistributed;
 import com.pddon.framework.easyapi.consts.PartnerStatus;
+import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.controller.request.IdsRequest;
 import com.pddon.framework.easyapi.controller.response.PaginationResponse;
 import com.pddon.framework.easyapi.dao.BaseApplicationConfigDao;
@@ -33,7 +34,6 @@ import java.util.Arrays;
  * @Addr: https://pddon.cn
  */
 @Service
-@IgnoreTenant
 @Slf4j
 public class PartnerServiceImpl implements PartnerService {
 
@@ -64,6 +64,7 @@ public class PartnerServiceImpl implements PartnerService {
     @Override
     @LockDistributed
     @Transactional
+    @IgnoreTenant
     public void checkAndCreateHostPartner(){
         if(partnerItemDao.existsTenantId(HOST_TENANT_ID)){
             return;
@@ -83,6 +84,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    @IgnoreTenant
     public IdResponse addPartner(AddPartnerRequest req) {
         PartnerItem item = new PartnerItem();
         BeanUtils.copyProperties(req, item);
@@ -93,6 +95,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    @IgnoreTenant
     public void updatePartner(UpdatePartnerRequest req) {
         PartnerItem item = partnerItemDao.getByItemId(req.getId());
         if(item == null){
@@ -106,6 +109,7 @@ public class PartnerServiceImpl implements PartnerService {
     }
 
     @Override
+    @IgnoreTenant
     public void removePartner(IdsRequest req) {
         partnerItemDao.removeByIds(Arrays.asList(req.getIds()));
     }
@@ -124,6 +128,9 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public IdResponse addApp(AddAppRequest req) {
+        if(req.getTenantId() != null){
+            RequestContext.getContext().setIgnoreTenant(true);
+        }
         BaseApplicationConfig applicationConfig = new BaseApplicationConfig();
         BeanUtils.copyProperties(req, applicationConfig);
         String appId = req.getPartnerAppId();

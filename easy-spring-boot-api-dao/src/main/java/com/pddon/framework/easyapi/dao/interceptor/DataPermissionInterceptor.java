@@ -5,6 +5,7 @@ import com.baomidou.mybatisplus.extension.plugins.SqlExplainInterceptor;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.annotation.RequireDataPermission;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.operators.conditional.AndExpression;
@@ -67,6 +68,9 @@ public class DataPermissionInterceptor extends SqlExplainInterceptor implements 
                     PlainSelect plainSelect = (PlainSelect) selectBody;
                     Expression oldWhere = plainSelect.getWhere();
                     String permSQL = composeDataPermSQL();
+                    if(StringUtils.isEmpty(permSQL)){
+                        return invocation.proceed();
+                    }
                     Expression permExpression = CCJSqlParserUtil.parseCondExpression(permSQL);
 
                     Expression where = permExpression;
@@ -87,6 +91,9 @@ public class DataPermissionInterceptor extends SqlExplainInterceptor implements 
     public String composeDataPermSQL() {
         StringBuffer filterSql = new StringBuffer();
         Map<String, Object> dataPerms = RequestContext.getContext().getDataPermissions();
+        if(dataPerms == null || dataPerms.isEmpty()){
+            return null;
+        }
         String[] tableFields = RequestContext.getContext().getDataPermissionsInfo().get("tableFields");
         String[] tableFieldAlias = RequestContext.getContext().getDataPermissionsInfo().get("tableFieldAlias");
         for(int i=0; i < tableFields.length; i++){

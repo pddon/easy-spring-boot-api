@@ -59,6 +59,27 @@ public class DataPermissionResourceMntDaoImpl extends ServiceImpl<DataPermission
     }
 
     @Override
+    public boolean exists(String resType, String resName, String resField, String permId) {
+        return this.lambdaQuery()
+                .eq(DataPermissionResource::getResName, resName)
+                .eq(DataPermissionResource::getResField, resField)
+                .eq(DataPermissionResource::getPermId, permId)
+                .eq(DataPermissionResource::getResType, resType)
+                .count() > 0;
+    }
+
+    @Override
+    public boolean existsExcludeSelf(String resType, String resName, String resField, String permId, Long id) {
+        return this.lambdaQuery()
+                .eq(DataPermissionResource::getResName, resName)
+                .eq(DataPermissionResource::getResField, resField)
+                .eq(DataPermissionResource::getPermId, permId)
+                .eq(DataPermissionResource::getResType, resType)
+                .ne(DataPermissionResource::getId, id)
+                .count() > 0;
+    }
+
+    @Override
     public IPage<DataPermissionResource> pageQuery(DataPermissionResourceListRequest req) {
         Page<DataPermissionResource> page = new Page<>(req.getCurrent(), req.getSize());
         if(StringUtils.isEmpty(req.getOrderBy())){

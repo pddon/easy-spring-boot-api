@@ -108,6 +108,7 @@ public class UserSecurityServiceImpl implements UserSecurityService {
         return baseUserDao.getBySessionId(sessionId);
     }
 
+    @Override
     public Set<String> getAllPermissions(){
         List<PermItem> items = permItemDao.getAllPerms();
         return items.stream().map(PermItem::getPermId).collect(Collectors.toSet());

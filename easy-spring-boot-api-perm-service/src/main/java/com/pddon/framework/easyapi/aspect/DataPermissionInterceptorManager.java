@@ -12,6 +12,7 @@ import com.pddon.framework.easyapi.DataPermissionMntService;
 import com.pddon.framework.easyapi.context.RequestContext;
 import com.pddon.framework.easyapi.dao.annotation.RequireDataPermission;
 import com.pddon.framework.easyapi.dao.dto.DataPermDto;
+import com.pddon.framework.easyapi.dto.DataPermDtoList;
 import lombok.extern.slf4j.Slf4j;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
@@ -42,6 +43,9 @@ public class DataPermissionInterceptorManager implements MethodInterceptor {
 	 */
 	@Override
 	public Object invoke(MethodInvocation invocation) throws Throwable {
+		if(RequestContext.getContext().isSuperManager()){
+			return invocation.proceed();
+		}
 		if(log.isTraceEnabled()){
 			log.trace("进入数据权限拦截处理器切面!");
 		}
@@ -53,17 +57,17 @@ public class DataPermissionInterceptorManager implements MethodInterceptor {
 			requireDataPermission = AnnotationUtils.findAnnotation(method, RequireDataPermission.class);
 		}
 		if(requireDataPermission != null){
-			RequestContext.getContext().setDataPermissionsEnable(true);
-			RequestContext.getContext().setDataPermissionsInfo(requireDataPermission.tableFields(), requireDataPermission.tableFieldAlias());
 			//获取当前用户拥有的所有数据权限信息并设置到当前环境上下文
 			// TODO:
 			if(RequestContext.getContext().getSession() != null){
-				List<DataPermDto> dtos = dataPermissionMntService.getDataPermsByUserId(RequestContext.getContext().getSession().getUserId(), true);
-				Map<String, Object[]> perms = dtos.stream().collect(Collectors.toMap(dto -> String.format("%s.%s", dto.getResName(), dto.getResField()), dto -> {
+				DataPermDtoList dataPerms = dataPermissionMntService.getDataPermsByUserId(RequestContext.getContext().getSession().getUserId(), true);
+				Map<String, Object[]> perms = dataPerms.getItems().stream().collect(Collectors.toMap(dto -> String.format("%s.%s", dto.getResName(), dto.getResField()), dto -> {
 					return dto.getValues().toArray();
 				}));
 				RequestContext.getContext().setDataPermissions(perms);
 			}
+			RequestContext.getContext().setDataPermissionsEnable(true);
+			RequestContext.getContext().setDataPermissionsInfo(requireDataPermission.tableFields(), requireDataPermission.tableFieldAlias());
 		}
 		return invocation.proceed();
 	}

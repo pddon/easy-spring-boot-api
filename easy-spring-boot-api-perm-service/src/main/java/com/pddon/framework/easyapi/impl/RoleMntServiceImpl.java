@@ -206,7 +206,7 @@ public class RoleMntServiceImpl implements RoleMntService {
             }
         }
         List<String> permIds = new ArrayList<>(userSecurityService.getUserPermissions(userId, false));
-        List<PermItem> perms = permItemDao.getByPermIds(permIds);
+        List<PermItem> perms = permItemDao.getAllPerms();
         Map<String, Set<String>> map = new HashMap<>();
         perms.forEach(perm -> {
             String rootPermId = perm.getParentPermId();
@@ -226,12 +226,20 @@ public class RoleMntServiceImpl implements RoleMntService {
             PermTreeDataDto rootDto = new PermTreeDataDto();
             rootDto.setValue(perm.getPermId())
                     .setLabel(perm.getPermName());
+            if(!permIds.contains(perm.getPermId())){
+                rootDto.setDisabled(true);
+            }
             Set<String> subs = map.get(perm.getPermId());
             if(subs != null && !subs.isEmpty()){
                 rootDto.setChildren(perms.stream().filter(subPerm -> subs.contains(subPerm.getPermId())).map(subPerm -> {
                     PermTreeDataDto dto = new PermTreeDataDto();
                     dto.setLabel(subPerm.getPermName())
                             .setValue(subPerm.getPermId());
+                    if(rootDto.isDisabled() && !permIds.contains(subPerm.getPermId())){
+                        dto.setDisabled(true);
+                    }else{
+                        dto.setDisabled(false);
+                    }
                     return dto;
                 }).collect(Collectors.toList()));
             }else{
@@ -239,7 +247,12 @@ public class RoleMntServiceImpl implements RoleMntService {
             }
             return rootDto;
         }).collect(Collectors.toList());
-        return dtos;
+        return dtos.stream().filter(dto -> {
+            if(dto.isDisabled()){
+                return dto.getChildren().stream().filter(subDto -> !subDto.isDisabled()).count() > 0;
+            }
+            return true;
+        }).collect(Collectors.toList());
     }
 
     @Override
