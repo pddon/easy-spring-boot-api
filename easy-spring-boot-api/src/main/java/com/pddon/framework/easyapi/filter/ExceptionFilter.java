@@ -7,6 +7,8 @@ import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.utils.IOUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.*;
@@ -22,6 +24,7 @@ import java.io.IOException;
  * @Addr: https://pddon.cn
  */
 @Component
+@Order(value = Ordered.LOWEST_PRECEDENCE)
 @Slf4j
 public class ExceptionFilter implements Filter {
 

@@ -126,7 +126,10 @@ public class ApiLogInterceptor implements ApiMethodInterceptor {
 					}
 				}
 			}
-			return buffer.substring(0, buffer.length() - 1);
+			if(buffer.length() > 1){
+				return buffer.substring(0, buffer.length() - 1);
+			}
+			return buffer.toString();
 		}
 		return null;
 	}

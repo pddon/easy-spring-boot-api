@@ -11,6 +11,7 @@ package com.pddon.framework.easyapi.controller;
 
 
 
+import com.pddon.framework.easyapi.aspect.ApiExceptionAspector;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.controller.response.ErrorResponse;
 import io.swagger.annotations.Api;
@@ -44,11 +45,14 @@ import springfox.documentation.annotations.ApiIgnore;
 public class CustomErrorController implements ErrorController{
 	@Autowired
 	private LanguageTranslateManager languageTranslateManager;
+
+	@Autowired
+	private ApiExceptionAspector apiExceptionAspector;
 	
 	@ApiOperation(value = "默认错误处理接口")
 	@ApiIgnore
     @RequestMapping("/error")
-    public DefaultResponseWrapper<ErrorResponse> error(HttpServletRequest request, HttpServletResponse response){
+    public DefaultResponseWrapper<?> error(HttpServletRequest request, HttpServletResponse response){
 		
 		DefaultResponseWrapper<ErrorResponse> resp = null;
         Integer statusCode = (Integer) request.getAttribute("javax.servlet.error.status_code");
@@ -61,6 +65,13 @@ public class CustomErrorController implements ErrorController{
         		originalUri = (String) request.getAttribute("javax.servlet.forward.servlet_path");
         	}        	
         }
+		Throwable ex = (Throwable)request.getAttribute("javax.servlet.error.exception");
+
+		if(ex != null && ex instanceof Exception){
+			// 异常处理
+			DefaultResponseWrapper<?> responseWrapper = apiExceptionAspector.resolveRestControllerException(request, response, null, (Exception) ex);
+			return responseWrapper;
+		}
         if(statusCode == HttpStatus.NOT_FOUND.value()){        	      	
         	String systemError = languageTranslateManager.get(
     				ErrorCodes.NOT_FOUND.getMsgCode(), 

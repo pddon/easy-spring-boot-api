@@ -7,7 +7,9 @@ import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
 import com.pddon.framework.easyapi.exception.handler.CommonExceptionHandler;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.shiro.ShiroException;
+import org.apache.shiro.authc.DisabledAccountException;
 import org.apache.shiro.authc.IncorrectCredentialsException;
+import org.apache.shiro.authc.LockedAccountException;
 import org.apache.shiro.authz.UnauthorizedException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -49,6 +51,31 @@ public class AuthExceptionHandler implements CommonExceptionHandler {
             errorMsgCode = "账号或密码错误，请检查!";
         } else if(e instanceof UnauthorizedException){
             errorMsgCode = "您没有此功能的操作权限，请向管理员申请，分配权限后重新登录账号生效！";
+        } else if(e instanceof DisabledAccountException || e instanceof LockedAccountException){
+            //系统错误码
+            errorMsgCode = e.getMessage();
+        }else if(e instanceof BusinessException || e.getCause() instanceof BusinessException){
+            BusinessException exception = null;
+            if(e instanceof BusinessException){
+                exception = (BusinessException) e;
+            }else{
+                exception = (BusinessException) e.getCause();
+            }
+            if(StringUtils.isEmpty(exception.getSubCode())){
+                //系统错误码
+                errorMsg = languageTranslateManager.get(
+                        ErrorCodes.getByCode(exception.getCode()).getMsgCode(), locale,
+                        exception.getParams());
+            }else{
+                errorMsg = languageTranslateManager.get(
+                        exception.getSubCode(), locale,
+                        exception.getParams());
+            }
+            exception.setMsg(errorMsg);
+            if(log.isTraceEnabled()){
+                log.trace("subError:{},exception:{},locale:{}",exception.getSubCode(), exception.getMsg(),locale);
+            }
+            return new DefaultResponseWrapper<>(exception);
         }
         errorMsg = languageTranslateManager.get(errorMsgCode, locale);
         ErrorCodes errorCode = ErrorCodes.getByMsgCode(errorMsgCode);

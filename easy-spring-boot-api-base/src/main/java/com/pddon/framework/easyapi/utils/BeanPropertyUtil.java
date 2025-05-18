@@ -73,7 +73,7 @@ public class BeanPropertyUtil {
             	if(object != null){
 					if(object.getClass().equals(Date.class)){
 						SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-						sdf.setTimeZone(Calendar.getInstance().getTimeZone());
+						sdf.setTimeZone(TimeZone.getDefault());
 						resultMap.put(parentKey, sdf.format((Date)object));
 					}else{
 						resultMap.put(parentKey, object.toString());

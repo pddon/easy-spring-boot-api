@@ -61,7 +61,7 @@ public class UserAuthenticatingFilter extends AuthenticatingFilter {
         RequestContext.getContext().setAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.SESSION_ID), sessionId);
         BaseUser user = userSecurityService.queryBySessionId(sessionId);
         if(user == null){
-            throw new BusinessException(ErrorCodes.ACCOUNT_NOT_FOUND);
+            throw new BusinessException(ErrorCodes.INVALID_SESSION_ID);
         }
         UserAuthenticationToken token = new UserAuthenticationToken(sessionId, user.getUserId(), user.getPassword());
         return token;

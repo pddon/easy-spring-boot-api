@@ -36,10 +36,7 @@ public class BusinessExceptionHandler implements CommonExceptionHandler {
 	 */
 	@Override
 	public boolean support(Exception e) {
-		if (e instanceof BusinessException || (e.getCause() instanceof BusinessException)){
-			return true;
-		}
-		return false;
+		return e instanceof BusinessException || (e.getCause() instanceof BusinessException);
 	}
 
 	/**
