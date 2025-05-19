@@ -1,5 +1,6 @@
 package com.pddon.framework.easyapi.controller;
 
+import com.pddon.framework.easyapi.CaptchaService;
 import com.pddon.framework.easyapi.FileItemService;
 import com.pddon.framework.easyapi.annotation.IgnoreSign;
 import com.pddon.framework.easyapi.annotation.RequiredParam;
@@ -38,6 +39,9 @@ public class FileController {
     @Autowired
     private FileItemService fileItemService;
 
+    @Autowired
+    private CaptchaService captchaService;
+
     @PostMapping("upload")
     @IgnoreSign
     @RequiredSession
@@ -69,5 +73,10 @@ public class FileController {
     @ResponseBody
     public void delete(@RequestParam("fileKey") String fileKey) throws IOException {
        fileItemService.removeByKey(fileKey);
+    }
+
+    @GetMapping("captcha.jpg")
+    public void getCaptcha(@RequestParam("id") String id, HttpServletResponse response){
+        captchaService.generateCaptcha(id, response);
     }
 }

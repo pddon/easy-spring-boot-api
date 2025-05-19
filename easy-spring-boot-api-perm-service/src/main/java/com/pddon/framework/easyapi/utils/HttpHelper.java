@@ -94,40 +94,45 @@ public class HttpHelper {
     }
 
     public static String[] getParams(ServletRequest request, String... paramNames){
-        if(request.getContentType() != null && request.getContentType().contains("multipart")){
-            return new String[]{null, null};
-        }
-        String[] values = new String[paramNames.length];
-        HttpServletRequest servletRequest = WebUtils.toHttp(request);
-        String method = ((HttpServletRequest) request).getMethod();
-        JSONObject json = null;
-        if(!RequestMethod.GET.name().equals(method) &&
-                !RequestMethod.HEAD.name().equals(method) &&
-                !RequestMethod.TRACE.name().equals(method)){
-            json = JSONUtil.parseObj(HttpHelper.getBodyString(request));
-        }
-        for(int i = 0; i < paramNames.length; i++){
-            values[i] = null;
-            String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(paramNames[i]);
-            //从query参数中获取
-            try {
-                values[i] = ServletRequestUtils.getStringParameter(request, key);
+        try{
+            if(request.getContentType() != null && request.getContentType().contains("multipart")){
+                return new String[]{null, null};
+            }
+            String[] values = new String[paramNames.length];
+            HttpServletRequest servletRequest = WebUtils.toHttp(request);
+            String method = ((HttpServletRequest) request).getMethod();
+            JSONObject json = null;
+            if(!RequestMethod.GET.name().equals(method) &&
+                    !RequestMethod.HEAD.name().equals(method) &&
+                    !RequestMethod.TRACE.name().equals(method)){
+                json = JSONUtil.parseObj(HttpHelper.getBodyString(request));
+            }
+            for(int i = 0; i < paramNames.length; i++){
+                values[i] = null;
+                String key = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(paramNames[i]);
+                //从query参数中获取
+                try {
+                    values[i] = ServletRequestUtils.getStringParameter(request, key);
+                    if(values[i] != null){
+                        continue;
+                    }
+                } catch (ServletRequestBindingException e) {
+                    //
+                }
+                //从header中获取
+                values[i] = servletRequest.getHeader(key);
                 if(values[i] != null){
                     continue;
                 }
-            } catch (ServletRequestBindingException e) {
-                //
+                //从body中获取
+                if(json != null && json.containsKey(paramNames[i])){
+                    values[i] = json.get(paramNames[i]).toString();
+                }
             }
-            //从header中获取
-            values[i] = servletRequest.getHeader(key);
-            if(values[i] != null){
-                continue;
-            }
-            //从body中获取
-            if(json != null && json.containsKey(paramNames[i])){
-                values[i] = json.get(paramNames[i]).toString();
-            }
+            return values;
+        }catch (Exception e){
+            log.trace(IOUtils.getThrowableInfo(e));
+            return new String[]{null, null};
         }
-        return values;
     }
 }
