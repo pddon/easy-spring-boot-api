@@ -8,6 +8,8 @@
  */
 package com.pddon.framework.easyapi.dao.config;
 
+import com.alibaba.druid.wall.WallConfig;
+import com.alibaba.druid.wall.WallFilter;
 import com.baomidou.mybatisplus.autoconfigure.MybatisPlusProperties;
 import com.baomidou.mybatisplus.core.injector.ISqlInjector;
 import com.baomidou.mybatisplus.core.parser.ISqlParser;
@@ -23,11 +25,13 @@ import com.pddon.framework.easyapi.dao.interceptor.InsertCommentInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.RenameCacheKeyInterceptor;
 import com.pddon.framework.easyapi.dao.interceptor.UpdateCommentInterceptor;
 import com.pddon.framework.easyapi.dao.tenant.EasyApiTenantHandler;
+import com.pddon.framework.easyapi.dao.tenant.PddonTenantSqlParser;
 import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 import net.sf.jsqlparser.expression.Expression;
 import net.sf.jsqlparser.expression.StringValue;
 import org.mybatis.spring.annotation.MapperScan;
+import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -38,6 +42,23 @@ import java.util.List;
 @MapperScan({"com.**.dao.mapper", "org.**.dao.mapper"})
 @Slf4j
 public class MybatisPlusConfig {
+
+	@Bean
+	@ConfigurationProperties("spring.datasource.druid.filter.wall")
+	public WallFilter wallFilter() {
+		WallFilter wallFilter = new WallFilter();
+		WallConfig wallConfig = new WallConfig();
+
+		// 允许永真条件
+		wallConfig.setConditionAndAlwayTrueAllow(false);
+		// 允许永假条件
+		wallConfig.setConditionAndAlwayFalseAllow(false);
+		// 允许永真条件在SELECT中出现
+		wallConfig.setSelectWhereAlwayTrueCheck(false);
+
+		wallFilter.setConfig(wallConfig);
+		return wallFilter;
+	}
 
 	/**
 	 * 逻辑删除插件
@@ -59,8 +80,9 @@ public class MybatisPlusConfig {
     	log.info("Init Pagination Plugin ...");
 		PaginationInterceptor paginationInterceptor = new PaginationInterceptor().setDialectType("mysql");
 		// 创建SQL解析器，会对sql进行拦截处理。
-		TenantSqlParser tenantSqlParser = new TenantSqlParser();
+		PddonTenantSqlParser tenantSqlParser = new PddonTenantSqlParser();
 		tenantSqlParser.setTenantHandler(new EasyApiTenantHandler());
+		tenantSqlParser.setEasyApiTenantHandler(tenantSqlParser.getTenantHandler());
 
 		// 创建SQL解析器集合
 		List<ISqlParser> sqlParserList = new ArrayList<>();

@@ -47,6 +47,10 @@ public class CaptchaServiceImpl implements CaptchaService {
         if(number == null){
             return false;
         }
-        return number.equals(code);
+        boolean re = number.equals(code);
+        if(re){
+            cacheManager.remove(id, 300L, CacheExpireMode.EXPIRE_AFTER_WRITE);
+        }
+        return re;
     }
 }

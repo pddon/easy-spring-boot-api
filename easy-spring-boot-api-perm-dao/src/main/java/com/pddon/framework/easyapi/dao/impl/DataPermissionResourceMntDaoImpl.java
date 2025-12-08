@@ -97,7 +97,6 @@ public class DataPermissionResourceMntDaoImpl extends ServiceImpl<DataPermission
                             .like(DataPermissionResource::getResName, req.getKeyword()).or()
                             .like(DataPermissionResource::getComment, req.getKeyword());
                 })
-                .eq(StringUtils.isNotEmpty(req.getTenantId()), DataPermissionResource::getTenantId, req.getTenantId())
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DataPermissionResource::getCrtTime : DataPermissionResource::getChgTime);
         return this.page(page, wrapper);
     }

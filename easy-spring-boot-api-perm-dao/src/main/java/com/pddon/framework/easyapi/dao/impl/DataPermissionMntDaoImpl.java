@@ -70,7 +70,6 @@ public class DataPermissionMntDaoImpl extends ServiceImpl<DataPermissionMapper, 
                             .like(DataPermission::getComment, req.getKeyword());
                 })
                 .eq(StringUtils.isNotEmpty(req.getQueryType()), DataPermission::getQueryType, req.getQueryType())
-                .eq(StringUtils.isNotEmpty(req.getTenantId()), DataPermission::getTenantId, req.getTenantId())
                 .eq(req.getDisabled() != null, DataPermission::getDisabled, req.getDisabled())
                 .orderBy(!StringUtils.isEmpty(req.getOrderBy()), req.getIsAsc(), "crtTime".equals(req.getOrderBy()) ? DataPermission::getCrtTime : DataPermission::getChgTime);
         return this.page(page, wrapper);

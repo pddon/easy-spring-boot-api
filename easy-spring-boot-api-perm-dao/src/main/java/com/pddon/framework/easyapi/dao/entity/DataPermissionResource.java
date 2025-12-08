@@ -20,7 +20,7 @@ import lombok.experimental.Accessors;
 @ToString
 @Accessors(chain=true)
 @TableName("data_permission_resource")
-public class DataPermissionResource extends BaseTenantEntity {
+public class DataPermissionResource extends BaseEntity {
     /**
      * 记录ID
      * @author pddon.com

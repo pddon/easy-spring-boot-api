@@ -40,6 +40,13 @@ public class InsertCommentInterceptor extends SqlExplainInterceptor implements I
             if(!StringUtils.isEmpty(userId)){
                 entity.setCrtUserId(userId);
             }
+            if(param instanceof BaseTenantEntity){
+                BaseTenantEntity tenantEntity = (BaseTenantEntity) param;
+                String tenantId = RequestContext.getContext().getSession().getChannelId();
+                if(StringUtils.isEmpty(tenantEntity.getTenantId()) && StringUtils.isNotEmpty(tenantId) && RequestContext.getContext().isSuperManager()){
+                    ((BaseTenantEntity)param).setTenantId(tenantId);
+                }
+            }
             /*if(param instanceof BaseTenantEntity){
                 BaseTenantEntity tenantEntity = (BaseTenantEntity) param;
                 String tenantId = RequestContext.getContext().getChannelId();

@@ -360,6 +360,9 @@ public class BeanPropertyUtil {
 		if(object instanceof Number){
 			return true;
 		}
+		if(object instanceof String){
+			return true;
+		}
 		Class className = object.getClass();
 	    return isBaseTypeClass(className);
 	}

@@ -95,16 +95,17 @@ public class HttpHelper {
 
     public static String[] getParams(ServletRequest request, String... paramNames){
         try{
-            if(request.getContentType() != null && request.getContentType().contains("multipart")){
+            /*if(request.getContentType() != null && request.getContentType().contains("multipart")){
                 return new String[]{null, null};
-            }
+            }*/
             String[] values = new String[paramNames.length];
             HttpServletRequest servletRequest = WebUtils.toHttp(request);
             String method = ((HttpServletRequest) request).getMethod();
             JSONObject json = null;
             if(!RequestMethod.GET.name().equals(method) &&
                     !RequestMethod.HEAD.name().equals(method) &&
-                    !RequestMethod.TRACE.name().equals(method)){
+                    !RequestMethod.TRACE.name().equals(method) &&
+                    (request.getContentType() != null && !request.getContentType().contains("multipart"))){
                 json = JSONUtil.parseObj(HttpHelper.getBodyString(request));
             }
             for(int i = 0; i < paramNames.length; i++){

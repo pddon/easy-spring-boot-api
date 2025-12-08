@@ -24,6 +24,7 @@ import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import com.pddon.framework.easyapi.utils.BeanPropertyUtil;
 import com.pddon.framework.easyapi.utils.EncryptUtils;
 import com.pddon.framework.easyapi.utils.SpringBeanUtil;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import lombok.extern.slf4j.Slf4j;
 
 import com.pddon.framework.easyapi.SignManager;
@@ -51,9 +52,9 @@ public class DefaultSignManagerImpl implements SignManager{
 				nameValueMap.putAll(BeanPropertyUtil.objToStringMap(value, key, IgnoreSign.class));
 			}
 		}
-		//剔除系统参数
+		//剔除系统参数和空字符串
 		Map<String, String> map = nameValueMap.keySet().stream()
-				.filter(key -> !SystemParameterRenameProperties.DEFAULT_PARAM_MAP.containsKey(key))
+				.filter(key -> !SystemParameterRenameProperties.DEFAULT_PARAM_MAP.containsKey(key) && StringUtils.isNotEmpty(nameValueMap.get(key)))
 				.collect(Collectors.toMap(key->key, key -> nameValueMap.get(key)));
 		//按key进行字符串自然序排序后，进行拼接
 		String content = EncryptUtils.sortAndMontage(map);

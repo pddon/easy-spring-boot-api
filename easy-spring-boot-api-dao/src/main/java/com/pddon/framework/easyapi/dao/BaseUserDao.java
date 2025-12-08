@@ -30,6 +30,8 @@ public interface BaseUserDao<K extends BaseUser> {
 
     IPage<K> pageQuery(UserListRequest req, List<Long> depIds);
 
+    IPage<K> pageQuery(UserListRequest req);
+
     boolean existUsername(String username);
 
     BaseUser getByItemId(Long id);

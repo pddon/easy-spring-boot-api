@@ -21,4 +21,12 @@ public class BaseTenantEntity extends BaseEntity{
      */
     private String tenantId;
 
+    public String getTenantId() {
+        return tenantId;
+    }
+
+    public BaseTenantEntity setTenantId(String tenantId) {
+        this.tenantId = tenantId;
+        return this;
+    }
 }

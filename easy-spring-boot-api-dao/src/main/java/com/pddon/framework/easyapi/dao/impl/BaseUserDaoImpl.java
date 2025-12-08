@@ -14,6 +14,7 @@ import com.pddon.framework.easyapi.dao.mapper.BaseUserMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -69,6 +70,11 @@ public abstract class BaseUserDaoImpl<T extends BaseUserMapper<K>, K extends Bas
         K entity = newEntityInstance();
         BeanUtils.copyProperties(user, entity);
         return this.save(entity);
+    }
+
+    @Override
+    public IPage<K> pageQuery(UserListRequest req) {
+        return pageQuery(req, Collections.emptyList());
     }
 
     @Override
