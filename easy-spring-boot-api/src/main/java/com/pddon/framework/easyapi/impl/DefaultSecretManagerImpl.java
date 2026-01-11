@@ -9,6 +9,8 @@
 package com.pddon.framework.easyapi.impl;
 
 import com.pddon.framework.easyapi.ApplicationManager;
+import com.pddon.framework.easyapi.context.RequestContext;
+import com.pddon.framework.easyapi.properties.SystemParameterRenameProperties;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -16,6 +18,7 @@ import lombok.Setter;
 import com.pddon.framework.easyapi.SecretManager;
 import com.pddon.framework.easyapi.dto.ApiPermissionDto;
 import com.pddon.framework.easyapi.dto.SecretInfo;
+import org.springframework.util.StringUtils;
 
 @Setter
 @AllArgsConstructor
@@ -35,6 +38,9 @@ public class DefaultSecretManagerImpl implements SecretManager {
 		ApiPermissionDto permission = null;
 		if(appId != null){
 			permission = applicationManager.getAppPermission(appId);
+			if(StringUtils.isEmpty(channelId)){
+				RequestContext.getContext().setAttachment(SystemParameterRenameProperties.CHANNEL_ID, permission.getTenantId());
+			}
 		}
 		if(permission == null){
 			permission = applicationManager.getChannelPermission(channelId);

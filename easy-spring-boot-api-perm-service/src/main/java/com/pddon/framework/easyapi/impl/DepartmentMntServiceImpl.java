@@ -54,7 +54,7 @@ public class DepartmentMntServiceImpl implements DepartmentMntService {
         BeanUtils.copyProperties(req, department);
         department.setOrderValue(System.currentTimeMillis());
         if(RequestContext.getContext().isSuperManager()){
-            department.setTenantId(RequestContext.getContext().getSession().getChannelId());
+            department.setTenantId(RequestContext.getContext().getChannelId());
         }
         departmentMntDao.saveItem(department);
         /*if(StringUtils.isNotEmpty(department.getLeaderId())){

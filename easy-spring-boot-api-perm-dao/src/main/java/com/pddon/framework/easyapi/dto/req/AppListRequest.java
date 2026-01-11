@@ -19,4 +19,6 @@ public class AppListRequest extends PaginationRequest {
     private String tenantId;
 
     private String keyword;
+
+    private String appType;
 }

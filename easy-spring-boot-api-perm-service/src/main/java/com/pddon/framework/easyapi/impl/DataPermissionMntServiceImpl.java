@@ -259,7 +259,7 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
         }
 
         Map<String, List<String>> convertDataPerms = new HashMap<>();
-        permItems.add(new DataPermItemDto("UserScope", RequestContext.getContext().getSession().getUserId()));
+        permItems.add(new DataPermItemDto("UserScope", RequestContext.getContext().getUserId()));
         if(!permItems.isEmpty()){
             List<String> permIds = permItems.stream().map(DataPermItemDto::getPermId).collect(Collectors.toList());
             //查找需要转换的数据权限
@@ -319,21 +319,23 @@ public class DataPermissionMntServiceImpl implements DataPermissionMntService {
                         values.addAll(convertDataPerms.get(key));
                     }
                 }
-                perms.addAll(tableFields.stream().map(item -> {
-                    //每张表都需要添加权限值
-                    DataPermDto dto = new DataPermDto();
-                    dto.setPermId(item.getPermId());
-                    dto.setResType(item.getResType());
-                    dto.setResName(item.getResName());
-                    dto.setResField(item.getResField());
-                    if(item.getDisabled()){
-                        //禁用该数据权限资源，所有字段均允许查询
-                        dto.setValues(Arrays.asList("*"));
-                    }else{
-                        dto.setValues(values);
-                    }
-                    return dto;
-                }).collect(Collectors.toList()));
+                if(tableFields != null){
+                    perms.addAll(tableFields.stream().map(item -> {
+                        //每张表都需要添加权限值
+                        DataPermDto dto = new DataPermDto();
+                        dto.setPermId(item.getPermId());
+                        dto.setResType(item.getResType());
+                        dto.setResName(item.getResName());
+                        dto.setResField(item.getResField());
+                        if(item.getDisabled()){
+                            //禁用该数据权限资源，所有字段均允许查询
+                            dto.setValues(Arrays.asList("*"));
+                        }else{
+                            dto.setValues(values);
+                        }
+                        return dto;
+                    }).collect(Collectors.toList()));
+                }
             });
         }
         return new DataPermDtoList(perms);

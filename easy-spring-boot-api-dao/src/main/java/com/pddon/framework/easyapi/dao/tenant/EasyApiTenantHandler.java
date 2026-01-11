@@ -20,9 +20,6 @@ public class EasyApiTenantHandler implements TenantHandler {
     @Override
     public Expression getTenantId() {
         String channelId = RequestContext.getContext().getChannelId();
-        if(RequestContext.getContext().getSession() != null && StringUtils.isNotEmpty(RequestContext.getContext().getSession().getChannelId())){
-            channelId = RequestContext.getContext().getSession().getChannelId();
-        }
         if(StringUtils.isNotEmpty(channelId)){
             return new StringValue(channelId);
         }

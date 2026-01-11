@@ -15,6 +15,14 @@ import lombok.Data;
 @Data
 public class ApiPermissionDto {
 	/**
+	 * 租户ID
+	 */
+	private String tenantId;
+	/**
+	 * 应用ID
+	 */
+	private String appId;
+	/**
 	 * 对称秘钥，用于加签、验签，对数据进行对称加解密
 	 */
 	private String secret;

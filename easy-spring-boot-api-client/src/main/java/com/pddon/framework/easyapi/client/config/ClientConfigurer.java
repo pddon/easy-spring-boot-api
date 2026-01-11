@@ -32,7 +32,7 @@ import org.springframework.context.annotation.Configuration;
 public class ClientConfigurer {
     @Bean
     @ConditionalOnMissingBean(ApiClient.class)
-    @ConditionalOnProperty(name={"easyapi.client.app.appId"}, matchIfMissing = false)
+    //@ConditionalOnProperty(name={"easyapi.client.app.appId"}, matchIfMissing = false)
     public ApiClient apiClient(@Autowired ApplicationConfig applicationConfig){
         return ApiClient.newInstance(applicationConfig);
     }

@@ -43,6 +43,17 @@ public class AddAppRequest implements Serializable {
     private String secret;
 
     /**
+     * 应用类型 COMMON 通用应用 PAY 支付应用 FOOD 餐饮应用 TOOL 工具应用
+     * @author pddon.com
+     */
+    private String appType;
+    /**
+     * 各类型应用的专用配置
+     * @author pddon.com
+     */
+    private String typeConfig;
+
+    /**
      * 私钥，用于非对称加解密的秘钥对
      * @author pddon.com
      */

@@ -58,7 +58,7 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
     }
 
     @Override
-    public IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword) {
+    public IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword, String appType) {
         Page<K> page = new Page<>(req.getCurrent(), req.getSize());
         if(StringUtils.isEmpty(req.getOrderBy())){
             //默认按创建时间排序
@@ -70,6 +70,7 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
         }
         Wrapper<K> wrapper = new LambdaQueryWrapper<K>()
                 .eq(!StringUtils.isEmpty(tenantId), BaseApplicationConfig::getTenantId, tenantId)
+                .eq(!StringUtils.isEmpty(appType), BaseApplicationConfig::getAppType, appType)
                 .and(!StringUtils.isEmpty(keyword), query -> {
                     return query.likeRight(BaseApplicationConfig::getAppName, keyword).or()
                             .likeRight(BaseApplicationConfig::getDescription, keyword);

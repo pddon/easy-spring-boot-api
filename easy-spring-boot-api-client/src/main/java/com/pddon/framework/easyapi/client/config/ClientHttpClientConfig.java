@@ -22,6 +22,7 @@ import org.apache.http.protocol.HttpContext;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Primary;
 
 import javax.net.ssl.SSLContext;
 import javax.net.ssl.TrustManager;
@@ -32,7 +33,8 @@ import java.security.cert.CertificateException;
 import java.security.cert.X509Certificate;
 
 @Configuration
-public class HttpClientConfig {
+@Primary
+public class ClientHttpClientConfig {
 
     @Value("${http_max_total:800}")
     private int maxTotal = 800;
@@ -104,7 +106,7 @@ public class HttpClientConfig {
     @Bean
     public PoolingHttpClientConnectionManager createPoolingHttpClientConnectionManager() throws NoSuchAlgorithmException, KeyManagementException {
         //采用绕过验证的方式处理https请求
-        SSLContext sslcontext = HttpClientConfig.createIgnoreVerifySSL();
+        SSLContext sslcontext = ClientHttpClientConfig.createIgnoreVerifySSL();
 
         // 设置协议http和https对应的处理socket链接工厂的对象
         Registry<ConnectionSocketFactory> socketFactoryRegistry = RegistryBuilder.<ConnectionSocketFactory>create()

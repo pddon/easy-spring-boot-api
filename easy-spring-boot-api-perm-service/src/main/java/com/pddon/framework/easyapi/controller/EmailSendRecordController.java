@@ -44,7 +44,7 @@ public class EmailSendRecordController {
     @RequiredSession
     @IgnoreTenant
     public PaginationResponse<EmailSendRecord> userEmails(@RequestBody EmailRecordListRequest req){
-        req.setToUserId(RequestContext.getContext().getSession().getUserId());
+        req.setToUserId(RequestContext.getContext().getUserId());
         return emailSendRecordMntService.list(req);
     }
 

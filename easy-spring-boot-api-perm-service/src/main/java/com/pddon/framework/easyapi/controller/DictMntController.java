@@ -125,8 +125,8 @@ public class DictMntController {
     @RequiredSign(scope = SignScope.REQUEST)
     @RequiredSession
     public PaginationResponse<DictGroup> listGroup(@RequestBody DictGroupListRequest req){
-        if(!RequestContext.getContext().getSession().isSuperManager()){
-            req.setTenantId(RequestContext.getContext().getSession().getChannelId());
+        if(!RequestContext.getContext().isSuperManager()){
+            req.setTenantId(RequestContext.getContext().getChannelId());
         }
         return dictMntService.listGroup(req);
     }

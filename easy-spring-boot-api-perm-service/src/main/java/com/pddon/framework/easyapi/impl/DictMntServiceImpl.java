@@ -161,7 +161,7 @@ public class DictMntServiceImpl extends DictServiceImpl implements DictMntServic
         DictItem dictItem = null;
         if(RequestContext.getContext().getSession() != null){
             //先查租户配置
-            dictItem = dictItemMntDao.getTenantDefaultDict(RequestContext.getContext().getSession().getChannelId(), dictId);
+            dictItem = dictItemMntDao.getTenantDefaultDict(RequestContext.getContext().getChannelId(), dictId);
         }
         if(dictItem == null){
             dictItem = dictItemMntDao.getDefaultByDictId(dictId);

@@ -33,7 +33,7 @@ public class InsertCommentInterceptor extends SqlExplainInterceptor implements I
         if(param == null){
             return invocation.proceed();
         }
-        String userId = RequestContext.getContext().getSession() != null ? RequestContext.getContext().getSession().getUserId() : RequestContext.getContext().getUserId();
+        String userId = RequestContext.getContext().getUserId();
         if(param instanceof BaseHardEntity){
             BaseHardEntity entity = (BaseHardEntity) param;
             entity.setCrtTime(new Date());
@@ -42,7 +42,7 @@ public class InsertCommentInterceptor extends SqlExplainInterceptor implements I
             }
             if(param instanceof BaseTenantEntity){
                 BaseTenantEntity tenantEntity = (BaseTenantEntity) param;
-                String tenantId = RequestContext.getContext().getSession().getChannelId();
+                String tenantId = RequestContext.getContext().getChannelId();
                 if(StringUtils.isEmpty(tenantEntity.getTenantId()) && StringUtils.isNotEmpty(tenantId) && RequestContext.getContext().isSuperManager()){
                     ((BaseTenantEntity)param).setTenantId(tenantId);
                 }

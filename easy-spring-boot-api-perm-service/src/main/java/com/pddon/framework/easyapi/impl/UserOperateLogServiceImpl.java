@@ -34,7 +34,7 @@ public class UserOperateLogServiceImpl implements UserOperateLogService {
         record.setUserId(RequestContext.getContext().getUserId());
         record.setSessionId(RequestContext.getContext().getSessionId());
         if(RequestContext.getContext().getSession() != null){
-            record.setUsername(RequestContext.getContext().getSession().getUsername());
+            record.setUsername(RequestContext.getContext().getUsername());
         }
         record.setOperateType(operateType);
         record.setApiName(apiName);

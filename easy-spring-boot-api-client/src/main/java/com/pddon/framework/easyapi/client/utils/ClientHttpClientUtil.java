@@ -21,6 +21,7 @@ import org.apache.http.util.EntityUtils;
 import org.springframework.beans.BeansException;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
+import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
@@ -33,8 +34,9 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@Primary
 @Slf4j
-public class HttpClientUtil implements ApplicationContextAware {
+public class ClientHttpClientUtil implements ApplicationContextAware {
     
     private static CloseableHttpClient httpClient;
 

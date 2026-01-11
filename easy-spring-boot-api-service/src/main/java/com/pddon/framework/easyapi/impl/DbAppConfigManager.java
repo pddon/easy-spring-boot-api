@@ -4,6 +4,7 @@ import com.pddon.framework.easyapi.ApplicationManager;
 import com.pddon.framework.easyapi.annotation.CacheMethodResult;
 import com.pddon.framework.easyapi.consts.CacheKeyMode;
 import com.pddon.framework.easyapi.dao.BaseApplicationConfigDao;
+import com.pddon.framework.easyapi.dao.annotation.IgnoreTenant;
 import com.pddon.framework.easyapi.dao.entity.BaseApplicationConfig;
 import com.pddon.framework.easyapi.dto.ApiPermissionDto;
 import com.pddon.framework.easyapi.dto.SecretKeyPair;
@@ -31,6 +32,7 @@ import java.util.Set;
  * @Addr: https://pddon.cn
  */
 @Component
+@IgnoreTenant
 @Slf4j
 @NoArgsConstructor
 public class DbAppConfigManager extends DefaultApplicationManagerImpl implements ApplicationManager, ApplicationContextAware {
@@ -62,6 +64,8 @@ public class DbAppConfigManager extends DefaultApplicationManagerImpl implements
             return super.getAppPermission(appId);
         }
         ApiPermissionDto permissionDto = new ApiPermissionDto();
+        permissionDto.setAppId(appId);
+        permissionDto.setTenantId(applicationConfig.getTenantId());
         permissionDto.setSecret(applicationConfig.getSecret());
         SecretKeyPair keypair = new SecretKeyPair();
         keypair.setPrivateSecret(applicationConfig.getPrivateSecret());

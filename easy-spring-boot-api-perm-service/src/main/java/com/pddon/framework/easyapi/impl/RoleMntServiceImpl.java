@@ -192,13 +192,13 @@ public class RoleMntServiceImpl implements RoleMntService {
     @Override
     public List<PermTreeDataDto> getUserPerms(String userId) {
         if(StringUtils.isEmpty(userId)){
-            userId = RequestContext.getContext().getSession().getUserId();
+            userId = RequestContext.getContext().getUserId();
         }else{
             BaseUser user = userSecurityService.queryByUserId(userId);
             if(user == null){
                 throw new BusinessException("账号未找到!");
             }
-            if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+            if(!RequestContext.getContext().getUserId().equalsIgnoreCase(user.getUserId())){
                 //修改他人账号需要用户修改权限
                 // 获取当前Subject
                 Subject subject = SecurityUtils.getSubject();

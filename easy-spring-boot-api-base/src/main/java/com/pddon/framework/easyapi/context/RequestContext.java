@@ -185,15 +185,34 @@ public class RequestContext {
     }
     
     public String getUserId(){
-    	return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.USER_ID));
+        String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.USER_ID));
+        if(StringUtils.isBlank(value) && this.session != null){
+            value = this.session.getUserId();
+        }
+        return value;
     }
-    
+
+    public String getUsername() {
+        if(this.session != null){
+           return this.session.getUsername();
+        }
+        return null;
+    }
+
     public String getAppId(){
-    	return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.APP_ID));
+        String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.APP_ID));
+        if(StringUtils.isBlank(value) && this.session != null){
+            value = this.session.getAppId();
+        }
+        return value;
     }
     
     public String getChannelId(){
-    	return this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.CHANNEL_ID));
+    	String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.CHANNEL_ID));
+        if(StringUtils.isBlank(value) && this.session != null){
+            value = this.session.getChannelId();
+        }
+        return value;
     }
     
     public String getRepeatCode(){
@@ -286,5 +305,5 @@ public class RequestContext {
     public void setDataPermissionsEnable(Boolean enable){
         this.setObjectAttachment(DATA_PERMISSION_ENABLE, enable);
     }
-	
+
 }

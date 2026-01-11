@@ -34,6 +34,17 @@ public class UpdateAppRequest implements Serializable {
     private String appName;
 
     /**
+     * 应用类型 COMMON 通用应用 PAY 支付应用 FOOD 餐饮应用 TOOL 工具应用
+     * @author pddon.com
+     */
+    private String appType;
+    /**
+     * 各类型应用的专用配置
+     * @author pddon.com
+     */
+    private String typeConfig;
+
+    /**
      * 用于对称加解密、生成数字签名、验证数字签名的秘钥
      * @author pddon.com
      */

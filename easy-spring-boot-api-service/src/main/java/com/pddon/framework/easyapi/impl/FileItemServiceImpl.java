@@ -42,7 +42,7 @@ public class FileItemServiceImpl implements FileItemService {
                 .setStoreType(FileStoreType.IN_DB.name())
                 .setUseCount(0)
                 .setFileUrl(fileUrl);
-        if(RequestContext.getContext().getSession().isSuperManager()){
+        if(RequestContext.getContext().isSuperManager()){
             if(StringUtils.isEmpty(tenantId)){
                 throw new BusinessException("租户ID为必填!");
             }

@@ -1,7 +1,7 @@
 package com.pddon.framework.easyapi.client.annotations;
 
 import com.pddon.framework.easyapi.client.config.ClientConfigurer;
-import com.pddon.framework.easyapi.client.config.HttpClientConfig;
+import com.pddon.framework.easyapi.client.config.ClientHttpClientConfig;
 import org.springframework.context.annotation.Import;
 
 import java.lang.annotation.*;
@@ -17,6 +17,6 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.RUNTIME)
 @Documented
 @Inherited
-@Import({HttpClientConfig.class, ClientConfigurer.class})
+@Import({ClientHttpClientConfig.class, ClientConfigurer.class})
 public @interface EnableEasyApiClient {
 }

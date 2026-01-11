@@ -62,14 +62,14 @@ public class UserMntServiceImpl implements UserMntService {
     public UserInfoDto getUserInfo(String userId) {
         UserInfoDto userInfoDto = new UserInfoDto();
         if(StringUtils.isEmpty(userId)){
-            userId = RequestContext.getContext().getSession().getUserId();
+            userId = RequestContext.getContext().getUserId();
         }
         Set<String> perms = userSecurityService.getUserPermissions(userId, true);
         BaseUser user = userSecurityService.queryByUserId(userId);
         if(user == null){
             throw new BusinessException("账号未找到!");
         }
-        if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+        if(!RequestContext.getContext().getUserId().equalsIgnoreCase(user.getUserId())){
             //修改他人账号需要用户修改权限
             // 获取当前Subject
             Subject subject = SecurityUtils.getSubject();
@@ -131,7 +131,7 @@ public class UserMntServiceImpl implements UserMntService {
         if(RequestContext.getContext().isSuperManager()){
             String tenantId = req.getTenantId();
             if(StringUtils.isEmpty(tenantId) && (RequestContext.getContext().getSession() != null)){
-                tenantId = RequestContext.getContext().getSession().getChannelId();
+                tenantId = RequestContext.getContext().getChannelId();
             }
             user.setTenantId(tenantId);
         }else{
@@ -168,7 +168,7 @@ public class UserMntServiceImpl implements UserMntService {
         if(user == null){
             throw new BusinessException("账号未找到，修改失败!");
         }
-        if(!RequestContext.getContext().getSession().getUserId().equalsIgnoreCase(user.getUserId())){
+        if(!RequestContext.getContext().getUserId().equalsIgnoreCase(user.getUserId())){
             //修改他人账号需要用户修改权限
             // 获取当前Subject
             Subject subject = SecurityUtils.getSubject();
