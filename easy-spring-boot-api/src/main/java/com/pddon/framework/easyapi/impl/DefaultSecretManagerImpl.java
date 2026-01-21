@@ -38,7 +38,7 @@ public class DefaultSecretManagerImpl implements SecretManager {
 		ApiPermissionDto permission = null;
 		if(appId != null){
 			permission = applicationManager.getAppPermission(appId);
-			if(StringUtils.isEmpty(channelId)){
+			if(!StringUtils.isEmpty(permission.getTenantId())){
 				RequestContext.getContext().setAttachment(SystemParameterRenameProperties.CHANNEL_ID, permission.getTenantId());
 			}
 		}

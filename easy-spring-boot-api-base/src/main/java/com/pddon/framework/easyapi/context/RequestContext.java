@@ -209,7 +209,7 @@ public class RequestContext {
     
     public String getChannelId(){
     	String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.CHANNEL_ID));
-        if(StringUtils.isBlank(value) && this.session != null){
+        if(this.session != null && StringUtils.isNotBlank(this.session.getChannelId())){
             value = this.session.getChannelId();
         }
         return value;

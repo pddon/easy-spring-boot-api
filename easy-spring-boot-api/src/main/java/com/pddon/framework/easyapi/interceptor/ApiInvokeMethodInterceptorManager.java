@@ -28,9 +28,7 @@ import org.springframework.aop.framework.AopProxyUtils;
 import org.springframework.aop.support.AopUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.core.LocalVariableTableParameterNameDiscoverer;
-import org.springframework.core.MethodParameter;
-import org.springframework.core.ParameterNameDiscoverer;
+import org.springframework.core.*;
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.method.HandlerMethod;
@@ -68,7 +66,19 @@ public class  ApiInvokeMethodInterceptorManager implements MethodInterceptor {
 	
 	private static List<ApiMethodInterceptor> interceptors = new ArrayList<>();
 	
-	private ParameterNameDiscoverer parameterNameDiscoverer = new LocalVariableTableParameterNameDiscoverer();
+	private static ParameterNameDiscoverer parameterNameDiscoverer = new PrioritizedParameterNameDiscoverer();
+	static {
+		PrioritizedParameterNameDiscoverer discoverer = (PrioritizedParameterNameDiscoverer)parameterNameDiscoverer;
+		// 1. 首先尝试 Java 8+ 反射（需要 -parameters 编译参数）
+		discoverer.addDiscoverer(new StandardReflectionParameterNameDiscoverer());
+
+		// 2. 然后尝试读取字节码的 LocalVariableTable（需要 -g 调试信息）
+		discoverer.addDiscoverer(new LocalVariableTableParameterNameDiscoverer());
+
+		// 3. 最后使用 ASM 字节码分析
+		discoverer.addDiscoverer(new KotlinReflectionParameterNameDiscoverer());
+	}
+
 	/**
 	 * 添加接口拦截器
 	 * @author danyuan

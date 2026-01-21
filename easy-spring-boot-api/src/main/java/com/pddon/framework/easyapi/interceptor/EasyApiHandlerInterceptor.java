@@ -107,7 +107,11 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 			return;
 		}
         //再通过请求体获取系统参数
-        if(RequestMethod.POST.name().equals(method) || RequestMethod.PUT.name().equals(method)){
+        if(RequestMethod.POST.name().equals(method)
+				|| RequestMethod.PUT.name().equals(method)
+				|| RequestMethod.DELETE.name().equals(method)
+				|| RequestMethod.HEAD.name().equals(method)
+				|| RequestMethod.PATCH.name().equals(method)){
         	String body = null;
         	//判断action
         	String action=request.getContentType();
