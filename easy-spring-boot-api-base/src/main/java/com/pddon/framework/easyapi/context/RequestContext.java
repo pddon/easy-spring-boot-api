@@ -75,6 +75,14 @@ public class RequestContext {
      */
     private Session session;
     /**
+     * 支持主动设置的租户ID
+     */
+    private String tenantId;
+    /**
+     * 支持主动设置的应用ID
+     */
+    private String appId;
+    /**
      * 是否忽略多租户条件
      */
     private boolean ignoreTenant = false;
@@ -152,6 +160,8 @@ public class RequestContext {
         this.ignoreTenant = false;
         this.shiroSessionEnable = false;
         this.superManager = false;
+        this.tenantId = null;
+        this.appId = null;
     }
 
     public boolean isSuperManager() {
@@ -200,6 +210,9 @@ public class RequestContext {
     }
 
     public String getAppId(){
+        if(StringUtils.isNotEmpty(this.appId)){
+            return this.appId;
+        }
         String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.APP_ID));
         if(StringUtils.isBlank(value) && this.session != null){
             value = this.session.getAppId();
@@ -208,6 +221,9 @@ public class RequestContext {
     }
     
     public String getChannelId(){
+        if(StringUtils.isNotBlank(this.tenantId)){
+            return this.tenantId;
+        }
     	String value = this.getAttachment(SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(SystemParameterRenameProperties.CHANNEL_ID));
         if(this.session != null && StringUtils.isNotBlank(this.session.getChannelId())){
             value = this.session.getChannelId();

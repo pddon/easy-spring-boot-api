@@ -25,7 +25,7 @@ public interface BaseApplicationConfigDao<K extends BaseApplicationConfig> {
 
     boolean removeByAppIds(List<String> asList);
 
-    IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword, String appType);
+    IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword, String appType, List<String> appTypes, String notAppType);
 
     boolean existsAppId(String appId);
 }

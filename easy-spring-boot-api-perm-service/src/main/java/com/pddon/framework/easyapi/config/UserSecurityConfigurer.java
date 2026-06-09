@@ -6,6 +6,7 @@ import com.pddon.framework.easyapi.UserAuthorizingRealm;
 import com.pddon.framework.easyapi.UserSecurityService;
 import com.pddon.framework.easyapi.filter.UserAuthenticatingFilter;
 import com.pddon.framework.easyapi.impl.EasyApiWebSessionManager;
+import com.pddon.framework.easyapi.utils.StringUtils;
 import org.apache.shiro.authc.credential.HashedCredentialsMatcher;
 import org.apache.shiro.codec.Base64;
 import org.apache.shiro.mgt.SecurityManager;
@@ -151,6 +152,14 @@ public class UserSecurityConfigurer {
         Arrays.stream(securityConfigProperties.getAuthAccessResourceUrls()).forEach(url -> {
             filterMap.put(url, "userAuthFilter");
         });
+        if(StringUtils.isNotBlank(securityConfigProperties.getHostPath())){
+            String hostPath = securityConfigProperties.getHostPath();
+            Map<String, String> hostFilterMap = new LinkedHashMap<>();
+            filterMap.keySet().forEach(key -> {
+                hostFilterMap.put(hostPath + key, filterMap.get(key));
+            });
+            filterMap.putAll(hostFilterMap);
+        }
         //需要特殊权限访问用户资源
         securityConfigProperties.getResourcePerms().forEach((url, permArr) -> {
             String perms = "perms[" + Arrays.stream(permArr).collect(Collectors.joining(",")) + "]";

@@ -44,6 +44,10 @@ public class SecurityConfigProperties implements Serializable {
 
     private Map<String,String> apiPermTypes = new HashMap<>();
     /**
+     * 根路径
+     */
+    private String hostPath = "";
+    /**
      * 当无权限时跳转的页面
      */
     private String loginUrl = "/login.html";

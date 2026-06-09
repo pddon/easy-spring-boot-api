@@ -12,6 +12,7 @@ import com.pddon.framework.easyapi.dao.mapper.BaseApplicationConfigMapper;
 import org.springframework.beans.BeanUtils;
 import org.springframework.util.StringUtils;
 
+import java.util.Arrays;
 import java.util.List;
 
 /**
@@ -58,7 +59,7 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
     }
 
     @Override
-    public IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword, String appType) {
+    public IPage<K> pageQuery(PaginationRequest req, String tenantId, String keyword, String appType, List<String> appTypes, String notAppType) {
         Page<K> page = new Page<>(req.getCurrent(), req.getSize());
         if(StringUtils.isEmpty(req.getOrderBy())){
             //默认按创建时间排序
@@ -71,6 +72,8 @@ public abstract class BaseApplicationConfigDaoImpl<T extends BaseApplicationConf
         Wrapper<K> wrapper = new LambdaQueryWrapper<K>()
                 .eq(!StringUtils.isEmpty(tenantId), BaseApplicationConfig::getTenantId, tenantId)
                 .eq(!StringUtils.isEmpty(appType), BaseApplicationConfig::getAppType, appType)
+                .in(appTypes != null && !appTypes.isEmpty() && (notAppType != null), BaseApplicationConfig::getAppType, Arrays.asList(notAppType))
+                .notIn(notAppType != null, BaseApplicationConfig::getAppType, Arrays.asList(notAppType))
                 .and(!StringUtils.isEmpty(keyword), query -> {
                     return query.likeRight(BaseApplicationConfig::getAppName, keyword).or()
                             .likeRight(BaseApplicationConfig::getDescription, keyword);

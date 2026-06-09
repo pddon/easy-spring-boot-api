@@ -5,6 +5,7 @@ import lombok.Data;
 import lombok.experimental.Accessors;
 
 import javax.validation.constraints.NotEmpty;
+import java.util.List;
 
 /**
  * @ClassName: AppListRequest
@@ -21,4 +22,8 @@ public class AppListRequest extends PaginationRequest {
     private String keyword;
 
     private String appType;
+
+    private List<String> appTypes;
+
+    private String notAppType;
 }

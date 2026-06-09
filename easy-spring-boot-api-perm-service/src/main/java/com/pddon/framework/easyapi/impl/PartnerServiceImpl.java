@@ -160,7 +160,7 @@ public class PartnerServiceImpl implements PartnerService {
 
     @Override
     public PaginationResponse<BaseApplicationConfig> listApp(AppListRequest req) {
-        IPage<BaseApplicationConfig> itemPage = baseApplicationConfigDao.pageQuery(req, req.getTenantId(), req.getKeyword(), req.getAppType());
+        IPage<BaseApplicationConfig> itemPage = baseApplicationConfigDao.pageQuery(req, req.getTenantId(), req.getKeyword(), req.getAppType(), req.getAppTypes(), req.getNotAppType());
         PaginationResponse<BaseApplicationConfig> page = new PaginationResponse<>();
         page.setSize(itemPage.getSize())
                 .setCurrent(itemPage.getCurrent())
