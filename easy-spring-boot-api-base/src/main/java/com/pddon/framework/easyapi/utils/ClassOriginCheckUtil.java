@@ -20,14 +20,14 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
 public class ClassOriginCheckUtil {
-	
+
 	public static String getDeafultBasePackage(){
 		//查找启动类默认包名
 		Map<String,Object> beanMap = SpringBeanUtil.getBeansWithAnnotation(SpringBootApplication.class);
 		if(beanMap != null && beanMap.size() > 0){
 			//自动扫描第一个启动类包名下的所有接口
 			for(Object object : beanMap.values()){
-				return object.getClass().getPackage().getName(); 
+				return object.getClass().getPackage().getName();
 			}
 		}
 		return "";

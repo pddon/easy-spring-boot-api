@@ -1,0 +1,70 @@
+# =============================================================================
+# easy-spring-boot-api-demo 生产环境降内存配置（A 类：纯配置项，不改代码）
+#
+# 激活方式（任选其一，优先级从高到低）：
+#   1) 启动参数：java ... --spring.profiles.active=prod
+#   2) 环境变量：export SPRING_PROFILES_ACTIVE=prod
+#   3) conf/application.properties 中写 spring.profiles.active=prod
+#
+# 未激活时本文件不会被加载，开发/测试行为与改动前完全一致。
+# 注意：profile 配置只覆盖同名键，不会删除 application.yml 中的其它配置项。
+# =============================================================================
+
+server:
+  undertow:
+    threads:
+      # IO 线程（XNIO 事件循环）：只做读写事件分发，不执行业务逻辑。
+      # 默认值 max(2, CPU 核数)；这里按 4 核部署显式给 4。
+      # 依据：IO 线程数超过 CPU 核数没有收益，只会增加线程栈与 selector 开销，
+      #       而线程数是常驻内存的乘数项（默认 -Xss 1MB/线程）。
+      io: 4
+      # 业务线程（阻塞式执行 Controller）：默认 io * 8 = 32，此处保持 32。
+      # 依据：本项目业务以 DB/Redis 同步调用为主，32 个 worker 配合请求队列可支撑常规并发；
+      #       压测出现请求排队（队列打满/响应变慢）再上调，最大不建议超过 64。
+      worker: 32
+    # 每个请求/响应的直接内存缓冲区大小。默认 16364（约 16KB，堆 >= 128MB 时）。
+    # 改为 8192（8KB）：绝大多数 JSON 报文远小于 8KB，每连接/每请求的直接内存占用减半。
+    # 副作用：响应体超过 8KB 的接口会多一次缓冲区切换/拷贝（CPU 略升、内存下降）；
+    #       大文件下载请走流式接口，不要靠调大此值来解决。
+    buffer-size: 8192
+    # 使用堆外直接内存做缓冲区（默认 true）。保持 true：缓冲区不占堆，
+    # 总量受启动参数 -XX:MaxDirectMemorySize=256m 约束（见 startup.sh）。
+    direct-buffers: true
+    # 单个请求体大小上限。Undertow/Spring Boot 默认 -1（不限制），等于把“请求体大小”
+    # 这个内存上限交给客户端决定；这里设 16MB：demo 的 FileController 单文件上限是 12MB，
+    # 留 4MB 余量给表单/JSON 外层包装。
+    # 副作用：超过 16MB 的请求会被 Undertow 直接拒绝（413 或连接重置）；
+    #       需要更大报文的接口应改用分片上传，或同步上调此值并重新评估堆/直接内存峰值。
+    max-http-post-size: 16MB
+
+spring:
+  servlet:
+    multipart:
+      # 与application.yml保持一致：单文件12MB、单请求16MB。
+      # 不配置时Spring Boot默认1MB，会在进入Controller前拒绝1~12MB的文件。
+      max-file-size: 12MB
+      max-request-size: 16MB
+
+easyapi:
+  # 生产环境关闭 swagger 接口文档：swagger 会扫描 basePackage 下全部接口并常驻缓存
+  # 文档模型元数据（额外堆占用），同时会对外暴露接口清单，属安全风险。
+  # 开发/测试环境不要带 prod profile 即可保持开启。
+  enable-swagger: false
+
+logging:
+  level:
+    # ApiLogInterceptor 在 INFO 级别下会对每个请求执行：
+    #   「请求参数序列化整份 JSON → 截断到 1024 字符」+「响应体序列化整份 JSON → 截断到 1024 字符」，
+    # 且请求参数会被序列化两次。整份 JSON 的临时对象是请求链路里最明显的一次性分配。
+    # 设为 WARN 后 log.isInfoEnabled() 返回 false，上述序列化与截断逻辑整体跳过。
+    #
+    # 影响排查吗：会看不到单次请求的入参/出参日志，但异常堆栈、业务 WARN/ERROR、
+    # 链路 ID（X-Request-Id）与接口耗时不受影响。
+    # 临时排查办法（命令行参数优先级最高，无需改文件、无需重启其他配置）：
+    #   java ... --logging.level.com.pddon.framework.easyapi.interceptor.impl.ApiLogInterceptor=INFO
+    # 或用环境变量：
+    #   LOGGING_LEVEL_COM_PDDON_FRAMEWORK_EASYAPI_INTERCEPTOR_IMPL_APILOGINTERCEPTOR=INFO
+    com.pddon.framework.easyapi.interceptor.impl.ApiLogInterceptor: WARN
+    # application.yml 中框架包级是 TRACE（演示用）；生产覆盖为 INFO，
+    # 避免框架内部 trace/debug（请求上下文、缓存命中、拦截器链路）持续生成字符串与日志缓冲。
+    com.pddon.framework.easyapi: INFO

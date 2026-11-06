@@ -10,9 +10,12 @@ package com.pddon.framework.easyapi.response.enhance;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.Map;
+import java.util.Set;
 
 import com.fasterxml.jackson.databind.SerializationFeature;
 import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
@@ -42,6 +45,21 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 
 	@Autowired
 	private ObjectMapper objectMapper;
+
+	/**
+	 * 响应类型 -> 该类型声明的字段名集合，避免每次响应都反射扫描字段。
+	 * 使用ClassValue按类隔离，类卸载时缓存随之释放
+	 */
+	private static final ClassValue<Set<String>> DECLARED_FIELD_NAMES_CACHE = new ClassValue<Set<String>>() {
+		@Override
+		protected Set<String> computeValue(Class<?> type) {
+			Set<String> names = new HashSet<>();
+			for(Field field : type.getDeclaredFields()){
+				names.add(field.getName());
+			}
+			return Collections.unmodifiableSet(names);
+		}
+	};
 	
 	/**
 	 * @author danyuan
@@ -120,7 +138,7 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 	private Map<String, Object> baseResponseWrapper(Object resp) throws JsonProcessingException, IOException {
 		//ObjectMapper mapper = new ObjectMapper();
 		//mapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
-		JsonNode json = objectMapper.readTree(objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(resp));
+		JsonNode json = objectMapper.readTree(objectMapper.writeValueAsString(resp));
 		Map<String, Object> map = new HashMap<>();
 		if(RequestContext.getContext().getResponseWrapper() != null){//系统签名为
 			map.put(responseWrapperProperties.getSign(), RequestContext.getContext().getResponseWrapper().getSign());
@@ -151,6 +169,7 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 		if(resp instanceof DefaultResponseWrapper){
 			return true;
 		}else{
+			Set<String> fieldNames = DECLARED_FIELD_NAMES_CACHE.get(resp.getClass());
 			Map<String, Boolean> fieldStatusMap = new HashMap<>();
 			fieldStatusMap.put(responseWrapperProperties.getCode(), false);
 			fieldStatusMap.put(responseWrapperProperties.getSubCode(), false);
@@ -158,11 +177,9 @@ public class AutoAddResponseWrapperHandler extends AbstractResponseEnhanceHandle
 			fieldStatusMap.put(responseWrapperProperties.getMsg(), false);
 			fieldStatusMap.put(responseWrapperProperties.getSign(), false);
 			fieldStatusMap.put(responseWrapperProperties.getTimestamp(), false);
-			// 获取实体类的所有属性，返回Field数组
-			Field[] fields = resp.getClass().getDeclaredFields();
-			for(Field field : fields){
-				if(fieldStatusMap.containsKey(field.getName())){
-					fieldStatusMap.put(field.getName(), true);
+			for(String fieldName : fieldNames){
+				if(fieldStatusMap.containsKey(fieldName)){
+					fieldStatusMap.put(fieldName, true);
 				}
 			}
 			for(boolean status : fieldStatusMap.values()){

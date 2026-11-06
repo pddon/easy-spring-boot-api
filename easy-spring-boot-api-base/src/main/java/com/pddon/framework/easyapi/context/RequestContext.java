@@ -112,12 +112,19 @@ public class RequestContext {
      * 附带属性
      */
     private Map<String, Object> attachments = new HashMap<>();
+
+    /**
+     * 请求参数日志快照（已按日志长度上限截断）。
+     * 供ApiLogInterceptor在请求/响应两个阶段复用，避免同一请求参数被重复序列化。
+     * 不放入attachments，避免出现在日志对象的系统参数中。
+     */
+    private String requestLogContent;
  
     public static RequestContext getContext() {
         return (RequestContext)LOCAL.get();
     }
  
-    protected RequestContext() {
+    public RequestContext() {
     }
  
     public String getAttachment(String key) {
@@ -146,8 +153,10 @@ public class RequestContext {
     }
     
     public void clear() {
-        this.attachments.clear(); 
-        this.responseSystemParams.clear();
+        //重新赋值而非原地clear：异步上下文快照共享不可变attachments，原地clear会抛UnsupportedOperationException
+        this.attachments = new HashMap<>();
+        this.responseSystemParams = new HashMap<>();
+        this.requestLogContent = null;
         this.targetClass = null;
         this.apiRestrictions = null;
         this.apiInfo = null;
@@ -158,6 +167,7 @@ public class RequestContext {
         this.request = null;
         this.response = null;
         this.ignoreTenant = false;
+        this.ignoreDataPerm = false;
         this.shiroSessionEnable = false;
         this.superManager = false;
         this.tenantId = null;

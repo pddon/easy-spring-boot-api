@@ -1,5 +1,8 @@
 # JavaScript客户端调用API使用方法
 > easy-api-client项目用于快速接入服务端api框架easy-spring-boot-api，其基于axios，可用于web或者node环境。提供了ApiClient工具，自动对api加签、验签、加解密等等功能，在保障服务器api安全的前提下，能做到业务无感知，简化前后端开发人员的联调工作。
+>
+> 说明：`easy-api-client` 是独立发布的外部TypeScript/JavaScript包（源码地址：[https://github.com/pddon/easy-api-client](https://github.com/pddon/easy-api-client)），不在本仓库内，本文示例无法通过本仓库代码核对。
+
 ## 1. 安装依赖
   `npm install easy-api-client`
   

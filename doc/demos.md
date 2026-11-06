@@ -38,28 +38,40 @@
 
 ## 10 接口用户会话功能使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)。simple-demos 中暂未提供用户会话示例模块。
 
 ## 11 系统参数使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)；系统参数校验示例见 [validate-params-demo](../../easy-spring-boot-api-simple-demos/validate-params-demo)。
 
 ## 12 系统错误使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)；可运行示例见 [error-code-demo](../../easy-spring-boot-api-simple-demos/error-code-demo)。
 
 ## 13 国际化翻译器使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)；可运行示例见 [translate-resp-language-demo](../../easy-spring-boot-api-simple-demos/translate-resp-language-demo)。
 
 ## 14 缓存管理器使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)（simple-demos 暂未提供 CacheManager 手动管理缓存示例）；本地缓存容器与方法结果缓存示例见 [method-result-cache-demo](../../easy-spring-boot-api-simple-demos/method-result-cache-demo)。
 
 ## 15 接口响应系统参数使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)。simple-demos 中暂未提供响应系统参数示例模块。
 
 ## 16 静态资源使用示例
 
-[请参考使用示例](MORE.md)
+示例待补充，详见 [MORE.md](MORE.md)。simple-demos 中暂未提供静态资源示例模块。
+
+## 17 API日志与traceId、拦截器使用示例
+
+[请参考示例工程](../../easy-spring-boot-api-simple-demos/api-log-interceptor-demo)
+
+## 18 异步线程池与reject-policy使用示例
+
+[请参考示例工程](../../easy-spring-boot-api-simple-demos/async-thread-pool-demo)
+
+## 19 Java客户端SDK使用示例
+
+[请参考示例工程](../../easy-spring-boot-api-simple-demos/java-client-demo)

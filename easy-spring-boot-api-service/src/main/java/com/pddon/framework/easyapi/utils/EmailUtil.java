@@ -128,7 +128,11 @@ public class EmailUtil {
         return sendEmail(userId, null, null, toUserAccount, title, content, true);
     }
 
-    public static boolean sendTemplateEmail(String userId, String sceneId, String resourceId, String email, Object ...params){
+    public static boolean sendTemplateEmail(String userId, String sceneId, String resourceId, String email, Object ...params) {
+        return sendTemplateTitleEmail(userId, sceneId, resourceId, null, email, params);
+    }
+
+    public static boolean sendTemplateTitleEmail(String userId, String sceneId, String resourceId, String title, String email, Object ...params){
         EmailTemplate emailTemplate = emailTemplateService.getByScene(sceneId, resourceId);
         if(emailTemplate == null){
             throw new BusinessException("邮件模板[{}-{}]未找到，无法发送通知邮件!").setParam(sceneId, resourceId);
@@ -137,6 +141,6 @@ public class EmailUtil {
         if(params != null && params.length > 0){
             content = StringFormatUtil.formatParams(emailTemplate.getContent(), params);
         }
-        return sendEmail(userId, sceneId, resourceId, email, emailTemplate.getTitle(), content, true);
+        return sendEmail(userId, sceneId, resourceId, email, title != null ? title : emailTemplate.getTitle(), content, true);
     }
 }

@@ -20,5 +20,9 @@ public enum UserAccountStatus {
     /**
      * 被禁用，无法使用
      */
-    DISABLE
+    DISABLE,
+    /**
+     * 被注销
+     */
+    DELETED
 }

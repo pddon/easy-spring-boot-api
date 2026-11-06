@@ -1,0 +1,53 @@
+# =============================================================================
+# 外置配置（bin.zip 部署包中的 conf/application.yml）
+#
+# 加载方式：bin/startup.sh 在检测到本文件时追加
+#   --spring.config.additional-location=file:${APP_HOME}/conf/
+# 优先级：本文件 > jar 内 classpath:/application.yml（只覆盖同名键，jar 内其余配置项继续生效）。
+#
+# 本文件只放“易变且安全”的部署期参数：端口、容器线程/缓冲、日志级别、状态存储开关。
+# 不要放业务密钥（channels.*.secret 等请留在 jar 内 yml 或由配置中心/环境变量注入）。
+# =============================================================================
+
+server:
+  # 对外服务端口。默认值 8383 仅作为部署包示例，实际部署请按环境修改。
+  port: 8383
+  undertow:
+    threads:
+      # IO 线程（只做读写事件分发）：默认 max(2, CPU核数)，按 4 核部署给 4
+      io: 4
+      # 业务线程（执行 Controller）：默认 io*8=32
+      worker: 32
+    # 每个请求/响应的直接内存缓冲：默认约 16KB，改为 8KB 可减半每请求直接内存占用
+    buffer-size: 8192
+    # 缓冲区使用堆外直接内存，总量受 -XX:MaxDirectMemorySize 约束（见 startup.sh）
+    direct-buffers: true
+    # 单请求体上限：demo 的 FileController 单文件上限 12MB，留 4MB 余量
+    max-http-post-size: 16MB
+
+logging:
+  level:
+    com.pddon.framework.easyapi: INFO
+    org.springframework.web: INFO
+
+easyapi:
+  state-store:
+    # auto（默认：存在 Redis 则用 Redis，否则本地）/ local（强制本地）/ redis（强制 Redis，缺失时启动失败）
+    type: auto
+    # key 全局前缀。留空则自动使用 easyapi:<spring.application.name 或 default>:
+    key-prefix: ""
+    # Redis 故障时是否回退本地存储；false 为 fail-fast
+    fallback-to-local-on-failure: true
+    # 降级 WARN 日志打印间隔（秒），避免故障期刷爆日志
+    fallback-warn-interval-seconds: 60
+
+# -----------------------------------------------------------------------------
+# Redis 连接占位（使用前取消注释并填写实际地址；不要把真实地址/密码提交到仓库）
+# 仅当 classpath 中存在 spring-boot-starter-data-redis 时生效，state-store.type=auto 会自动切换到 Redis。
+# -----------------------------------------------------------------------------
+# spring:
+#   redis:
+#     host: 127.0.0.1
+#     port: 6379
+#     password: ""
+#     timeout: 3000ms

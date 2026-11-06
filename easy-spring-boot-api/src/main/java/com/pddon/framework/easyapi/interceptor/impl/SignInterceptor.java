@@ -9,10 +9,14 @@
 package com.pddon.framework.easyapi.interceptor.impl;
 
 import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
+
 import com.pddon.framework.easyapi.dto.SecretInfo;
+import com.pddon.framework.easyapi.security.SignReplayProtector;
 import lombok.extern.slf4j.Slf4j;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +44,9 @@ public class SignInterceptor extends AbstractApiMethodInterceptor {
 	
 	@Autowired
 	private SystemParameterRenameProperties systemParameterProperties;
+
+	@Autowired
+	private SignReplayProtector signReplayProtector;
 	/**
 	 * @author danyuan
 	 */
@@ -60,8 +67,29 @@ public class SignInterceptor extends AbstractApiMethodInterceptor {
 			//检查接口数字签名
 			String sign = RequestContext.getContext().getSign();			
 			String timestamp = RequestContext.getContext().getTimestamp();
-			if(!signManager.checkSign(sign, secret.getSecret(), timestamp, requestParams)){
+			String nonce = null;
+			List<ApiRequestParameter> paramsToVerify = requestParams;
+			if(signReplayProtector.isEnabled()){
+				//开启防重放后：校验时间窗，并将nonce作为签名参数参与验签，
+				//避免攻击者替换nonce后仍能复用旧签名
+				String nonceParam = signReplayProtector.getNonceParam();
+				HttpServletRequest request = (HttpServletRequest)RequestContext.getContext().getRequest();
+				nonce = request == null ? null : request.getParameter(nonceParam);
+				signReplayProtector.checkTimestamp(timestamp, systemParameterProperties.getTimestamp());
+				signReplayProtector.requireValidNonce(nonce);
+				paramsToVerify = new ArrayList<>(requestParams);
+				ApiRequestParameter nonceParameter = new ApiRequestParameter();
+				nonceParameter.setParamName(nonceParam);
+				nonceParameter.setParam(nonce);
+				nonceParameter.setNeedSign(true);
+				paramsToVerify.add(nonceParameter);
+			}
+			if(!signManager.checkSign(sign, secret.getSecret(), timestamp, paramsToVerify)){
 				throw new BusinessException(ErrorCodes.ERROR_SIGN).setParam(systemParameterProperties.getSign(), sign);
+			}
+			if(signReplayProtector.isEnabled()){
+				//验签通过后才消费nonce，避免无效签名占用nonce
+				signReplayProtector.consumeNonce(nonce);
 			}
 		}else if(RequestContext.getContext().getApiRestrictions().getRequestSign()){
 			log.warn("渠道和应用的验签秘钥配置均为空，无法进行进行验签，请先配置!");

@@ -44,6 +44,12 @@ public class RepeatedlyReadFilter implements Filter {
 			chain.doFilter(request, response);
 			return;
 		}
+		//无请求体（contentLength==0）时无需缓存与包装：没有内容需要重复读取，
+		//可省去一次包装对象、字节数组与字符转换；contentLength为-1（chunked/未知）仍按有body处理
+		if(request.getContentLength() == 0){
+			chain.doFilter(request, response);
+			return;
+		}
 		if(log.isTraceEnabled()){
 			log.trace("构建可重复读取的request.getInputStream流");
 		}		

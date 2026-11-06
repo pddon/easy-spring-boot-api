@@ -14,6 +14,7 @@ import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -30,6 +31,63 @@ public class BeanPropertyUtil {
 	private static Pattern linePattern = Pattern.compile("_(\\w)");
 	
 	private static Pattern humpPattern = Pattern.compile("[A-Z]");
+
+	/**
+	 * 类的字段列表缓存，避免每次请求都重复扫描继承链并反射获取字段。
+	 * 使用ClassValue按类隔离，类卸载时缓存随之释放，避免静态缓存持有类加载器
+	 */
+	private static final ClassValue<List<Field>> ALL_FIELD_CACHE = new ClassValue<List<Field>>() {
+		@Override
+		protected List<Field> computeValue(Class<?> clazz) {
+			List<Field> scanned = new ArrayList<>();
+			Class<?> currentClass = clazz;
+			//当父类为null的时候说明到达了最上层的父类(Object类).
+			while (currentClass != null && !"java.lang.Object".equals(currentClass.getName())) {
+				scanned.addAll(Arrays.asList(currentClass.getDeclaredFields()));
+				currentClass = currentClass.getSuperclass(); //得到父类,然后赋给自己
+			}
+			return Collections.unmodifiableList(scanned);
+		}
+	};
+	/**
+	 * 类注解缓存，避免每次处理对象时都复制注解数组
+	 */
+	private static final ClassValue<Annotation[]> CLASS_ANNOTATION_CACHE = new ClassValue<Annotation[]>() {
+		@Override
+		protected Annotation[] computeValue(Class<?> clazz) {
+			return clazz.getAnnotations();
+		}
+	};
+	/**
+	 * 字段是否存在公共getter的缓存，避免每个字段都触发一次反射查找与异常。
+	 * 以Field（声明类+字段名+类型）为key，避免子类与父类同名字段（类型不同）互相串值
+	 */
+	private static final ClassValue<Map<Field, Boolean>> FIELD_GETTER_CACHE =
+			new ClassValue<Map<Field, Boolean>>() {
+				@Override
+				protected Map<Field, Boolean> computeValue(Class<?> clazz) {
+					return new ConcurrentHashMap<>();
+				}
+			};
+
+	/**
+	 * 可序列化字段缓存：按“声明类 + 忽略注解”缓存通过getter校验、且已设置为可访问的字段列表。
+	 * 原先每次遍历对象都要对每个字段重复做getter判定查询、注解扫描和setAccessible反射调用；
+	 * 字段清单、getter与可访问性在运行期不变，缓存后每个字段只需一次反射取值。
+	 * 使用ClassValue按类隔离，类卸载时缓存随之释放，避免静态缓存持有类加载器。
+	 */
+	private static final ClassValue<Map<Class<?>, List<Field>>> SERIALIZABLE_FIELD_CACHE =
+			new ClassValue<Map<Class<?>, List<Field>>>() {
+				@Override
+				protected Map<Class<?>, List<Field>> computeValue(Class<?> clazz) {
+					return new ConcurrentHashMap<>();
+				}
+			};
+
+	/**
+	 * 不忽略任何注解时的缓存key（ConcurrentHashMap不允许null key）
+	 */
+	private static final Class<?> NO_IGNORE_ANNO = Void.class;
 
 	public static String[] getNullPropertyNames(Object source) {
 		final BeanWrapper src = new BeanWrapperImpl(source);
@@ -53,7 +111,7 @@ public class BeanPropertyUtil {
 		return objToStringMap(object, parentKey, hashCodeSet, ignoreAnno);
 	}
 	@SuppressWarnings("unchecked")
-	public static Map<String, String> objToStringMap(Object object, String parentKey, Set<String> hashCodeSet, Class<?> ignoreAnno) {			
+	public static Map<String, String> objToStringMap(Object object, String parentKey, Set<String> hashCodeSet, Class<?> ignoreAnno) {
 		Map<String, String> resultMap = new HashMap<>();
 		if(object == null){
 			return resultMap;
@@ -63,7 +121,7 @@ public class BeanPropertyUtil {
 				return resultMap;
 			}
 			hashCodeSet.add(String.valueOf(object.hashCode()));
-		}		
+		}
         if(parentKey == null){
         	parentKey = "";
         }
@@ -124,7 +182,6 @@ public class BeanPropertyUtil {
             	}            	      	
             }else if(object instanceof Set<?>){//Set集合
             	Set<Object> set = (Set<Object>)object;
-            	Set<Object> newSet = new HashSet<Object>();
             	int i = 0;
             	for(Object subObj : set){
             		String currentKey = "";
@@ -135,37 +192,21 @@ public class BeanPropertyUtil {
 						resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
 					}
             	} 
-            	set.removeAll(set);
-            	set.addAll(newSet);
             }else{//普通对象
-            	List<Field> fields = getAllField(object);
-            	boolean ignoreField = false;
+            	List<Field> fields = getSerializableFields(object.getClass(), ignoreAnno);
                 for (Field field : fields) {
-                	ignoreField = false;
-                	if(ignoreAnno != null){
-                		//判断该字段是否需要忽略
-                    	Annotation[] fieldAnnos= field.getAnnotations();
-                    	if(fieldAnnos != null){
-                			for(Annotation anno : fieldAnnos){
-                				if(anno.annotationType().equals(ignoreAnno)){
-                					ignoreField = true;
-                					break;
-                				}
-                			}
-                		}   
-                	}                	
-                	if(!ignoreField && hasPublicGetter(field, object)){
+                	if(!field.isAccessible()){
                 		field.setAccessible(true);
-                    	Object subObj = field.get(object);
-                    	String subKeyName = field.getName();
-                    	String currentKey = subKeyName;
-                    	if(!StringUtils.isEmpty(parentKey)){
-                    		currentKey = parentKey+"."+currentKey;
-                    	}
-						if(subObj != null){
-							resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
-						}
-                	}                	
+                	}
+                	Object subObj = field.get(object);
+                	String subKeyName = field.getName();
+                	String currentKey = subKeyName;
+                	if(!StringUtils.isEmpty(parentKey)){
+                		currentKey = parentKey+"."+currentKey;
+                	}
+					if(subObj != null){
+						resultMap.putAll(objToStringMap(subObj, currentKey, hashCodeSet, ignoreAnno));
+					}
                 }
             } 
         } catch (Exception e) {
@@ -187,6 +228,7 @@ public class BeanPropertyUtil {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public static Object decorateObj(String fieldName, Object object, Map<Class<?>, Annotation> annotations, DecorateContentFunction fun, Set<String> hashCodeSet) throws Throwable {
 		if(object == null){
+			//空值不做类型判断，直接交给装饰函数；是否返回null由装饰函数决定（内置处理器均原样返回）
 			return fun.decorate(fieldName, object, annotations);
 		}
 		if(!isBaseType(object) && !(object instanceof Map) && !(object instanceof Collections) && !(object instanceof Iterator)){//非基础数据类型需要防止重复引用的问题
@@ -195,7 +237,7 @@ public class BeanPropertyUtil {
 			}
 			hashCodeSet.add(String.valueOf(object.hashCode()));
 		}		
-		Annotation[] currentAnnotations = object.getClass().getAnnotations();//获取类上的注解
+		Annotation[] currentAnnotations = getClassAnnotations(object.getClass());//获取类上的注解
 		Map<Class<?>, Annotation> allAnnos = new HashMap<>();
 		if(annotations != null){
 			allAnnos.putAll(annotations);
@@ -267,26 +309,26 @@ public class BeanPropertyUtil {
             	set.removeAll(set);
             	set.addAll(newSet);
             }else{//普通对象
-                List<Field> fields = getAllField(object);
+                List<Field> fields = getSerializableFields(object.getClass(), null);
                 for (Field field : fields) {
-                	if(hasPublicGetter(field, object)){
+                	if(!field.isAccessible()){
                 		field.setAccessible(true);
-                    	Object subObj = field.get(object);
-                    	Annotation[] fieldAnnos= field.getAnnotations();
-						HashMap<Class<?>, Annotation> allFieldAnnos = new HashMap<>(allAnnos);
-                    	if(fieldAnnos != null){
-                			for(Annotation anno : fieldAnnos){
-								allFieldAnnos.put(anno.annotationType(), anno);
-                			}
-                		}
-						if(subObj != null){
-							try{
-								field.set(object, decorateObj(field.getName(), subObj, allFieldAnnos, fun, hashCodeSet));
-							}catch(Exception e){
-								log.warn(e.getMessage());
-							}
+                	}
+                    Object subObj = field.get(object);
+                    Annotation[] fieldAnnos= field.getAnnotations();
+					HashMap<Class<?>, Annotation> allFieldAnnos = new HashMap<>(allAnnos);
+                	if(fieldAnnos != null){
+            			for(Annotation anno : fieldAnnos){
+							allFieldAnnos.put(anno.annotationType(), anno);
+            			}
+            		}
+					if(subObj != null){
+						try{
+							field.set(object, decorateObj(field.getName(), subObj, allFieldAnnos, fun, hashCodeSet));
+						}catch(Exception e){
+							log.warn(e.getMessage());
 						}
-                	}                	
+					}
                 }
             } 
         } catch (Exception e) {
@@ -296,21 +338,71 @@ public class BeanPropertyUtil {
 	}
 	
 	public static List<Field> getAllField(Object object){
-		List<Field> fieldList = new ArrayList<>() ;
-		Class<?> currentClass = object.getClass();
-		//当父类为null的时候说明到达了最上层的父类(Object类).
-		while (currentClass !=null && !currentClass.getName().toLowerCase().equals("java.lang.object")) {
-		      fieldList.addAll(Arrays.asList(currentClass .getDeclaredFields()));
-		      currentClass = currentClass.getSuperclass(); //得到父类,然后赋给自己
+		//返回副本，保持原有"调用方可自由修改返回集合"的语义
+		return new ArrayList<>(getAllFieldCached(object.getClass()));
+	}
+
+	private static List<Field> getAllFieldCached(Class<?> clazz){
+		return ALL_FIELD_CACHE.get(clazz);
+	}
+
+	/**
+	 * 获取可用于序列化的字段列表（有公共getter、且不是指定忽略注解标注的字段）。
+	 * 结果按“类 + 忽略注解类型”缓存，并为字段设置可访问性；返回的列表不可修改。
+	 */
+	private static List<Field> getSerializableFields(Class<?> clazz, Class<?> ignoreAnno){
+		Map<Class<?>, List<Field>> cache = SERIALIZABLE_FIELD_CACHE.get(clazz);
+		Class<?> cacheKey = ignoreAnno == null ? NO_IGNORE_ANNO : ignoreAnno;
+		List<Field> cached = cache.get(cacheKey);
+		if(cached != null){
+			return cached;
 		}
-		return fieldList;
+		List<Field> fields = new ArrayList<>();
+		for(Field field : getAllFieldCached(clazz)){
+			if(ignoreAnno != null && hasAnnotation(field, ignoreAnno)){
+				continue;
+			}
+			if(!resolvePublicGetter(field, clazz)){
+				continue;
+			}
+			try{
+				field.setAccessible(true);
+			}catch(Exception ignored){
+				//无法设置可访问性时保留原字段，取值阶段会再次尝试并抛出异常，保持原有失败语义
+			}
+			fields.add(field);
+		}
+		List<Field> result = Collections.unmodifiableList(fields);
+		List<Field> previous = cache.putIfAbsent(cacheKey, result);
+		return previous != null ? previous : result;
+	}
+
+	private static boolean hasAnnotation(Field field, Class<?> annoClass){
+		Annotation[] fieldAnnos = field.getAnnotations();
+		if(fieldAnnos == null){
+			return false;
+		}
+		for(Annotation anno : fieldAnnos){
+			if(anno.annotationType().equals(annoClass)){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	private static Annotation[] getClassAnnotations(Class<?> clazz){
+		return CLASS_ANNOTATION_CACHE.get(clazz);
 	}
 	
 	public static Method getMethod(Object obj, String methodName) throws Exception{
+		return getMethod(obj.getClass(), methodName);
+	}
+
+	private static Method getMethod(Class<?> clazz, String methodName) throws Exception{
 		Method method = null;	
-		Class<?> currentClass = obj.getClass();
+		Class<?> currentClass = clazz;
 		//当父类为null的时候说明到达了最上层的父类(Object类).
-		while (currentClass !=null && !currentClass.getName().toLowerCase().equals("java.lang.object")) {
+		while (currentClass != null && !"java.lang.Object".equals(currentClass.getName())) {
 			try{
 				method = currentClass.getDeclaredMethod(methodName);	
 			}catch(Exception e){				
@@ -325,11 +417,30 @@ public class BeanPropertyUtil {
 	}
 	
 	public static boolean hasPublicGetter(Field field, Object obj){
+		Class<?> clazz = obj.getClass();
+		Map<Field, Boolean> getterCache = FIELD_GETTER_CACHE.get(clazz);
+
+		Boolean exists = getterCache.get(field);
+		if(exists == null){
+			exists = resolvePublicGetter(field, obj);
+			getterCache.put(field, exists);
+		}
+		return exists;
+	}
+
+	private static boolean resolvePublicGetter(Field field, Object obj){
+		return resolvePublicGetter(field, obj.getClass());
+	}
+
+	/**
+	 * 判断字段是否存在公共getter；只依赖字段声明信息与类结构，与具体实例无关。
+	 */
+	private static boolean resolvePublicGetter(Field field, Class<?> clazz){
 		String name = field.getName().substring(0,1).toUpperCase() + field.getName().substring(1);	
 		try {
 			String getterMethodName = "get"+name;
 			
-			boolean exists = getMethod(obj, getterMethodName) != null;
+			boolean exists = getMethod(clazz, getterMethodName) != null;
 			if(exists){
 				return true;
 			}
@@ -338,7 +449,7 @@ public class BeanPropertyUtil {
 		if(field.getType().equals(Boolean.class) || field.getType().equals(boolean.class)){
 			try {
 				String booleanGetterMethodName = "is"+name;
-				return getMethod(obj, booleanGetterMethodName) != null; 
+				return getMethod(clazz, booleanGetterMethodName) != null; 
 			}catch (Exception e) {
 			}
 		}		

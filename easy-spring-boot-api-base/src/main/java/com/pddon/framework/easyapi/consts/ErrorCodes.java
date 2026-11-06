@@ -38,6 +38,7 @@ public enum ErrorCodes {
 	ERROR_SIGN(130005),//验签失败
 	UNIQUE_TOKEN_USING(130006),//您提交的请求正在处理，请勿重复提交
 	UNIQUE_TOKEN_USED(130007),//你的请求数据已提交成功，请勿重复提交
+	REPLAY_ATTACK(130008),//请求验签重放：nonce已被使用（仅在开启验签防重放时出现）
 
 	ACCOUNT_DISABLED(130011),//账户被禁用
 	ACCOUNT_LOCKED(130012),//账户被锁定

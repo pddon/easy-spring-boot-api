@@ -28,12 +28,12 @@
 
     * EasyApi使用了springboot带来的所有便利，其在springmvc的基础上提供了额外的功能增强，如下图所示
 
-        ![EasyApi业务流程图](imgs/EasyApi业务流程图.jpg)
+        ![EasyApi业务流程图](imgs/业务流程图.jpg)
 
 ### 1.1.2 EasyApi项目组件架构解析
 * 架构图
 
-    ![EasyApi内部组件架构图](imgs/EasyApi内部组件架构图.jpg)
+    ![EasyApi内部组件架构图](imgs/内部组件架构图.jpg)
 
 * 组件介绍
 
@@ -155,7 +155,7 @@
     > 8. API请求参数、响应参数的自动校验，校验结果自动处理后通过API响应反馈给调用者
     > 9. 简单方便的缓存管理器，使用Guava cache作为默认的本地缓存管理器，支持缓存管理器的灵活拓展，提供`@CacheMethodResult`和`@CacheMethodResultEvict`注解实现方法接口结果的缓存和失效
     > 10. 接口安全相关组件，验签、加解密、防重复提交等等，使用时只需要为你的API添加一个注解即可搞定
-    > 11. 接口会话管理机制，提供Guava cache实现的默认本地会话管理器，支持业务灵活定制以支持分布式会话管理
+    > 11. 接口会话管理机制，默认提供本地会话管理器；引入可选Redis状态存储后自动切换为跨实例共享会话（见5.6），也支持业务灵活定制会话管理器
     > 12. 接口文档化支持，提供了swagger接口文档自动生成，并整合了knife4j提供简单易用的实时api文档
     > 13. 接口调用日志打印，提供对接口请求参数信息、接口响应信息的简要打印，预留了接口调用日志持久化机制，用于业务方定制流量监控相关功能
     > 14. web容器性能参数优化（迭代加）
@@ -483,6 +483,86 @@ public class StartDemoApplication {
 > 4. 可以添加自定义响应序列化预处理器，根据业务需要定制化返回信息
 > 5. 可以添加自定义异常处理器，为目标类型的异常做额外的处理
 > 6. 可以灵活定制和使用自定义的加解密处理器
+
+## 5.3 性能优化说明
+
+> 以下优化均保持现有 public API、配置项语义、返回结构与日志语义不变，不改变接口的对外行为。详细说明与基准数据见根目录 [README.md](../README.md) 的“5.3 性能优化说明”。
+
+| 优化点 | 代码位置 | 优化方式 |
+| ------ | -------- | -------- |
+| 启动类包名、根包集合 | `ClassOriginCheckUtil`、`EasyApiConfig.getAllBasePackages` | 根包集合按`EasyApiConfig`实例缓存，`setBasePackages`时失效；不再使用静态缓存，避免多Spring上下文串值 |
+| 反射转换与元数据 | `BeanPropertyUtil`、`ApiInvokeMethodInterceptorManager`、`ApiDataFormatInterceptor`、`MethodCacheInterceptorManager` | 按类使用`ClassValue`缓存（BeanPropertyUtil按运行时类、拦截器按方法声明类；类卸载时释放）；参数名解析失败时不缓存 |
+| 日志与响应包装 | `ApiLogInterceptor`、`AutoAddResponseWrapperHandler` | 复用`ObjectWriter`、`convertValue`、关闭INFO日志时跳过拼装 |
+| 参数校验Validator | `ValidateParamsInterceptor` | `ObjectProvider<Validator>`延迟注入容器Validator，脱离Spring时回退默认实现；多Validator时回退并只告警一次 |
+| 启动期消息转换器 | `EasyApiWebConfigurer` | `easyapi.enableHttpMessageConverterCache`，默认关闭 |
+| 本地缓存写锁 | `LocalCacheContainer` | `easyapi.local-cache.lock-free`，默认关闭 |
+| 异步线程池拒绝策略 | `EasyApiAsyncConfigurer` | `easyapi.async-thread-pool.reject-policy`，默认`discard`，可选`callerRuns` |
+| 异步线程池启动校验 | `EasyApiAsyncConfigurer`、`AsyncThreadPoolConfig` | `easyapi.async-thread-pool.fail-fast`，默认`true`（非法配置启动期抛异常）；`false`时记录ERROR日志并回退默认值（core=5、max=20、queue=10000、keepAlive=600） |
+
+> 注意：`lock-free`模式下并发写入同一key不同过期时效时，可能短暂同时存在于两个过期桶；写入完成后会清理其它桶中的副本，极端交错下也可能短暂缺失（表现为一次缓存未命中，不会返回错误数据），对强一致清理有要求时保持默认全局锁模式。
+
+## 5.4 并发与正确性修复
+
+| 问题 | 代码位置 | 修复方式 |
+| ---- | -------- | -------- |
+| 防重复提交检查与写入标记非原子 | `DefaultCheckRepeatManagerImpl.check` | 按重复提交码哈希分片加锁，同一码的校验+写入原子执行；本地模式仅保证单JVM内唯一，引入可选Redis后由`SET NX EX`保证跨实例唯一 |
+| `RequestContext.clear()`未重置`ignoreDataPerm` | `RequestContext.clear` | 清理时恢复默认值，避免线程复用导致数据权限忽略标记泄漏 |
+| 缓存管理器数量达上限后`remove`回退到默认桶 | `LocalCacheContainer.remove`/`getCache` | `remove`直接失效定位到的缓存管理器；桶创建在锁内二次校验上限 |
+
+> 验签时间戳默认仅参与签名内容，不含有效期与nonce校验（保持原行为）；需要防重放可开启`easyapi.sign.replay-protection.enabled=true`（详见5.5）。
+
+## 5.5 失败释放防重码与验签防重放
+
+| 能力 | 配置项 | 默认值 | 行为 |
+| ---- | ------ | ------ | ---- |
+| 失败释放防重码 | `easyapi.no-repeat-submit.release-on-failure` | `true` | 业务成功→标记已提交；业务成功前失败（参数校验/验签/业务异常/系统异常）→释放提交码，允许立即重试；`false`回退旧行为 |
+| 验签防重放 | `easyapi.sign.replay-protection.enabled` | `false` | 开启后增加时间窗校验与nonce一次性校验；关闭时验签行为完全不变 |
+| 时间窗 | `timestamp-window-seconds` | `300` | 毫秒时间戳偏差超窗返回`ERROR_SIGN(130005)` |
+| nonce有效期 | `nonce-ttl-seconds` | `300` | nonce在状态存储中的保留时间 |
+| nonce容量 | `nonce-cache-size` | `100000` | 本地模式下的容量参考，避免内存无界增长 |
+| nonce参数名 | `nonce-param` | `nonce` | 客户端需以该参数名传递nonce并参与签名 |
+| nonce长度 | `nonce-max-length` | `128` | 超长nonce直接拒绝（`ERROR_SIGN`） |
+
+> nonce重复使用返回新增错误码`REPLAY_ATTACK(130008)`。nonce通过统一状态存储`DistributedStateStore`消费：未接入Redis时为单JVM校验；接入Redis后跨实例只消费一次。
+
+## 5.6 可选Redis与分布式一致性
+
+| 配置项 | 默认值 | 说明 |
+| ---- | ---- | ---- |
+| `easyapi.state-store.type` | `auto` | `auto`：有Redis用Redis，否则本地；`local`强制本地；`redis`强制Redis（缺少Redis依赖/模板时启动失败） |
+| `easyapi.state-store.key-prefix` | 空 | 为空时自动使用`easyapi:<spring.application.name或default>:`，避免多应用共享Redis时key冲突 |
+| `easyapi.state-store.fallback-to-local-on-failure` | `true` | Redis异常时回退本地并限频WARN；`false`为fail-fast（异常抛出，请求失败） |
+| `easyapi.state-store.fallback-warn-interval-seconds` | `60` | 降级WARN日志打印间隔 |
+
+- 接入方式：业务项目引入`spring-boot-starter-data-redis`并配置`spring.redis.*`即可；框架对该依赖声明为`optional`，未引入时`redisStateStore`配置类不生效，自动使用`localStateStore`，行为与历史版本一致。
+- 跨实例强一致：防重复提交码、验签nonce（`SET NX EX`原子占用/消费）。
+- `CacheManager`能力：`state-store`解析为Redis时，框架的`CacheManager`自动切换为`RedisStateCacheManager`，会话、方法结果缓存、国际化翻译缓存、验证码/邮箱码跨实例共享；同一key的命中与失效在所有实例一致。
+- 仍需业务配合：同一会话并发更新为最后写入者生效（不合并）；验证码`get+remove`非原子，极并发下可能被重复校验；方法缓存无single-flight，并发未命中可能重复计算。
+- 序列化与key规范：值为JSON信封`{"c":"原始类名","v":值}`（禁止JDK序列化），key为`<全局前缀>cache:<write|read>:<业务key>`；`repeat-submit:`、`sign:nonce:`共用同一全局前缀。
+- Redis模式差异：无TTL桶，`clear(expireSeconds)`清理整个`cache:`命名空间；`stats/getAllCaches/getCaches`返回空集合（避免`KEYS`）；对象无法JSON序列化时跳过缓存并打印WARN。
+- 故障影响：默认降级期间跨实例一致性失效，需监控WARN日志；Redis生产环境建议哨兵/集群。
+- 回退与迁移：`type=local`或移除Redis依赖即回到单JVM行为；切换后旧缓存不会被读取（一次冷启动），Redis中的key按TTL自然过期，必要时按`cache:`前缀清理。
+- 未实测：本机无Redis，真实Redis用例默认通过JUnit Assume跳过；有Redis时执行
+  `mvn -o -pl easy-spring-boot-api test -DskipTests=false -Dtest=RedisIntegrationTest -Dredis.test.enabled=true -Dredis.host=127.0.0.1 -Dredis.port=6379`。
+
+## 5.7 内存优化（B类）
+
+> 保持public API、返回结构、日志字段与截断长度、异常类型与消息、缓存key与TTL语义不变；风险改动均由配置控制且默认保持现状。完整说明与实测数据见根目录 [README.md](../README.md) 的“5.6 内存优化（B类）”。
+
+| 优化点 | 代码位置 | 优化方式 | 默认行为 |
+| --- | --- | --- | --- |
+| 日志有界序列化与请求参数复用 | `ApiLogInterceptor`、`RequestContext.requestLogContent` | 达到1024字符即中断序列化；请求参数日志一次生成、请求/响应两阶段复用 | 日志字段与截断结果与旧实现逐字符一致 |
+| 请求体包装前置判断 | `RepeatedlyReadFilter`、`BodyReaderHttpServletRequestWrapper` | `contentLength==0`不包装；直接缓存原始字节，避免String→byte[]→String | 重复读取能力不变；`getReader`仍按平台默认字符集 |
+| 本地缓存容量可配 | `LocalCacheContainer`、`LocalCacheConfig` | `easyapi.local-cache.max-cache-size`、`max-cache-num` | 默认100000/2000，与改造前一致 |
+| 权限对象缓存TTL可配 | `EasyApiConfig`、`MethodCacheInterceptorManager` | `easyapi.method-cache.expire-seconds-by-prefix`按前缀覆盖注解TTL | 默认空Map，沿用注解3600秒 |
+| 方法缓存key格式可配 | `MethodCacheManager`、`MethodCacheInterceptorManager` | `easyapi.method-cache.auto-key-v2`，默认`false`保持旧格式；`true`时参数值URL编码并以`&`拼接、null参数显式占位，消除`("x-y","z")`与`("x","y-z")`、`("x",null)`与`(null,"x")`碰撞；字段名改为精确匹配，`design`/`signal`不再被误剔除 | 开启后旧格式key全部失效、存量缓存首次回源；回滚只需改回`false`，旧key与未过期值继续有效 |
+| 异步上下文快照 | `EasyApiAsyncConfigurer.ContextTaskDecorator`、`RequestContext.clear` | 提交时生成快照，attachments不可变共享；`clear()`改为重新赋值Map | 父请求先结束时任务仍能拿到提交时的上下文；任务内不可修改attachments |
+| Set分支副作用 | `BeanPropertyUtil.objToStringMap` | 删除`set.removeAll(set)`，不再清空调用方集合 | 转换结果不变 |
+| 文件上传配置 | demo `application.yml`/`application-prod.yml` | 补充`spring.servlet.multipart`（12MB/16MB） | 修复1~12MB文件被默认1MB限制拒绝的问题 |
+
+> 未做项：`FileController.getBytes()`流式改造需同时修改dao接口与service实现，因两模块存在未提交改动，本轮仅分析未改；service模块历史`RedisCacheManager`的`toString`浪费与NPE风险同样只读分析，详见README 5.6.3/5.6.4。
+> 验证：框架全量152个用例、0失败、1跳过（本机无Redis）；simple-demos全量80个用例、0失败。
+> 新增回归：`MethodCacheKeyFormatTest`（旧格式逐字符保持、3类碰撞样例在新格式下不再碰撞、精确字段过滤）、`CrossContextInterceptorIsolationTest`（同JVM双上下文隔离与关闭清理）、`AsyncThreadPoolConfigValidationTest`（合法/core>max/负数/非法拒绝策略/fail-fast两态）、`BeanPropertyUtilNullDecorateTest`（null不抛NPE）。
 
 # 6、交流与答疑
 

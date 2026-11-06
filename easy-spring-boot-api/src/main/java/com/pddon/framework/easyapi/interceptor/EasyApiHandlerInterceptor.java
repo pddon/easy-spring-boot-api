@@ -10,6 +10,7 @@ package com.pddon.framework.easyapi.interceptor;
 
 
 import java.io.IOException;
+import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -70,7 +71,10 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
 					log.trace("解析系统参数完成!");
 				}
 				String path=request.getServletPath();
-				if(path.replaceFirst("/", "").trim().equals("error")){//处理默认的错误结果页
+				if(path.startsWith("/")){
+					path = path.substring(1);
+				}
+				if(path.trim().equals("error")){//处理默认的错误结果页
 					//throw new ApiBusinessException(ErrorCodes.INVALID_METHOD).setParam(request.getRequestURI());
 				}
 			}
@@ -96,13 +100,13 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
         String method = request.getMethod();
         HttpServletRequest requestWrapper = request;
         //先通过URL获取参数
-        SystemParameterRenameProperties.DEFAULT_PARAM_MAP.keySet().stream().forEach(key -> {
-        	String paramName = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(key);
+        for(Map.Entry<String, String> entry : SystemParameterRenameProperties.DEFAULT_PARAM_MAP.entrySet()){
+        	String paramName = entry.getValue();
         	String paramValue = request.getParameter(paramName);
         	if(!StringUtils.isEmpty(paramValue)){
         		RequestContext.getContext().setAttachment(paramName, paramValue);
         	}        	
-        });
+        }
 		if(request.getContentType() != null && request.getContentType().contains("multipart")){
 			return;
 		}
@@ -132,15 +136,15 @@ public final class EasyApiHandlerInterceptor implements HandlerInterceptor {
                         	//ObjectMapper mapper = new ObjectMapper();
 							//objectMapper.disable(SerializationFeature.FAIL_ON_EMPTY_BEANS);
                         	JsonNode json = objectMapper.readTree(body);
-                        	SystemParameterRenameProperties.DEFAULT_PARAM_MAP.keySet().stream().forEach(key -> {
-                            	String paramName = SystemParameterRenameProperties.DEFAULT_PARAM_MAP.get(key);
+                        	for(Map.Entry<String, String> entry : SystemParameterRenameProperties.DEFAULT_PARAM_MAP.entrySet()){
+                            	String paramName = entry.getValue();
                             	if(json.has(paramName)){
                             		String paramValue = json.get(paramName).asText();
                                 	if(!StringUtils.isEmpty(paramValue)){
                                 		RequestContext.getContext().setAttachment(paramName, paramValue);
                                 	} 
                             	}                            	       	
-                            });
+                            }
                         }catch(Exception e){
                         	log.warn(IOUtils.getThrowableInfo(e));
                         }  

@@ -7,6 +7,11 @@
 		<dependencySet>
 			<useProjectArtifact>true</useProjectArtifact>
 			<outputDirectory>lib</outputDirectory>
+			<excludes>
+				<!-- byte-buddy 由 test 作用域的 mockito-core 传递而来（生效 scope=compile），
+				     仅测试期使用；与 spring-boot-maven-plugin repackage 的排除保持一致 -->
+				<exclude>net.bytebuddy:byte-buddy</exclude>
+			</excludes>
 		</dependencySet>
 	</dependencySets>
 	<fileSets>
@@ -28,6 +33,7 @@
 			<outputDirectory>/conf</outputDirectory>
 			<includes>
 				<include>*.properties</include>
+				<include>*.yml</include>
 			</includes>
 		</fileSet>
 

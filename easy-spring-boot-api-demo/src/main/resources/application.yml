@@ -2,6 +2,14 @@ server:
   port: 8282
   servlet:
     context-path: /test
+spring:
+  servlet:
+    multipart:
+      # 单文件上限12MB，与FileController的MAX_SIZE校验保持一致；
+      # 不配置时Spring Boot默认1MB，1~12MB的文件会在进入Controller前被拒绝
+      max-file-size: 12MB
+      # 单次请求总上限16MB，给多文件/表单字段预留4MB
+      max-request-size: 16MB
 easyapi:
   #全局默认配置
   #是否启用EasyApi框架
@@ -11,7 +19,7 @@ easyapi:
   #默认语言,请求中或者会话中不存在语言参数时的默认取值
   #locale: "zh_CN"
   #是否开启多语言翻译缓存
-  #enableLanguageCache: false
+  #enableLanguageCache: true
   #多语言缓存的最长时间，单位秒
   #languageCacheSeconds: 180
   #防重复提交码过期时间
@@ -19,7 +27,7 @@ easyapi:
   #用户会话失效时间
   #sessionExpireSeconds: 600
   #当未找到该语言的翻译时，是否使用默认翻译内容
-  #alwaysUseDefaultLocale: false
+  #alwaysUseDefaultLocale: true
   #是否强制对所有api响应添加响应壳
   #forceAutoAddResponseWrapper: true
   #根包名集合,以逗号分隔

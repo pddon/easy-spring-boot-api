@@ -37,6 +37,15 @@ public class FileItemDaoImpl extends ServiceImpl<FileItemMapper, FileItem> imple
     }
 
     @Override
+    public FileItem getByKey(String fileKey) {
+        List<FileItem> items = this.lambdaQuery()
+                .eq(FileItem::getFileKey, fileKey)
+                .orderByDesc(FileItem::getCrtTime)
+                .list();
+        return items.isEmpty() ? null : items.get(0);
+    }
+
+    @Override
     public boolean removeByKey(String fileKey) {
         return this.remove(new LambdaQueryWrapper<FileItem>().eq(FileItem::getFileKey, fileKey));
     }

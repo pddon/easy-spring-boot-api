@@ -10,6 +10,7 @@ package com.pddon.framework.easyapi.config;
 
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.validation.Valid;
@@ -69,6 +70,16 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
 	@Autowired
 	private EasyApiHandlerInterceptor easyApiHandlerInterceptor;
 
+	@Autowired
+	private EasyApiConfig easyApiConfig;
+
+	/**
+	 * 默认消息转换器列表缓存。
+	 * 仅在easyapi.enableHttpMessageConverterCache=true时启用，
+	 * 避免启动期configureMessageConverters与addArgumentResolvers重复构建。
+	 */
+	private volatile List<HttpMessageConverter<?>> defaultHttpMessageConverters;
+
 	@Override
 	public void addFormatters(FormatterRegistry registry) {
 		WebMvcConfigurer.super.addFormatters(registry);
@@ -93,6 +104,27 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
 	}	
 	
 	private List<HttpMessageConverter<?>> getDefaultHttpMessageConverter(){
+		boolean cacheEnabled = Boolean.TRUE.equals(easyApiConfig.getEnableHttpMessageConverterCache());
+		if(!cacheEnabled){
+			//保持原有行为：每次调用都重新构建默认消息转换器
+			return createDefaultHttpMessageConverters();
+		}
+		List<HttpMessageConverter<?>> cached = this.defaultHttpMessageConverters;
+		if(cached != null){
+			return cached;
+		}
+		synchronized (this){
+			cached = this.defaultHttpMessageConverters;
+			if(cached == null){
+				//保存不可变副本，避免下游对列表的修改污染共享缓存
+				cached = Collections.unmodifiableList(createDefaultHttpMessageConverters());
+				this.defaultHttpMessageConverters = cached;
+			}
+			return cached;
+		}
+	}
+
+	private List<HttpMessageConverter<?>> createDefaultHttpMessageConverters(){
 		return new WebMvcConfigurationSupport() {
 
 			public List<HttpMessageConverter<?>> defaultMessageConverters() {
@@ -138,7 +170,8 @@ public class EasyApiWebConfigurer implements WebMvcConfigurer {
 		}		
 	    //对接口注解继承能力的支持，以便于feign和controller继承自相同的Interface接口
 		// RequestBody 支持接口注解
-		resolvers.add(new RequestResponseBodyMethodProcessor(getDefaultHttpMessageConverter()) {
+		//传入副本，避免消息转换器处理器后续修改列表时污染共享缓存
+		resolvers.add(new RequestResponseBodyMethodProcessor(new ArrayList<>(getDefaultHttpMessageConverter())) {
             @Override
             public boolean supportsParameter(MethodParameter parameter) {
                 return super.supportsParameter(ClassOriginCheckUtil.interfaceMethodParameter(parameter, RequestBody.class));

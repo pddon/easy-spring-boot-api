@@ -3,7 +3,7 @@
 # 简介
 > 此项目用于演示如何easyapi如何提供统一标准的JSON格式的API响应信息，把开发者从繁琐的API响应处理工作中解脱出来。
 
-* [demo源码传送门](../../easy-spring-boot-api-simple-demos/add-response-wrapper-demo)
+* [demo源码传送门](../../../easy-spring-boot-api-simple-demos/add-response-wrapper-demo)
 
 # 项目示例
 
@@ -11,75 +11,70 @@
 
 * 项目结构
 
-    ```ruby
-    │  pom.xml
-    │  README.md
-    │      
-    └─src
-        ├─main
-        │  ├─java
-        │  │  └─com
-        │  │      └─pddon
-        │  │          └─framework
-        │  │              └─demo
-        │  │                  └─easyapi
-        │  │                      │  StartDemoApplication.java
-        │  │                      │  
-        │  │                      └─controller
-        │  │                          │  TestAutoWrapResponseController.java
-        │  │                          │  TestOriginalResponseController.java
-        │  │                          │  
-        │  │                          └─dto
-        │  │                                  CustomResponse.java
-        │  │                                  
-        │  └─resources
-        │          application.yml
-        │          
-        └─test
-            └─java
-                └─com
-                    └─pddon
-                        └─framework
+```ruby
+│  pom.xml
+│
+└─src
+    ├─main
+    │  ├─java
+    │  │  └─com
+    │  │      └─pddon
+    │  │          └─framework
+    │  │              └─demo
+    │  │                  └─easyapi
+    │  │                      ├─startup
+    │  │                      │      Startup.java #项目启动类
+    │  │                      │
+    │  │                      └─wrapper
+    │  │                              ResponseWrapperController.java
+    │  │                              UserDto.java
+    │  └─resources
+    │          application.yml #服务端口8084
+    └─test
+        └─java
+            └─com
+                └─pddon
+                    └─framework
+                        └─demo
                             └─easyapi
-                                └─mvc
-    ```
+                                └─wrapper
+                                        ResponseWrapperEndToEndTest.java
+```
 
 * 引入模块依赖，在`pom.xml`添加
 
 ```xml
-	<dependency>
-		<groupId>com.pddon.framework</groupId>
-		<artifactId>easy-spring-boot-api</artifactId>
-		<version>${easy-spring-boot-api.version}</version>
-	</dependency>
+<dependency>
+    <groupId>com.pddon.framework</groupId>
+    <artifactId>easy-spring-boot-api</artifactId>
+</dependency>
 ```
+
+> 版本由父工程`easy-spring-boot-api-simple-demos`的`dependencyManagement`统一管理（`easy-spring-boot-api.version` = 2.0.8）。
 
 ## 2 启用EasyApi框架
 
 ```java
-/**  
-* Title StartDemoApplication.java  
-* Description  
-* @author danyuan
-* @date Oct 31, 2020
-* @version 1.0.0
-* site: pddon.cn
-*/ 
-package com.pddon.framework.demo.easyapi;
+package com.pddon.framework.demo.easyapi.startup;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.annotation.ComponentScan;
+
 import com.pddon.framework.easyapi.annotation.EnableEasyApi;
 
+/**
+ * 响应统一包装示例启动类。
+ */
 @SpringBootApplication
+@ComponentScan(basePackages = "com.pddon.framework.demo.easyapi")
 @EnableEasyApi
-public class StartDemoApplication {
+public class Startup {
 
-	public static void main(String[] args) {
-		SpringApplication.run(StartDemoApplication.class, args);
-	}
+    public static void main(String[] args) {
+        SpringApplication.run(Startup.class, args);
+    }
 }
-
 ```
 
 ## 3 API响应自动包装示例
@@ -95,292 +90,158 @@ public class StartDemoApplication {
 > | 关闭自动包装响应体功能   | easyapi.forceAutoAddResponseWrapper = false | 关闭easyapi提供的响应包装功能         | 全局生效       |
 > | 关闭easyapi框架       | easyapi.enable = false                      | 关闭easyapi框架，失去其提供的所有特性 | 全局生效       |
 
-* 接口源码`TestOriginalResponseController.java`
+> 差异说明：原文档示例的`TestOriginalResponseController`（`original/emptyResponse`、`intResponse`、`booleanResponse`、`mapResponse`、`listResponse`、`customObjectResponse`、`wrappedResponse`）在本模块中不存在，实际接口为`ResponseWrapperController`（包`com.pddon.framework.demo.easyapi.wrapper`，路径前缀`/wrapper`），对应的原始值接口为`GET /wrapper/wrapped`和`GET /wrapper/ignore`；DTO由`CustomResponse`替换为`UserDto`（字段`userName`、`age`）。
 
-    ```java
-    /**  
-     * Title TestOriginalResponseController.java  
-     * Description  返回原始的响应值，有如下几种场景
-     * 1、如果返回的响应已经附带响应壳，easyapi将不会重复包装响应内容
-     * 2、如果响应内容被@IgnoreResponseWrapper注解修饰，将直接返回原始内容
-     * 3、关闭自动包装响应体功能，配置属性easyapi.forceAutoAddResponseWrapper = false 也可以关闭自动包装响应信息
-     * 4、关闭easyapi框架，配置属性easyapi.enable = false，所有easyapi提供的能力均失效，自然也可以返回原始内容
-     * 
-     * @author danyuan
-     * @date Jan 3, 2021
-     * @version 1.0.0
-     * site: pddon.cn
+* 接口源码`ResponseWrapperController.java`
+
+```java
+package com.pddon.framework.demo.easyapi.wrapper;
+
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.pddon.framework.easyapi.annotation.IgnoreResponseWrapper;
+import com.pddon.framework.easyapi.controller.response.DefaultResponseWrapper;
+
+/**
+ * 响应统一包装示例。
+ */
+@RestController
+@RequestMapping("/wrapper")
+public class ResponseWrapperController {
+
+    /**
+     * 普通对象会被自动包装为 {code,data,...}。
      */
-    package com.pddon.framework.demo.easyapi.controller;
-    
-    import java.util.ArrayList;
-    import java.util.HashMap;
-    import java.util.List;
-    import java.util.Map;
-    
-    import io.swagger.annotations.Api;
-    import io.swagger.annotations.ApiOperation;
-    
-    import org.springframework.web.bind.annotation.GetMapping;
-    import org.springframework.web.bind.annotation.RequestMapping;
-    import org.springframework.web.bind.annotation.RestController;
-    
-    import com.pddon.framework.demo.easyapi.controller.dto.CustomResponse;
-    import com.pddon.framework.easyapi.annotation.IgnoreResponseWrapper;
-    import com.pddon.framework.easyapi.response.controller.DefaultResponseWrapper;
-    
-    @Api(tags = "返回原始的响应值接口列表")
-    @RestController
-    @RequestMapping("original")
-    public class TestOriginalResponseController {
-    
-    	@GetMapping("emptyResponse")
-    	@ApiOperation(value = "测试返回空原始值", notes = "测试返回空原始值")
-    	@IgnoreResponseWrapper
-    	public void emptyResponse() {
-    
-    	}
-    
-    	@GetMapping("intResponse")
-    	@ApiOperation(value = "测试返回整型原始值", notes = "测试返回整型原始值")
-    	@IgnoreResponseWrapper
-    	public int intResponse() {
-    		return 22;
-    	}
-    
-    	@GetMapping("booleanResponse")
-    	@ApiOperation(value = "测试返回boolean型原始值", notes = "测试返回boolean型原始值")
-    	@IgnoreResponseWrapper
-    	public boolean booleanResponse() {
-    		return true;
-    	}
-    
-    	@GetMapping("stringResponse")
-    	@ApiOperation(value = "测试返回字符串型原始值", notes = "测试返回字符串型原始值")
-    	@IgnoreResponseWrapper
-    	public String stringResponse() {
-    		return "this just a string response test !";
-    	}
-    
-    	@GetMapping("mapResponse")
-    	@ApiOperation(value = "测试返回map型原始值", notes = "测试返回map型原始值")
-    	@IgnoreResponseWrapper
-    	public Map<String, Object> mapResponse() {
-    		// mock数据
-    		Map<String, Object> userInfos = new HashMap<>();
-    		userInfos.put("username", "小明");
-    		userInfos.put("age", 23);
-    		userInfos.put("sex", "男");
-    		userInfos.put("desc", "阳光乐观外向，喜欢唱歌、打篮球！");
-    
-    		// 返回数据
-    		return userInfos;
-    	}
-    	
-    	@GetMapping("listResponse")
-    	@ApiOperation(value = "测试返回list型原始值", notes = "测试返回list型原始值")
-    	@IgnoreResponseWrapper
-    	public List<String> listResponse() {
-    		// mock数据
-    		List<String> list = new ArrayList<>();
-    		list.add("first");
-    		list.add("second");
-    		list.add("third");
-    		// 返回数据
-    		return list;
-    	}
-    	
-    	@GetMapping("customObjectResponse")
-    	@ApiOperation(value = "测试返回自定义对象类型原始值", notes = "测试返回自定义对象类型原始值")
-    	@IgnoreResponseWrapper
-    	public CustomResponse customObjectResponse() {
-    		// mock数据
-    		CustomResponse resp = new CustomResponse();
-    		resp.setUsername("小明")
-    			.setAge(23)
-    			.setSex(true)
-    			.setDesc("阳光、帅气、活泼、积极、向上！");
-    		// 返回数据
-    		return resp;
-    	}
-    	
-    	@GetMapping("wrappedResponse")
-    	@ApiOperation(value = "测试返回已经被包装过的原始值", notes = "测试返回已经被包装过的原始值")
-    	public DefaultResponseWrapper<List<String>> wrappedResponse() {
-    		// mock数据
-    		List<String> list = new ArrayList<>();
-    		list.add("first");
-    		list.add("second");
-    		list.add("third");
-    		// 返回数据
-    		return new DefaultResponseWrapper<>(list);
-    	}
+    @GetMapping("/user")
+    public UserDto user() {
+        return new UserDto("张三", 18);
     }
-    ```
+
+    /**
+     * 已经是标准响应壳时不会重复包装。
+     */
+    @GetMapping("/wrapped")
+    public DefaultResponseWrapper<UserDto> wrapped() {
+        return new DefaultResponseWrapper<>(new UserDto("李四", 20));
+    }
+
+    /**
+     * 字符串响应同样会被包装为 {code,data}。
+     */
+    @GetMapping("/string")
+    public String string() {
+        return "hello";
+    }
+
+    /**
+     * 标注 @IgnoreResponseWrapper 后返回原始内容，不再包装。
+     */
+    @GetMapping("/ignore")
+    @IgnoreResponseWrapper
+    public UserDto ignore() {
+        return new UserDto("王五", 22);
+    }
+}
+```
+
+* 返回对象`UserDto.java`
+
+```java
+package com.pddon.framework.demo.easyapi.wrapper;
+
+/**
+ * 普通业务响应对象。
+ */
+public class UserDto {
+
+    private String userName;
+    private Integer age;
+
+    public UserDto() {
+    }
+
+    public UserDto(String userName, Integer age) {
+        this.userName = userName;
+        this.age = age;
+    }
+
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
+    public Integer getAge() {
+        return age;
+    }
+
+    public void setAge(Integer age) {
+        this.age = age;
+    }
+}
+```
+
+* 请求示例
+
+```shell
+curl "http://localhost:8084/wrapper/wrapped?appId=webApp&channelId=default"
+curl "http://localhost:8084/wrapper/ignore?appId=webApp&channelId=default"
+```
 
 ### 3.2 自动包装响应体
 
 > 只要不关闭自动包装响应信息，easyapi将自动检测API返回的响应内容是否为规范的响应格式，会自动进行包装响应壳。
 
-* 接口源码`TestAutoWrapResponseController.java`
+* 接口源码（`ResponseWrapperController.java`节选）
 
-    ```java
-    /**  
-     * Title TestAutoWrapResponseController.java  
-     * Description  返回包装后的响应值
-     * 
-     * @author danyuan
-     * @date Jan 3, 2021
-     * @version 1.0.0
-     * site: pddon.cn
+```java
+    /**
+     * 普通对象会被自动包装为 {code,data,...}。
      */
-    package com.pddon.framework.demo.easyapi.controller;
-    
-    import java.util.ArrayList;
-    import java.util.HashMap;
-    import java.util.List;
-    import java.util.Map;
-    
-    import io.swagger.annotations.Api;
-    import io.swagger.annotations.ApiOperation;
-    
-    import org.springframework.web.bind.annotation.GetMapping;
-    import org.springframework.web.bind.annotation.RequestMapping;
-    import org.springframework.web.bind.annotation.RestController;
-    
-    import com.pddon.framework.demo.easyapi.controller.dto.CustomResponse;
-    import com.pddon.framework.easyapi.response.controller.DefaultResponseWrapper;
-    
-    @Api(tags = "返回自动包装后的响应值接口列表")
-    @RestController
-    @RequestMapping("wrapped")
-    public class TestAutoWrapResponseController {
-    
-    	@GetMapping("emptyResponse")
-    	@ApiOperation(value = "测试返回空原始值", notes = "测试返回空原始值")
-    	public void emptyResponse() {
-    
-    	}
-    
-    	@GetMapping("intResponse")
-    	@ApiOperation(value = "测试返回整型原始值", notes = "测试返回整型原始值")
-    	public int intResponse() {
-    		return 22;
-    	}
-    
-    	@GetMapping("booleanResponse")
-    	@ApiOperation(value = "测试返回boolean型原始值", notes = "测试返回boolean型原始值")
-    	public boolean booleanResponse() {
-    		return true;
-    	}
-    
-    	@GetMapping("stringResponse")
-    	@ApiOperation(value = "测试返回字符串型原始值", notes = "测试返回字符串型原始值")
-    	public String stringResponse() {
-    		return "this just a string response test !";
-    	}
-    
-    	@GetMapping("mapResponse")
-    	@ApiOperation(value = "测试返回map型原始值", notes = "测试返回map型原始值")
-    	public Map<String, Object> mapResponse() {
-    		// mock数据
-    		Map<String, Object> userInfos = new HashMap<>();
-    		userInfos.put("username", "小明");
-    		userInfos.put("age", 23);
-    		userInfos.put("sex", "男");
-    		userInfos.put("desc", "阳光乐观外向，喜欢唱歌、打篮球！");
-    
-    		// 返回数据
-    		return userInfos;
-    	}
-    	
-    	@GetMapping("listResponse")
-    	@ApiOperation(value = "测试返回list型原始值", notes = "测试返回list型原始值")
-    	public List<String> listResponse() {
-    		// mock数据
-    		List<String> list = new ArrayList<>();
-    		list.add("first");
-    		list.add("second");
-    		list.add("third");
-    		// 返回数据
-    		return list;
-    	}
-    	
-    	@GetMapping("customObjectResponse")
-    	@ApiOperation(value = "测试返回自定义对象类型原始值", notes = "测试返回自定义对象类型原始值")
-    	public CustomResponse customObjectResponse() {
-    		// mock数据
-    		CustomResponse resp = new CustomResponse();
-    		resp.setUsername("小明")
-    			.setAge(23)
-    			.setSex(true)
-    			.setDesc("阳光、帅气、活泼、积极、向上！");
-    		// 返回数据
-    		return resp;
-    	}
-    	
-    	@GetMapping("wrappedResponse")
-    	@ApiOperation(value = "测试返回已经被包装过的原始值", notes = "测试返回已经被包装过的原始值")
-    	public DefaultResponseWrapper<List<String>> wrappedResponse() {
-    		// mock数据
-    		List<String> list = new ArrayList<>();
-    		list.add("first");
-    		list.add("second");
-    		list.add("third");
-    		// 返回数据
-    		return new DefaultResponseWrapper<>(list);
-    	}
-    	
+    @GetMapping("/user")
+    public UserDto user() {
+        return new UserDto("张三", 18);
     }
-    ```
 
-* 源码`CustomResponse.java`
-
-    ```java
-    /**  
-    * Title CustomResponse.java  
-    * Description  
-    * @author danyuan
-    * @date Jan 3, 2021
-    * @version 1.0.0
-    * site: pddon.cn
-    */ 
-    package com.pddon.framework.demo.easyapi.controller.dto;
-    
-    import java.io.Serializable;
-    
-    import lombok.Data;
-    import lombok.experimental.Accessors;
-    
-    @Data
-    @Accessors(chain = true)
-    public class CustomResponse implements Serializable{/** 
-    	 *serialVersionUID
-    	 */
-    	private static final long serialVersionUID = 1L;
-    	
-    	private String username;
-    	
-    	private Integer age;
-    	
-    	private Boolean sex;
-    	
-    	private String desc;
+    /**
+     * 字符串响应同样会被包装为 {code,data}。
+     */
+    @GetMapping("/string")
+    public String string() {
+        return "hello";
     }
-    ```
+```
+
+> 差异说明：原文档示例的`TestAutoWrapResponseController`（`wrapped/emptyResponse`、`intResponse`、`booleanResponse`、`mapResponse`、`listResponse`、`customObjectResponse`、`wrappedResponse`）在本模块中不存在，本模块只提供`GET /wrapper/user`和`GET /wrapper/string`两个自动包装示例接口。
+
+* 请求示例
+
+```shell
+curl "http://localhost:8084/wrapper/user?appId=webApp&channelId=default"
+curl "http://localhost:8084/wrapper/string?appId=webApp&channelId=default"
+```
 
 ## 4 配置信息
 
-> 我们还可以全局配置是否开启easyapi框架和默认是否自动对原始返回值进行包装。
+> 我们还可以全局配置是否开启easyapi框架和默认是否自动对原始返回值进行包装。本示例的`application.yml`：
 
 ```yaml
-#easyapi:
-  #全局默认配置
-  #是否启用EasyApi框架
-  #enable: false
+server:
+  port: 8084
+spring:
+  application:
+    name: add-response-wrapper-demo
+easyapi:
+  basePackages: com.pddon.framework.demo.easyapi
   #是否强制对所有api响应添加响应壳
-  #forceAutoAddResponseWrapper: false
+  forceAutoAddResponseWrapper: true
+  api:
+    channels:
+      default:
+        webApp:
+          secret: NKVNcuwwEF76622A
 ```
-
-
-

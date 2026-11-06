@@ -31,6 +31,13 @@
 			<artifactId>easy-spring-boot-api</artifactId>
 			<version>${project.version}</version>
 		</dependency>
+		<!-- 端到端测试使用客户端SDK发起真实HTTP请求 -->
+		<dependency>
+			<groupId>com.pddon.framework</groupId>
+			<artifactId>easy-spring-boot-api-client</artifactId>
+			<version>${project.version}</version>
+			<scope>test</scope>
+		</dependency>
 	</dependencies>
 
     <developers>
@@ -55,6 +62,44 @@
 
 	<build>
         <plugins>      
+            <!-- 每个测试类使用独立JVM，避免多个Spring上下文注册的静态拦截器互相污染 -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <reuseForks>false</reuseForks>
+                    <forkCount>1</forkCount>
+                </configuration>
+            </plugin>
+            <!--
+              标准可执行jar：由spring-boot-maven-plugin的repackage产出，带classifier=exec，
+              主产物仍为普通瘦jar（target/easy-spring-boot-api-demo-2.0.8.jar），两者互不覆盖。
+              运行方式：java -jar target/easy-spring-boot-api-demo-2.0.8-exec.jar
+            -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <configuration>
+                    <mainClass>com.pddon.framework.demo.easyapi.startup.Startup</mainClass>
+                    <!-- 使用classifier避免覆盖maven-jar-plugin产出的主jar -->
+                    <classifier>exec</classifier>
+                    <!--
+                      byte-buddy只被测试期Mockito使用（父POM的spring-boot-starter-test为test范围），
+                      repackage时仍会被带入BOOT-INF/lib（3.35MB），这里从可执行包中排除，测试类路径不受影响。
+                    -->
+                    <excludes>
+                        <exclude>
+                            <groupId>net.bytebuddy</groupId>
+                            <artifactId>byte-buddy</artifactId>
+                        </exclude>
+                    </excludes>
+                </configuration>
+            </plugin>
+            <!--
+              原有assembly仅保留部署包（bin.zip：lib/ + conf/ + bin/），用于脚本化部署；
+              不再产出jar-with-dependencies（该形式会丢失Spring Boot自动配置的spring.factories，
+              且Main-Class固定为不存在的Main，无法启动）。部署包在install阶段生成。
+            -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-assembly-plugin</artifactId>
@@ -62,17 +107,9 @@
                     <execution>
                         <id>${project.name}</id>
                         <configuration>
-                            <archive>
-                                <manifest>
-                                    <mainClass>Main</mainClass>
-                                </manifest>
-                            </archive>
                             <descriptors>
                                 <descriptor>src/main/resources/scripts/assembly.xml</descriptor>
                             </descriptors>
-                            <descriptorRefs>
-                                <descriptorRef>jar-with-dependencies</descriptorRef>
-                            </descriptorRefs>
                             <finalName>${project.name}-${project.version}</finalName>
                         </configuration>
                         <phase>install</phase>

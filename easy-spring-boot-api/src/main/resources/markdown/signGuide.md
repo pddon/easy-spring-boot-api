@@ -19,13 +19,13 @@ API调用过程中传递的数据的安全性可以利用数字签名机制防�
 2. ◆ 如果参数的值为空不参与签名； 
 3. ◆ 接口调用请求或响应中的系统参数均不参与签名；
 4. ◆ 参数名区分大小写； 
-5. ◆ 接口开启了验签后，需要对接口上传的所有需要验签的业务参数进行签名，将签名结果通过sign参数传递，且需要当前请求接口时间的timestamp时间戳信息，timestamp需要参与加签过程，还可以通过时间戳进行接口防重放攻击；
+5. ◆ 接口开启了验签后，需要对接口上传的所有需要验签的业务参数进行签名，将签名结果通过sign参数传递，且需要当前请求接口时间的timestamp时间戳信息，timestamp需要参与加签过程；如需防止旧签名被重放，可开启框架的验签防重放能力（见下文第3节），此时还需要额外的nonce参数并让它参与签名；
 6. ◆ 回调通知返回签名sign时，将生成的签名与接收到的sign值作校验；
 7. ◆ 接口可能增加字段，验证签名时必须支持增加的扩展字段 ；
 
 #### 1.2 第二步
 
-在paramsContent的首尾两端依次拼接上timestamp和秘钥secretKey得到signContent字符串，并对signContent进行SHA-1运算，再将得到的字符串所有字符转换为大写，得到sign值signValue。 注意：密钥secretKey的长度为32个字节。
+在paramsContent的首尾两端依次拼接上timestamp和秘钥secretKey得到signContent字符串，并对signContent进行SHA-1运算，再将得到的字符串所有字符转换为大写，得到sign值signValue。 注意：签名算法本身不限制密钥长度；框架默认的AES加解密为AES128，使用加解密功能时密钥长度需为16字节（本文示例中的secretKey即为16个字符）。
 
 ◆ secretKey获取途径：通过向接口服务提供方申请开通API应用，您将会得到应用相关信息，信息中包含secretKey。
 
@@ -115,7 +115,48 @@ sign=`"B44A68B18FF7FF84FA720EC5286916F89CD3CE29"`;
   "returnPageUrl" : "http://localhost:8088/payment-demo/payResult.html?orderId=202404101615191350"
 }
 ```
-### 2、客户端sdk开源代码示例
+### 2、验签防重放（可选，默认关闭）
+
+> 默认`easyapi.sign.replay-protection.enabled=false`，验签算法与校验行为保持原样（仅比对`sign`，旧签名可被重放）。开启后增加时间窗与nonce一次性校验，用于防止签名被截获后无限重放。
+
+#### 2.1 配置项
+
+```yaml
+easyapi:
+  sign:
+    replay-protection:
+      enabled: false                  #默认false；开启后启用防重放
+      timestamp-window-seconds: 300   #时间戳（毫秒）允许最大偏差，默认300秒
+      nonce-ttl-seconds: 300          #nonce保留时长，默认300秒
+      nonce-cache-size: 100000        #nonce缓存最大条目数，默认10万条，避免无界增长
+      nonce-param: nonce              #nonce请求参数名，默认nonce
+      nonce-max-length: 128           #nonce最大长度，默认128
+```
+
+#### 2.2 校验顺序与错误码
+
+1. 先校验时间窗：`timestamp`缺失或无法解析、与服务器时间偏差超过窗口 → `ERROR_SIGN(130005)`，错误参数为`timestamp`；
+2. 再校验nonce：为空或超过`nonce-max-length` → `ERROR_SIGN(130005)`，错误参数为`nonce`；
+3. 然后按原算法验签（nonce已作为普通业务参数参与签名）→ 不一致 → `ERROR_SIGN(130005)`；
+4. 最后原子消费nonce：已被使用 → `REPLAY_ATTACK(130008)`，错误参数为`nonce`。
+
+#### 2.3 客户端签名变化
+
+开启后客户端需在请求中额外传递`nonce`（建议UUID，保证唯一），并将其作为**业务参数**参与签名：
+
+```java
+Map<String, String> params = new TreeMap<>();
+params.put("name", "alice");
+params.put("nonce", UUID.randomUUID().toString());
+String timestamp = String.valueOf(System.currentTimeMillis());
+String sign = EncryptUtils.encryptSHA1Hex(secret, timestamp + EncryptUtils.sortAndMontage(params) + timestamp);
+```
+
+> 现有Java/TypeScript客户端SDK未内置`nonce`参数生成；未开启防重放时无需改造。开启后由调用方在业务参数中追加`nonce`即可，SDK仍按“全部非系统参数参与签名”的规则计算，无需改动SDK代码。
+>
+> nonce通过统一状态存储`DistributedStateStore`消费：未接入Redis时为单JVM有界缓存；接入Redis后为`SET NX EX`跨实例一次性消费（见README 5.5）。
+
+### 3、客户端sdk开源代码示例
 
 * java版SDK
 

@@ -18,10 +18,13 @@ import org.springframework.scheduling.annotation.AsyncConfigurer;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor;
 
 import java.lang.reflect.Method;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Executor;
 import java.util.concurrent.RejectedExecutionHandler;
 import java.util.concurrent.ThreadPoolExecutor;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * @ClassName: EasyApiAsyncConfigurer
@@ -62,14 +65,16 @@ public class EasyApiAsyncConfigurer implements AsyncConfigurer {
     static class ContextTaskDecorator implements TaskDecorator {
         @Override
         public Runnable decorate(Runnable runnable) {
-            //获取父线程的loginVal
-            RequestContext requestContext = RequestContext.getContext();
+            //在任务提交时构建一次快照：此时父线程的请求上下文一定有效，
+            //避免任务真正执行时父请求已结束/上下文已清空
+            ContextSnapshot snapshot = ContextSnapshot.capture();
             return () -> {
                 RequestContext subContext = RequestContext.getContext();
                 try {
                     // 将主线程的请求信息，设置到子线程中
-                    BeanUtils.copyProperties(requestContext, subContext);
-                    subContext.setAttachments(new HashMap<>(requestContext.getAttachments()));
+                    BeanUtils.copyProperties(snapshot.context, subContext);
+                    //共享同一份不可变attachments快照，重复执行该任务时不再重复复制Map
+                    subContext.setAttachments(snapshot.attachments);
                     //设置日志链路追踪ID
                     MDC.put("requestId", subContext.getRequestId());
                     // 执行子线程，这一步不要忘了
@@ -83,25 +88,142 @@ public class EasyApiAsyncConfigurer implements AsyncConfigurer {
     }
 
     /**
+     * 异步上下文快照：提交任务时复制一次请求上下文，
+     * attachments以不可变Map的形式在任务多次执行之间共享。
+     */
+    static final class ContextSnapshot {
+        private final RequestContext context;
+        private final Map<String, Object> attachments;
+
+        private ContextSnapshot(RequestContext context, Map<String, Object> attachments) {
+            this.context = context;
+            this.attachments = attachments;
+        }
+
+        static ContextSnapshot capture() {
+            RequestContext source = RequestContext.getContext();
+            //触发requestId懒生成，确保快照attachments中已包含requestId；
+            //否则子线程首次读取会在不可变快照上写入而抛UnsupportedOperationException
+            source.getRequestId();
+            RequestContext copy = new RequestContext();
+            BeanUtils.copyProperties(source, copy);
+            Map<String, Object> sharedAttachments = Collections.unmodifiableMap(
+                    new HashMap<>(source.getAttachments()));
+            return new ContextSnapshot(copy, sharedAttachments);
+        }
+    }
+
+    /**
+     * 队列满时的拒绝策略常量
+     */
+    public static final String REJECT_POLICY_DISCARD = "discard";
+    public static final String REJECT_POLICY_CALLER_RUNS = "callerRuns";
+
+    /**
+     * 未知拒绝策略只提示一次，避免重复创建执行器时反复打日志
+     */
+    private static final AtomicBoolean UNKNOWN_REJECT_POLICY_WARNED = new AtomicBoolean(false);
+
+    /**
      * @author Allen
      */
     @Override
     public Executor getAsyncExecutor() {
+        AsyncThreadPoolConfig config = resolveConfig();
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
-        executor.setCorePoolSize(asyncThreadPoolConfig.getCorePoolSize());
-        executor.setMaxPoolSize(asyncThreadPoolConfig.getMaxPoolSize());
-        executor.setQueueCapacity(asyncThreadPoolConfig.getQueueCapacity());
-        executor.setKeepAliveSeconds(asyncThreadPoolConfig.getKeepAliveSeconds());
-        executor.setThreadNamePrefix(asyncThreadPoolConfig.getThreadNamePrefix());
+        executor.setCorePoolSize(config.getCorePoolSize());
+        executor.setMaxPoolSize(config.getMaxPoolSize());
+        executor.setQueueCapacity(config.getQueueCapacity());
+        executor.setKeepAliveSeconds(config.getKeepAliveSeconds());
+        executor.setThreadNamePrefix(config.getThreadNamePrefix());
         executor.setTaskDecorator(new ContextTaskDecorator());
-        executor.setRejectedExecutionHandler(new RejectedExecutionHandler() {
+        executor.setRejectedExecutionHandler(buildRejectedExecutionHandler(config.getRejectPolicy()));
+        executor.initialize();
+        return executor;
+    }
+
+    /**
+     * 启动期校验线程池配置：
+     * fail-fast=true（默认）时保持原有快速失败语义，非法配置直接抛出IllegalArgumentException；
+     * fail-fast=false时记录明确日志并回退默认值，避免非法配置把线程池带进不可用状态。
+     *
+     * 拒绝策略不在校验范围：未知策略沿用原有行为，记录一次告警并使用discard策略。
+     */
+    AsyncThreadPoolConfig resolveConfig() {
+        AsyncThreadPoolConfig config = asyncThreadPoolConfig;
+        String error = validate(config);
+        if (error == null) {
+            return config;
+        }
+        if (config != null && config.isFailFast()) {
+            throw new IllegalArgumentException(error);
+        }
+        AsyncThreadPoolConfig fallback = new AsyncThreadPoolConfig();
+        if (config != null) {
+            if (config.getThreadNamePrefix() != null) {
+                fallback.setThreadNamePrefix(config.getThreadNamePrefix());
+            }
+            if (config.getRejectPolicy() != null) {
+                fallback.setRejectPolicy(config.getRejectPolicy());
+            }
+        }
+        log.error("异步线程池配置非法[{}]，fail-fast=false，已回退默认值：corePoolSize={}，maxPoolSize={}，queueCapacity={}，keepAliveSeconds={}",
+                error, fallback.getCorePoolSize(), fallback.getMaxPoolSize(),
+                fallback.getQueueCapacity(), fallback.getKeepAliveSeconds());
+        return fallback;
+    }
+
+    /**
+     * 校验线程池配置，合法返回null，非法返回具体的错误说明
+     */
+    private String validate(AsyncThreadPoolConfig config) {
+        if (config == null) {
+            return "easyapi.async-thread-pool configuration is missing";
+        }
+        Integer corePoolSize = config.getCorePoolSize();
+        Integer maxPoolSize = config.getMaxPoolSize();
+        Integer queueCapacity = config.getQueueCapacity();
+        Integer keepAliveSeconds = config.getKeepAliveSeconds();
+        if (corePoolSize == null || corePoolSize < 0) {
+            return "corePoolSize must be >= 0, current=" + corePoolSize;
+        }
+        if (maxPoolSize == null || maxPoolSize < 1) {
+            return "maxPoolSize must be >= 1, current=" + maxPoolSize;
+        }
+        if (maxPoolSize < corePoolSize) {
+            return "maxPoolSize must be >= corePoolSize, current maxPoolSize=" + maxPoolSize + ", corePoolSize=" + corePoolSize;
+        }
+        if (queueCapacity == null || queueCapacity < 0) {
+            return "queueCapacity must be >= 0, current=" + queueCapacity;
+        }
+        if (keepAliveSeconds == null || keepAliveSeconds < 0) {
+            return "keepAliveSeconds must be >= 0, current=" + keepAliveSeconds;
+        }
+        return null;
+    }
+
+    /**
+     * 根据配置构建拒绝策略：
+     * discard（默认）保持原有行为，只记录日志并丢弃任务；
+     * callerRuns 由提交任务的线程执行任务，形成背压，不丢任务。
+     */
+    private RejectedExecutionHandler buildRejectedExecutionHandler(String rejectPolicy) {
+        //配置值可能包含空白，忽略首尾空白后再匹配；匹配不区分大小写
+        String policy = rejectPolicy == null ? null : rejectPolicy.trim();
+        if(REJECT_POLICY_CALLER_RUNS.equalsIgnoreCase(policy)){
+            return new ThreadPoolExecutor.CallerRunsPolicy();
+        }
+        if(policy != null && !policy.isEmpty() && !REJECT_POLICY_DISCARD.equalsIgnoreCase(policy)){
+            if(UNKNOWN_REJECT_POLICY_WARNED.compareAndSet(false, true)){
+                log.warn("未知的异步线程池拒绝策略[{}]，使用默认的discard策略！", rejectPolicy);
+            }
+        }
+        return new RejectedExecutionHandler() {
             @Override
             public void rejectedExecution(Runnable r, ThreadPoolExecutor executor) {
                 log.error("Run out of Async Thread and wait in queue !");
             }
-        });
-        executor.initialize();
-        return executor;
+        };
     }
 
 }
